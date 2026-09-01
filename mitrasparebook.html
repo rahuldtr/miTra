@@ -649,11 +649,7 @@
         <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Quantity (ROB)</label>
-            <div class="flex items-center gap-1">
-              <button type="button" onclick="adjustModalQty(-1)" class="btn-action w-10 h-11 rounded-lg font-black text-sm text-rose-400 p-0">-</button>
-              <input type="number" id="item-qty" required min="0" value="1" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold text-center" />
-              <button type="button" onclick="adjustModalQty(1)" class="btn-action w-10 h-11 rounded-lg font-black text-sm text-emerald-400 p-0">+</button>
-            </div>
+            <input type="number" id="item-qty" required min="0" value="1" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold text-center" />
           </div>
           <div>
             <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Min Safe Threshold</label>
@@ -1679,26 +1675,18 @@
               ${item.notes ? `<p class="text-[11px] text-[var(--text-sub)] mt-2 italic">${item.notes}</p>` : ''}
             </div>
 
-            <!-- Quick Steppers & Actions -->
-            <div class="border-t border-[var(--border)] pt-3 space-y-2">
-              <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-1.5 bg-[var(--bg-panel-inner)] p-1 rounded-xl border border-[var(--border)]">
-                  <button onclick="adjustStockDirect('${item.id}', -1)" class="w-8 h-8 rounded-lg bg-[var(--bg)] hover:bg-rose-500/20 text-rose-400 font-black text-sm flex items-center justify-center transition">－</button>
-                  <span class="text-xs font-mono font-black px-2 text-[var(--text-main)]">${item.qty}</span>
-                  <button onclick="adjustStockDirect('${item.id}', 1)" class="w-8 h-8 rounded-lg bg-[var(--bg)] hover:bg-emerald-500/20 text-emerald-400 font-black text-sm flex items-center justify-center transition">＋</button>
-                </div>
-
-                <div class="flex gap-1.5">
-                  <button onclick="openConsumptionModal('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold text-rose-400 border-rose-400/30" title="Quickly log consumption">
-                    🔻 Log
-                  </button>
-                  <button onclick="toggleIndentItem('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold ${isIndented ? 'bg-amber-500/20 text-amber-300 border-amber-400' : 'text-amber-400'}" title="Add to Requisition Order">
-                    ${isIndented ? '✓ Indented' : '🛒 +Indent'}
-                  </button>
-                </div>
+            <!-- Card Actions -->
+            <div class="flex items-center justify-between border-t border-[var(--border)] pt-2.5 flex-wrap gap-1.5">
+              <div class="flex gap-1.5">
+                <button onclick="openConsumptionModal('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold text-rose-400 border-rose-400/30" title="Quickly log consumption">
+                  🔻 Log Use
+                </button>
+                <button onclick="toggleIndentItem('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold ${isIndented ? 'bg-amber-500/20 text-amber-300 border-amber-400' : 'text-amber-400'}" title="Add to Requisition Order">
+                  ${isIndented ? '✓ Indented' : '🛒 +Indent'}
+                </button>
               </div>
 
-              <div class="flex justify-end gap-1.5 pt-1">
+              <div class="flex gap-1.5">
                 <button onclick="openQrModal('${item.location}')" class="btn-action px-2.5 py-1 text-[10px] font-bold" title="Generate Rack QR">
                   🏷️ QR
                 </button>
@@ -1752,24 +1740,11 @@
       }).join('');
     }
 
-    function adjustStockDirect(id, delta) {
-      const idx = sparesData.findIndex(i => i.id === id);
-      if (idx !== -1) {
-        sparesData[idx].qty = Math.max(0, sparesData[idx].qty + delta);
-        saveToStorage();
-      }
-    }
-
     function filterByLocation(loc) {
       locationFilter = loc;
       document.getElementById('loc-filter-text').innerText = loc;
       document.getElementById('active-location-filter').classList.remove('hidden');
       renderInventory();
-    }
-
-    function adjustModalQty(delta) {
-      const input = document.getElementById('item-qty');
-      input.value = Math.max(0, Number(input.value) + delta);
     }
 
     function openAddItemModal() {
