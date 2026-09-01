@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "description": "miTra Biriyani Counter 🍛Because at sea, we don’t count the months. We count the Sundays.🌊 The Story Behind the CounterAsk anyone on land how long until they return home, and they will tell you in dates and weeks.Ask a seafarer out in the middle of the ocean, rolling in heavy swells with thousands of miles of blue in every direction, and the answer is always different:\"Five more Biriyanis, Chief.\" &gt; \"Halfway done—seven Biriyanis served, seven left to go.\"For generations across merchant ships, the Sunday Biriyani has been far more than just a meal. It is a shared ritual in the mess room. It is the moment engine grease and bridge watch fatigue pause for an hour. It is the steady heartbeat of a shipboard contract—a weekly reminder that no matter how long the voyage, how rough the passage, or how deep the homesickness runs, you are one Sunday closer to the gangway, one Sunday closer to family, and one Sunday closer to home.miTra Biriyani Counter (miTra02) was born out of that shared heartbeat. It transforms cold contract calendars into a warm, visual journey that honors the sailor’s tradition of counting time in plates of Sunday Biriyani.🧭 What miTra Biriyani Counter DoesBuilt as a lightweight, 100% offline single-file portal, this app needs no satellite Wi-Fi, external servers, or installations. It runs directly in any browser on your laptop, bridge tablet, or phone.🍛 The Sunday Biriyani Milestone Engine: Calculates total contract Sundays, completed feasts, and remaining countdowns with celebratory halfway markers and home-run alerts.⏱️ Master Maritime Chronometer: Synchronized offline vessel clock tracking Local Time vs. Coordinated Universal Time (UTC) with rapid 15m/30m/60m advance and retard steppers for ocean crossings.🚢 Consolidated Fleet Race: A hydrodynamic visual race track where the entire ship’s roster journeys together toward sign-off day.⚖️ MLC 2006 Relief Radar: Automatic visualization of the statutory $\\pm 30$-day sign-off window, keeping relief expectations grounded and transparent.🧭 Port Shore Leave &amp; Gangway Log: Live In/Out gangway status, shore leave curfews, landing permit guides, and port taxi logs.",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "miTra Vessel Biriyani Counter",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "miTra Biriyani counter",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "kunji"
+}
