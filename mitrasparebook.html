@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>miTra Spares Book - Modern Logistics, Photo & QR Inventory Engine</title>
+  <title>miTra Spares Book - miTraSpares ver 03 (Turbo Optimized)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Excel Parser & Exporter (SheetJS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -86,9 +86,9 @@
     }
 
     .btn-action {
-      min-height: 44px;
-      min-width: 44px;
-      padding: 8px 16px;
+      min-height: 40px;
+      min-width: 40px;
+      padding: 8px 14px;
       background: var(--bg-panel-inner);
       border: 1px solid var(--border);
       color: var(--text-main);
@@ -112,8 +112,34 @@
       transform: scale(0.96);
     }
 
+    .frost-square-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      flex-shrink: 0;
+    }
+
+    .frost-square-btn:hover {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--primary);
+      transform: translateY(-1.5px);
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.25);
+    }
+
     .tab-pill {
-      min-height: 44px;
+      min-height: 40px;
       font-size: 12px;
       font-weight: 800;
       padding: 8px 16px;
@@ -255,14 +281,14 @@
       color: var(--primary);
     }
 
-    #pdf-report-print-container {
+    #pdf-report-print-container, #bulk-qr-sheet-container {
       display: none;
     }
 
     @media print {
       @page {
         size: A4 landscape;
-        margin: 16mm 16mm 16mm 16mm;
+        margin: 14mm;
       }
       html, body {
         background: #ffffff !important;
@@ -283,7 +309,6 @@
         width: 100%;
         text-align: center;
       }
-
       body.printing-qr.label-dymo #qr-print-area {
         width: 50mm !important;
         height: 25mm !important;
@@ -294,7 +319,29 @@
         height: 35mm !important;
         padding: 3mm !important;
       }
-
+      body.printing-bulk-qr #bulk-qr-sheet-container,
+      body.printing-bulk-qr #bulk-qr-sheet-container * {
+        visibility: visible !important;
+      }
+      body.printing-bulk-qr #bulk-qr-sheet-container {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        padding: 6mm !important;
+      }
+      .bulk-qr-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 12px !important;
+      }
+      .bulk-qr-card {
+        border: 1px dashed #64748b !important;
+        padding: 8px !important;
+        text-align: center !important;
+        page-break-inside: avoid !important;
+      }
       body.printing-pdf-report #pdf-report-print-container,
       body.printing-pdf-report #pdf-report-print-container * {
         visibility: visible !important;
@@ -327,7 +374,6 @@
         background-color: #0f172a !important;
         color: #ffffff !important;
         font-size: 7.5pt !important;
-        letter-spacing: 0.3px !important;
       }
       .report-table tr:nth-child(even) td {
         background-color: #f8fafc !important;
@@ -349,9 +395,7 @@
           <svg class="kunji-rotating-orbit" viewBox="0 0 100 100">
             <path id="orbitPath" d="M 50, 50 m -36, 0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0" fill="none" />
             <text font-size="9.5" font-weight="900" font-family="ui-monospace, monospace" fill="#fde047" letter-spacing="2.2">
-              <textPath href="#orbitPath" startOffset="0%">
-                miTra • k u n j i •
-              </textPath>
+              <textPath href="#orbitPath" startOffset="0%">miTra • k u n j i •</textPath>
             </text>
           </svg>
           <svg class="kunji-core-glyph" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -374,11 +418,13 @@
               <span class="text-sky-400">miTra</span> <span>Spares Book</span>
             </h1>
             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-400/30">
-              miTra Spares1
+              miTraSpares ver 03
             </span>
           </div>
           <div class="flex items-center gap-2 text-xs font-semibold text-[var(--text-sub)] mt-0.5 flex-wrap">
             <span id="display-vessel-name" class="text-amber-400 font-bold">MT Venus 3</span>
+            <span>•</span>
+            <span id="db-status-pill" class="text-[10px] font-mono text-emerald-400">Database Active</span>
           </div>
         </div>
       </div>
@@ -446,7 +492,7 @@
       <div class="flex gap-2 flex-wrap items-center">
         <div class="relative flex-1 min-w-[240px]">
           <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
-          <input type="text" id="search-input" placeholder="Search by Part Name, Part No, Machinery, Publication, Rack location..." class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl pl-10 pr-4 text-xs text-[var(--text-main)] font-semibold outline-none focus:border-sky-400 font-mono transition" oninput="filterItems()" />
+          <input type="text" id="search-input" placeholder="Search by Part Name, Part No, IMPA, Machinery, Rack location..." class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl pl-10 pr-4 text-xs text-[var(--text-main)] font-semibold outline-none focus:border-sky-400 font-mono transition" />
         </div>
         <div class="flex gap-1 bg-[var(--bg-panel-inner)] p-1 rounded-xl border border-[var(--border)] h-11 items-center">
           <button id="btn-view-cards" onclick="setViewMode('cards')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white">Cards</button>
@@ -460,13 +506,13 @@
       <!-- Department Tabs -->
       <div class="flex gap-2 flex-wrap items-center justify-between border-t border-[var(--border)] pt-3">
         <div class="flex gap-2 flex-wrap overflow-x-auto pb-1" id="dept-tabs-container">
-          <button class="tab-pill active" onclick="selectDepartment('all')">All (<span id="count-all">0</span>)</button>
-          <button class="tab-pill" onclick="selectDepartment('engine')">🔧 Engine (<span id="count-engine">0</span>)</button>
-          <button class="tab-pill" onclick="selectDepartment('electrical')">⚡ Electrical Store (<span id="count-electrical">0</span>)</button>
-          <button class="tab-pill" onclick="selectDepartment('deck')">⚓ Deck (<span id="count-deck">0</span>)</button>
-          <button class="tab-pill" onclick="selectDepartment('bridge')">🧭 Bridge Pubs (<span id="count-bridge">0</span>)</button>
-          <button class="tab-pill" onclick="selectDepartment('galley')">🍲 Galley (<span id="count-galley">0</span>)</button>
-          <button class="tab-pill" onclick="selectDepartment('store')">📦 General (<span id="count-store">0</span>)</button>
+          <button class="tab-pill active" onclick="selectDepartment('all', this)">All (<span id="count-all">0</span>)</button>
+          <button class="tab-pill" onclick="selectDepartment('engine', this)">🔧 Engine Department (<span id="count-engine">0</span>)</button>
+          <button class="tab-pill" onclick="selectDepartment('electrical', this)">⚡ Electrical Store (<span id="count-electrical">0</span>)</button>
+          <button class="tab-pill" onclick="selectDepartment('deck', this)">⚓ Deck (<span id="count-deck">0</span>)</button>
+          <button class="tab-pill" onclick="selectDepartment('bridge', this)">🧭 Bridge Pubs (<span id="count-bridge">0</span>)</button>
+          <button class="tab-pill" onclick="selectDepartment('galley', this)">🍲 Galley (<span id="count-galley">0</span>)</button>
+          <button class="tab-pill" onclick="selectDepartment('store', this)">📦 General (<span id="count-store">0</span>)</button>
         </div>
         <div id="active-location-filter" class="hidden text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg flex items-center gap-2">
           <span>📍 Filter: <span id="loc-filter-text"></span></span>
@@ -494,6 +540,13 @@
           <tbody id="inventory-table-body" class="divide-y divide-[var(--border)] font-mono"></tbody>
         </table>
       </div>
+
+      <!-- Turbo Pagination Controls -->
+      <div id="pagination-controls" class="glass-card p-3 rounded-2xl flex justify-between items-center mt-3 text-xs">
+        <button id="btn-prev-page" onclick="changePage(-1)" class="btn-action text-xs px-3 py-1.5">◀ Previous</button>
+        <div id="pagination-info" class="font-mono text-[var(--text-sub)] font-bold">Showing 0 - 0 of 0</div>
+        <button id="btn-next-page" onclick="changePage(1)" class="btn-action text-xs px-3 py-1.5">Next ▶</button>
+      </div>
     </div>
 
     <!-- Footer -->
@@ -502,7 +555,7 @@
       <div class="font-mono text-[10px] opacity-80">
         <a href="mailto:rahuldtr@gmail.com" class="text-[var(--primary)] underline font-bold">rahuldtr@gmail.com</a>
         <span>•</span>
-        <span>Version: <strong>miTra Spares1</strong></span>
+        <span>Version: <strong>miTraSpares ver 03</strong></span>
       </div>
     </footer>
   </div>
@@ -584,7 +637,7 @@
     </div>
   </div>
 
-  <!-- Add/Edit Item Modal with Native History Datalists -->
+  <!-- Add/Edit Item Modal -->
   <div id="item-modal" class="modal-overlay" onclick="if(event.target===this) closeModal('item-modal')">
     <div class="glass-card max-w-lg w-full p-5 rounded-3xl space-y-4">
       <div class="flex justify-between items-center border-b border-[var(--border)] pb-2.5">
@@ -594,19 +647,45 @@
       <form onsubmit="event.preventDefault(); saveItemForm();" class="space-y-3 text-xs">
         <input type="hidden" id="edit-item-id" />
         
-        <!-- Photo Attachment & Space Saver Preview -->
-        <div class="p-3 rounded-2xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex items-center gap-3">
-          <div id="photo-preview-wrap" class="w-16 h-16 rounded-xl border border-[var(--border)] bg-[var(--bg)] flex items-center justify-center overflow-hidden flex-shrink-0">
-            <span id="photo-placeholder-icon" class="text-2xl text-[var(--text-sub)]">📷</span>
-            <img id="photo-preview-img" class="w-full h-full object-cover hidden" alt="Part Thumbnail" />
-          </div>
-          <div class="flex-1 space-y-1">
-            <label class="block text-[10px] font-black uppercase text-[var(--text-sub)]">Item Photo (Space Saver Compressed)</label>
-            <div class="flex items-center gap-2">
-              <input type="file" id="item-photo-input" accept="image/*" onchange="handlePhotoUpload(event)" class="text-xs text-[var(--text-sub)] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:bg-sky-600 file:text-white cursor-pointer w-full" />
-              <button type="button" id="btn-remove-photo" onclick="removePhoto()" class="hidden text-rose-500 font-bold text-[10px] whitespace-nowrap">Remove</button>
+        <!-- Photo Attachment Row with Live Viewfinder Stream & Snapshot Feature -->
+        <div class="p-3 rounded-2xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex flex-col gap-2">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div id="photo-preview-wrap" class="w-16 h-16 rounded-xl border border-[var(--border)] bg-[var(--bg)] flex items-center justify-center overflow-hidden flex-shrink-0">
+                <span id="photo-placeholder-icon" class="text-2xl text-[var(--text-sub)]">📷</span>
+                <img id="photo-preview-img" class="w-full h-full object-cover hidden" alt="Part Thumbnail" />
+              </div>
+              <div>
+                <div class="text-[10px] font-black uppercase text-[var(--text-sub)]">Item Photo</div>
+                <button type="button" id="btn-remove-photo" onclick="removePhoto()" class="hidden text-rose-500 font-bold text-[10px] hover:underline mt-1 block">Remove</button>
+              </div>
             </div>
-            <div class="text-[9px] text-[var(--text-sub)] font-mono">Auto-compressed thumbnail for offline storage</div>
+
+            <!-- Frosted Glass Square Icon Controls -->
+            <div class="flex items-center gap-2">
+              <input type="file" id="item-photo-file" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden" />
+              <input type="file" id="item-photo-camera" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" class="hidden" />
+
+              <button type="button" onclick="document.getElementById('item-photo-file').click()" class="frost-square-btn text-sky-400" title="Select photo from storage">
+                📁
+              </button>
+              <button type="button" onclick="openLiveCameraViewfinder()" class="frost-square-btn text-amber-400" title="Open camera to take photo">
+                📷
+              </button>
+            </div>
+          </div>
+
+          <!-- In-App Camera Viewfinder Container -->
+          <div id="live-camera-wrap" class="hidden flex-col items-center gap-2 pt-2 border-t border-[var(--border)]">
+            <video id="live-camera-stream" autoplay playsinline muted class="w-full max-h-48 rounded-xl object-cover bg-black border border-[var(--border)]"></video>
+            <div class="flex gap-2 w-full">
+              <button type="button" onclick="captureLiveSnapshot()" class="btn-action flex-1 text-emerald-400 font-bold text-xs h-10">
+                ⚪ Capture Snapshot
+              </button>
+              <button type="button" onclick="closeLiveCameraStream()" class="btn-action text-xs text-rose-400 h-10 px-3">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
 
@@ -614,7 +693,7 @@
           <div>
             <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Department</label>
             <select id="item-dept" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold">
-              <option value="engine">Engine Room</option>
+              <option value="engine">Engine Department</option>
               <option value="electrical">⚡ Electrical Store</option>
               <option value="deck">Deck Department</option>
               <option value="bridge">🧭 Bridge Publication</option>
@@ -623,7 +702,7 @@
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Machinery / System (Autofills History)</label>
+            <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Machinery / System</label>
             <input type="text" id="item-machine" list="machinery-history-list" required placeholder="Type or select machinery..." class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold" />
             <datalist id="machinery-history-list"></datalist>
           </div>
@@ -631,17 +710,29 @@
 
         <div>
           <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Part / Publication Name</label>
-          <input type="text" id="item-name" required placeholder="e.g. Exhaust Valve Spindle, SOLAS Consolidated Ed 2024" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold" />
+          <input type="text" id="item-name" required placeholder="e.g. Exhaust Valve Spindle, PTFE Seal Tape" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold" />
         </div>
 
+        <!-- Part No Input with IMPA Toggle -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Part No / Edition / IMO Ref</label>
-            <input type="text" id="item-partno" placeholder="e.g. 50401-0182, IMO-IB110E, NP-281" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-mono font-bold" />
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[10px] font-black uppercase text-[var(--text-sub)]">Part No / IMPA Code</label>
+              <label class="inline-flex items-center gap-1.5 cursor-pointer select-none" title="Toggle IMPA 6-digit suggestions">
+                <input type="checkbox" id="toggle-impa-suggest" checked onchange="toggleImpaMode(this.checked)" class="sr-only peer" />
+                <div class="w-7 h-4 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-sky-500 relative"></div>
+                <span class="text-[9px] font-mono font-black text-sky-400">IMPA</span>
+              </label>
+            </div>
+            
+            <div class="relative">
+              <input type="text" id="item-partno" list="impa-datalist" oninput="handlePartNoInput(this.value)" placeholder="e.g. 812401, 50401-0182, NP-281" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-mono font-bold text-xs" />
+              <datalist id="impa-datalist"></datalist>
+            </div>
           </div>
           <div>
-            <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Storage Location (Autofills History)</label>
-            <input type="text" id="item-location" list="location-history-list" required placeholder="Type or select rack/bin..." class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold" />
+            <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Storage Location</label>
+            <input type="text" id="item-location" list="location-history-list" required placeholder="Type or select rack/bin..." class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold text-xs" />
             <datalist id="location-history-list"></datalist>
           </div>
         </div>
@@ -649,11 +740,11 @@
         <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Quantity (ROB)</label>
-            <input type="number" id="item-qty" required min="0" value="1" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold text-center" />
+            <input type="number" id="item-qty" required min="0" value="1" class="w-full h-11 bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold text-center text-emerald-400 font-mono" />
           </div>
           <div>
             <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Min Safe Threshold</label>
-            <input type="number" id="item-min" required min="0" value="1" class="w-full bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold text-center h-11" />
+            <input type="number" id="item-min" required min="0" value="1" class="w-full bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2 font-bold text-center h-11 font-mono text-rose-400" />
           </div>
           <div>
             <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Unit</label>
@@ -662,8 +753,8 @@
         </div>
 
         <div>
-          <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Technical Remarks / Edition Details</label>
-          <textarea id="item-notes" rows="2" placeholder="Condition, overhaul kit reference, drawing code, latest e-NP supplement status..." class="w-full bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2"></textarea>
+          <label class="block text-[10px] font-black uppercase text-[var(--text-sub)] mb-1">Technical Remarks / Notes</label>
+          <textarea id="item-notes" rows="2" placeholder="Condition, overhaul kit reference, drawing code, latest supplement status..." class="w-full bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-xl p-2"></textarea>
         </div>
 
         <div class="flex justify-between items-center border-t border-[var(--border)] pt-3">
@@ -697,11 +788,16 @@
   <div id="locations-hub-modal" class="modal-overlay" onclick="if(event.target===this) closeModal('locations-hub-modal')">
     <div class="glass-card max-w-2xl w-full p-5 rounded-3xl space-y-4">
       <div class="flex justify-between items-center border-b border-[var(--border)] pb-2.5">
-        <h3 class="text-sm font-black uppercase tracking-wider text-[var(--text-main)]">🏷️ Shipboard Storage Locations & Racks</h3>
+        <h3 class="text-sm font-black uppercase tracking-wider text-[var(--text-main)]">🏷️ Storage Locations & Racks</h3>
         <button onclick="closeModal('locations-hub-modal')" class="text-xl font-bold">&times;</button>
       </div>
 
-      <div class="text-xs text-[var(--text-sub)]">Click any storage location to preview or print physical QR labels for racks, lockers, chart shelves, and bins.</div>
+      <div class="flex justify-between items-center text-xs text-[var(--text-sub)]">
+        <span>Click any storage location to preview or print physical QR labels.</span>
+        <button onclick="printAllRackQrs()" class="btn-action text-xs font-bold text-sky-400 h-9 px-3">
+          🖨️ Print All Bins (A4 Grid)
+        </button>
+      </div>
       <div id="locations-list-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto p-1"></div>
       <div class="flex justify-end pt-2">
         <button onclick="closeModal('locations-hub-modal')" class="btn-action text-xs font-bold">Close</button>
@@ -709,7 +805,7 @@
     </div>
   </div>
 
-  <!-- QR Code Single Preview & Physical Label Sizing Presets Modal -->
+  <!-- QR Code Single Preview Modal -->
   <div id="qr-modal" class="modal-overlay" onclick="if(event.target===this) closeModal('qr-modal')">
     <div class="glass-card max-w-sm w-full p-5 rounded-3xl space-y-4 text-center">
       <div class="flex justify-between items-center border-b border-[var(--border)] pb-2">
@@ -743,16 +839,23 @@
         <h3 class="text-xs font-black uppercase text-[var(--text-main)]">Scan Storage QR</h3>
         <button onclick="stopScanner()" class="text-xl font-bold">&times;</button>
       </div>
-      <div id="qr-reader-viewport" class="rounded-xl overflow-hidden bg-black h-64 border border-[var(--border)]"></div>
+      <div id="qr-reader-viewport" class="rounded-xl overflow-hidden bg-black h-64 border border-[var(--border)] flex items-center justify-center text-slate-500 text-xs"></div>
+      
+      <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex items-center justify-between gap-2">
+        <span class="text-[11px] text-[var(--text-sub)]">Camera blocked? Select photo:</span>
+        <input type="file" id="qr-file-input" accept="image/*" onchange="scanQrFromImageFile(this.files[0])" class="hidden" />
+        <button onclick="document.getElementById('qr-file-input').click()" class="btn-action text-xs text-sky-400 font-bold h-9">
+          🖼️ Scan From Image
+        </button>
+      </div>
       <div class="text-[11px] text-center text-[var(--text-sub)] font-mono">Audio chime & vibration active upon QR lock.</div>
     </div>
   </div>
 
-  <!-- SETTINGS HUB MODAL WITH INTEGRATED ADVANCED DRAWER -->
+  <!-- Settings Hub Modal -->
   <div id="settings-modal" class="modal-overlay" onclick="if(event.target===this) closeModal('settings-modal')">
     <div class="glass-card max-w-lg w-full p-5 rounded-3xl space-y-4 text-xs max-h-[90vh] overflow-y-auto custom-scrollbar">
       
-      <!-- Modal Header -->
       <div class="flex justify-between items-center border-b border-[var(--border)] pb-2.5">
         <h3 class="text-sm font-black uppercase text-[var(--text-main)] flex items-center gap-2">
           <span>⚙️</span> <span>Settings & System Hub</span>
@@ -761,8 +864,32 @@
       </div>
 
       <div class="space-y-3.5">
-        
-        <!-- 1. Official PDF Report Generator -->
+        <!-- Support Banner with Email -->
+        <div class="p-3.5 rounded-2xl border border-sky-500/30 bg-sky-500/10 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-black text-sky-400 text-xs">miTra Spares Support & Development</span>
+            <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">ver 03</span>
+          </div>
+          <div class="text-[11px] text-[var(--text-sub)]">Dedicated to shipboard engineers and seafarers worldwide by <strong>rahulDev</strong>.</div>
+          <div class="text-[11px] pt-1 flex items-center gap-1.5 flex-wrap">
+            <span class="text-[var(--text-muted)]">Support / Queries:</span>
+            <a href="mailto:rahuldtr@gmail.com" class="text-amber-400 font-mono font-bold underline hover:text-amber-300">rahuldtr@gmail.com</a>
+          </div>
+        </div>
+
+        <!-- Sync Hosted Repository Data on Demand -->
+        <div class="p-3.5 rounded-2xl border border-sky-500/40 bg-[var(--bg-modal-card)] space-y-2">
+          <div class="font-black text-[var(--text-main)] flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><span class="text-sky-400">🌐</span> Sync from Hosted Repository</span>
+            <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded border border-sky-400/40 text-sky-400">GitHub Pages Sync</span>
+          </div>
+          <p class="text-[10px] text-[var(--text-sub)]">Forces reload from the hosted <strong>spares_data.json</strong> in your repository without needing manual upload.</p>
+          <button onclick="fetchHostedRepositoryJson(true)" class="btn-action w-full font-bold text-sky-400 border-sky-400/40 flex items-center justify-center gap-2 h-9 text-xs">
+            <span>🔄</span> <span>Sync Catalog from Repository</span>
+          </button>
+        </div>
+
+        <!-- Official PDF Report Generator -->
         <div class="p-3.5 rounded-2xl border border-[var(--border)] space-y-2" style="background: var(--bg-modal-card);">
           <div class="font-black text-[var(--text-main)] flex items-center justify-between">
             <span class="flex items-center gap-1.5"><span class="text-emerald-400">📄</span> Official PDF Inventory Report</span>
@@ -774,7 +901,7 @@
           </button>
         </div>
 
-        <!-- 2. Vessel Configuration -->
+        <!-- Vessel Configuration -->
         <div class="p-3.5 rounded-2xl border border-[var(--border)] space-y-2.5" style="background: var(--bg-modal-card);">
           <div class="font-black text-[var(--text-main)] flex items-center gap-1.5">
             <span class="text-sky-400">⚓</span> Vessel Details Profile
@@ -798,7 +925,7 @@
           </div>
         </div>
 
-        <!-- 3. COLLAPSIBLE ADVANCED SETTINGS -->
+        <!-- Collapsible Advanced Settings -->
         <div class="border-t border-[var(--border)] pt-3 space-y-3">
           <button onclick="toggleAdvancedSettings()" class="w-full flex items-center justify-between py-2 px-3 bg-[var(--bg-panel-inner)] hover:bg-[var(--bg-hover)] rounded-xl border border-[var(--border)] transition">
             <span class="text-xs font-black text-amber-400 flex items-center gap-2">
@@ -807,15 +934,13 @@
             <span id="adv-arrow" class="text-xs text-[var(--text-sub)] font-mono">▼</span>
           </button>
 
-          <!-- Advanced Options Body -->
           <div id="advanced-settings-body" class="hidden space-y-3.5 pt-1">
-            
-            <!-- IN-BUILT INTERACTIVE COLUMN MAPPER LAUNCHER -->
+            <!-- Interactive Column Mapper Launcher -->
             <div class="p-3.5 rounded-2xl border border-[var(--border)] space-y-2" style="background: var(--bg-modal-card);">
               <div class="flex items-center justify-between">
                 <div>
                   <div class="text-xs font-black text-sky-400">⚡ Interactive Column Mapper</div>
-                  <div class="text-[10px] text-[var(--text-sub)]">Ingest unaligned or messy onboard Excel spreadsheets in-app</div>
+                  <div class="text-[10px] text-[var(--text-sub)]">Ingest unaligned onboard Excel spreadsheets in-app</div>
                 </div>
                 <button onclick="openBuiltInMapperModal()" class="btn-action px-3.5 py-1.5 text-xs font-bold text-sky-400 border-sky-400/40">
                   Open Mapper ↗
@@ -841,35 +966,33 @@
               <div class="font-black text-[var(--text-main)] flex items-center gap-1.5">
                 <span class="text-cyan-400">💾</span> Full Database Backup (With Photos)
               </div>
-              <p class="text-[10px] text-[var(--text-sub)]">Export complete offline database file (including all photos & QR codes) or restore from an earlier backup file.</p>
+              <p class="text-[10px] text-[var(--text-sub)]">Export complete offline database JSON file or restore from an earlier backup file.</p>
               <div class="flex gap-2 pt-0.5">
-                <button onclick="exportDataBackupFile()" class="btn-action flex-1 font-bold text-sky-400 text-xs h-10">📥 Export JSON File</button>
-                <button onclick="triggerRestoreFileInput()" class="btn-action flex-1 font-bold text-emerald-400 text-xs h-10">📂 Restore File</button>
-                <input type="file" id="restore-file-input" onchange="handleRestoreFile(event)" class="hidden" />
+                <button onclick="exportDataBackupFile()" class="btn-action flex-1 font-bold text-sky-400 text-xs h-10">📥 Export JSON</button>
+                <button onclick="triggerRestoreFileInput()" class="btn-action flex-1 font-bold text-emerald-400 text-xs h-10">📂 Restore JSON</button>
+                <input type="file" id="restore-file-input" accept=".json, .mitrabackup, application/json" onchange="handleRestoreFile(event)" class="hidden" />
               </div>
             </div>
 
-            <!-- Vessel Master Clear / Factory Reset -->
+            <!-- Vessel Master Clear -->
             <div class="p-3.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 space-y-2">
               <div class="flex items-center justify-between">
                 <div>
                   <div class="text-xs font-black text-rose-400">Vessel Database Wipe</div>
-                  <div class="text-[10px] text-[var(--text-sub)]">Clear all local spares, indents & records</div>
+                  <div class="text-[10px] text-[var(--text-sub)]">Clear all local spares, indents & photos</div>
                 </div>
                 <button onclick="factoryResetDatabase()" class="btn-action px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs border-0 rounded-xl">
                   Wipe All
                 </button>
               </div>
             </div>
-
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- IN-BUILT INTERACTIVE COLUMN MAPPER MODAL -->
+  <!-- Interactive Column Mapper Modal -->
   <div id="mapper-modal" class="modal-overlay" onclick="if(event.target===this) closeModal('mapper-modal')">
     <div class="glass-card max-w-2xl w-full p-5 rounded-3xl space-y-4 text-xs max-h-[92vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center border-b border-[var(--border)] pb-2.5">
@@ -882,7 +1005,6 @@
         <button onclick="closeModal('mapper-modal')" class="text-xl font-bold text-[var(--text-muted)] hover:text-[var(--text-main)]">&times;</button>
       </div>
 
-      <!-- Step 1: Upload and Sheet Controls -->
       <div class="p-3.5 rounded-2xl border border-[var(--border)] bg-[var(--bg-modal-card)] space-y-3">
         <div class="flex flex-col sm:flex-row gap-2 items-center justify-between">
           <input type="file" id="mapper-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="loadMapperExcel(event)" />
@@ -904,7 +1026,6 @@
         </div>
       </div>
 
-      <!-- Step 2: Mapping Selectors -->
       <div id="mapper-fields-container" class="hidden space-y-3">
         <div class="font-black text-sky-400 uppercase text-[10px] tracking-wider flex justify-between">
           <span>Map Columns to miTra Fields</span>
@@ -916,39 +1037,33 @@
             <label class="block text-[10px] font-bold text-sky-400 mb-1">Part Description / Name *</label>
             <select id="map-fld-name" onchange="updateMapperLivePreview()" class="mapper-dropdown w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg p-1.5 text-xs"></select>
           </div>
-
           <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)]">
             <label class="block text-[10px] font-bold text-slate-300 mb-1">Part / Drawing / Code No.</label>
             <select id="map-fld-partno" onchange="updateMapperLivePreview()" class="mapper-dropdown w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg p-1.5 text-xs"></select>
           </div>
-
           <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)]">
             <label class="block text-[10px] font-bold text-emerald-400 mb-1">ROB Quantity *</label>
             <select id="map-fld-qty" onchange="updateMapperLivePreview()" class="mapper-dropdown w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg p-1.5 text-xs"></select>
           </div>
-
           <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)]">
             <label class="block text-[10px] font-bold text-amber-400 mb-1">Storage Location (Rack/Bin)</label>
             <select id="map-fld-loc" onchange="updateMapperLivePreview()" class="mapper-dropdown w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg p-1.5 text-xs"></select>
           </div>
-
           <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)]">
             <label class="block text-[10px] font-bold text-slate-300 mb-1">Machinery / System</label>
             <select id="map-fld-machine" onchange="updateMapperLivePreview()" class="mapper-dropdown w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg p-1.5 text-xs"></select>
           </div>
-
           <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)]">
             <label class="block text-[10px] font-bold text-rose-400 mb-1">Min Safe Threshold</label>
             <select id="map-fld-min" onchange="updateMapperLivePreview()" class="mapper-dropdown w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg p-1.5 text-xs"></select>
           </div>
         </div>
 
-        <!-- Metadata Fallbacks -->
         <div class="p-3 rounded-2xl bg-[var(--bg-modal-card)] border border-[var(--border)] grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div>
             <label class="block text-[9px] font-black uppercase text-[var(--text-sub)] mb-1">Department</label>
             <select id="mapper-default-dept" class="w-full bg-[var(--bg-panel-inner)] border border-[var(--border)] rounded-lg p-1.5 text-xs font-bold">
-              <option value="engine">Engine Room</option>
+              <option value="engine">Engine Department</option>
               <option value="deck">Deck Department</option>
               <option value="electrical">Electrical / ETO</option>
               <option value="bridge">Bridge / Nav</option>
@@ -966,13 +1081,11 @@
           </div>
         </div>
 
-        <!-- Live Sample Preview -->
         <div class="space-y-1">
           <div class="text-[10px] font-bold text-slate-400">Live Preview (First 2 Extracted Items):</div>
           <div id="mapper-preview-box" class="p-2 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] font-mono text-[11px] text-[var(--text-sub)] space-y-1"></div>
         </div>
 
-        <!-- Import Actions -->
         <div class="pt-2 border-t border-[var(--border)] flex gap-2 justify-end">
           <button onclick="executeBuiltInImport(true)" class="btn-action text-xs font-bold text-slate-300">
             📥 Append (Keep Existing)
@@ -982,12 +1095,12 @@
           </button>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Dedicated A4 Printable Landscape PDF Report Container -->
+  <!-- Print Containers -->
   <div id="pdf-report-print-container"></div>
+  <div id="bulk-qr-sheet-container"></div>
 
   <script>
     let isDark = true;
@@ -999,7 +1112,11 @@
     let indentBasket = JSON.parse(localStorage.getItem("mitra_spares_indent")) || [];
     let currentLabelSize = 'a4';
 
-    // In-Built Mapper Data State
+    // Pagination & Search optimization state
+    let currentPage = 1;
+    const PAGE_SIZE = 48; // Max DOM nodes rendered at once
+    let searchDebounceTimer = null;
+
     let mapperWorkbook = null;
     let mapperRawMatrix = [];
     let mapperHeaders = [];
@@ -1010,38 +1127,262 @@
       type: localStorage.getItem("mitra_spares_type") || "Chemical Tanker"
     };
 
-    let sparesData = JSON.parse(localStorage.getItem("mitra_spares_items")) || [
-      { id: "sp-1", dept: "engine", machine: "M/E Akasaka-MAN B&W", name: "Exhaust Valve Spindle", partno: "50401-0182", location: "Rack-E1", qty: 2, min: 2, unit: "Pcs", notes: "Stellite coated, overhauled ready", photo: "" },
-      { id: "sp-2", dept: "engine", machine: "Framo Cargo Pumps", name: "Mechanical Shaft Seal", partno: "SD-200-S", location: "Bin-F4", qty: 3, min: 4, unit: "Sets", notes: "For SD200 pumps. Requisition 2 sets.", photo: "" },
-      { id: "sp-3", dept: "electrical", machine: "Main Switchboard (440V)", name: "Air Circuit Breaker Trip Coil", partno: "ACB-TC-24V", location: "ETO-Locker-1", qty: 2, min: 1, unit: "Pcs", notes: "24V DC Shunt Trip for Terasaki ACB", photo: "" },
-      { id: "sp-4", dept: "electrical", machine: "Bridge & ER Automation", name: "4-20mA Pressure Transmitter", partno: "PT-0-16BAR", location: "ETO-Bin-08", qty: 4, min: 2, unit: "Pcs", notes: "Danfoss MBS 3000 (0-16 bar)", photo: "" },
-      { id: "sp-5", dept: "deck", machine: "Mooring Winches", name: "Hydraulic Brake Lining", partno: "BL-880", location: "Deck-Locker-1", qty: 4, min: 2, unit: "Sets", notes: "Forward winches", photo: "" },
-      { id: "sp-6", dept: "bridge", machine: "IMO Publications", name: "SOLAS Consolidated Edition 2024", partno: "IMO-IF110E", location: "Chart-Shelf-A", qty: 1, min: 1, unit: "Book", notes: "Hardcopy onboard + e-Reader active", photo: "" },
-      { id: "sp-7", dept: "bridge", machine: "Admiralty Nautical Pubs", name: "NP-281(1) ALRS Radio Signals Vol 1", partno: "NP-281(1)", location: "Bridge-Pub-Rack", qty: 1, min: 1, unit: "Book", notes: "Annual edition with weekly corrections logged", photo: "" },
-      { id: "sp-8", dept: "galley", machine: "Main Galley Oven", name: "Heating Element 3.5KW", partno: "GL-440V", location: "Galley-Store", qty: 2, min: 1, unit: "Pcs", notes: "440V 60Hz 3-Phase", photo: "" },
-      { id: "sp-9", dept: "store", machine: "Safety Equipment", name: "EEBD Spare Oxygen Bottle", partno: "EEBD-15M", location: "Safety-Locker", qty: 6, min: 4, unit: "Cyl", notes: "Hydrostatic test certified", photo: "" }
+    let sparesData = [];
+
+    // ==========================================
+    // INTEGRATED IMPA MARINE STORES CATALOG
+    // ==========================================
+    let isImpaSuggestActive = true;
+    const IMPA_DATABASE = [
+      { code: "330101", name: "Lifebuoy Ring 2.5 kg with Reflective Tape", dept: "store", unit: "Pcs" },
+      { code: "330161", name: "Immersion Suit Insulated with Light & Whistle", dept: "store", unit: "Pcs" },
+      { code: "330416", name: "EEBD Emergency Escape Breathing Apparatus 15 Min", dept: "store", unit: "Set" },
+      { code: "330601", name: "Hydrostatic Release Unit (HRU) Hammar H20", dept: "store", unit: "Pcs" },
+      { code: "330901", name: "SCBA Self-Contained Breathing Apparatus 300 Bar", dept: "store", unit: "Set" },
+      { code: "590101", name: "Bronze Globe Valve JIS F7301 16K 25A", dept: "engine", unit: "Pcs" },
+      { code: "590102", name: "Bronze Globe Valve JIS F7301 16K 32A", dept: "engine", unit: "Pcs" },
+      { code: "590103", name: "Bronze Globe Valve JIS F7301 16K 50A", dept: "engine", unit: "Pcs" },
+      { code: "590401", name: "Cast Steel Gate Valve JIS F7363 10K 50A", dept: "engine", unit: "Pcs" },
+      { code: "610125", name: "Impact Socket Set 1/2\" Sq Drive 10-32mm (16 Pcs)", dept: "engine", unit: "Set" },
+      { code: "610214", name: "Combination Wrench Chrome Vanadium 24mm", dept: "engine", unit: "Pcs" },
+      { code: "611301", name: "Torque Wrench Dual Scale 1/2\" Sq Dr (40-200 Nm)", dept: "engine", unit: "Pcs" },
+      { code: "651101", name: "Pressure Gauge Bottom Conn 0-10 Bar (100mm 3/8\" BSP)", dept: "engine", unit: "Pcs" },
+      { code: "651701", name: "Exhaust Gas Pyrometer Thermometer 0-650°C Straight", dept: "engine", unit: "Pcs" },
+      { code: "731101", name: "Mooring Hawser Polypropylene 8-Strand 64mm (220 Mtrs)", dept: "deck", unit: "Coil" },
+      { code: "752001", name: "WD-40 Penetrating Multi-Purpose Lubricant (400ml)", dept: "engine", unit: "Can" },
+      { code: "752401", name: "Loctite 243 Medium Strength Threadlocker 50ml", dept: "engine", unit: "Btl" },
+      { code: "752405", name: "Loctite 270 High Strength Studlock 50ml", dept: "engine", unit: "Btl" },
+      { code: "790101", name: "Navigation Lamp P28s Double Contact 24V 65W Clear", dept: "electrical", unit: "Pcs" },
+      { code: "791201", name: "Digital Multimeter CAT III 600V", dept: "electrical", unit: "Pcs" },
+      { code: "812401", name: "PTFE Thread Seal Tape Pure 19mm x 0.1mm x 15m", dept: "engine", unit: "Roll" },
+      { code: "813801", name: "O-Ring NBR 70 Universal Splicing Box Kit (Metric 386 Pcs)", dept: "engine", unit: "Box" }
     ];
 
-    function saveToStorage() {
-      localStorage.setItem("mitra_spares_items", JSON.stringify(sparesData));
-      updateHistoryDatalists();
-      renderInventory();
+    function populateImpaDatalist() {
+      const datalist = document.getElementById('impa-datalist');
+      if (!datalist) return;
+      if (!isImpaSuggestActive) {
+        datalist.innerHTML = "";
+        return;
+      }
+      datalist.innerHTML = IMPA_DATABASE.map(item => 
+        `<option value="${item.code}">${item.code} • ${item.name} (${item.unit})</option>`
+      ).join('');
     }
 
-    // Refresh history suggestions dynamically from database
+    function toggleImpaMode(isActive) {
+      isImpaSuggestActive = isActive;
+      populateImpaDatalist();
+    }
+
+    function handlePartNoInput(val) {
+      if (!isImpaSuggestActive) return;
+      const cleanCode = val.trim().replace(/\s+/g, '');
+      const match = IMPA_DATABASE.find(item => item.code === cleanCode);
+      if (match) {
+        const nameField = document.getElementById('item-name');
+        const unitField = document.getElementById('item-unit');
+        const deptField = document.getElementById('item-dept');
+        if (!nameField.value || IMPA_DATABASE.some(i => i.name === nameField.value)) {
+          nameField.value = match.name;
+        }
+        if (match.unit) unitField.value = match.unit;
+        if (match.dept) deptField.value = match.dept;
+      }
+    }
+
+    // ==========================================
+    // STORAGE ENGINE (IndexedDB)
+    // ==========================================
+    const DB_NAME = "mitra_spares_catalog_db";
+    const DB_VERSION = 1;
+    const STORE_NAME = "spares_records";
+    let dbInstance = null;
+
+    function openDatabase() {
+      if (dbInstance) return Promise.resolve(dbInstance);
+      return new Promise((resolve, reject) => {
+        try {
+          if (!window.indexedDB) return reject(new Error("IndexedDB unavailable"));
+          const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME, { keyPath: "id" });
+            }
+          };
+          req.onsuccess = (e) => {
+            dbInstance = e.target.result;
+            resolve(dbInstance);
+          };
+          req.onerror = (e) => reject(e.target.error);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    async function loadDataFromDB() {
+      try {
+        const db = await openDatabase();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      } catch (err) {
+        console.warn("IndexedDB read failed, fallback to memory:", err);
+        return JSON.parse(localStorage.getItem("mitra_spares_items") || "[]");
+      }
+    }
+
+    async function saveItemToDB(item) {
+      try {
+        const db = await openDatabase();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.objectStore(STORE_NAME).put(item);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (err) {
+        console.error("Save item failed:", err);
+      }
+    }
+
+    async function removeItemFromDB(id) {
+      try {
+        const db = await openDatabase();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          tx.objectStore(STORE_NAME).delete(id);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (err) {}
+    }
+
+    async function batchSaveToDB(items) {
+      try {
+        const db = await openDatabase();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          const store = tx.objectStore(STORE_NAME);
+          store.clear();
+          for (let i = 0; i < items.length; i++) {
+            store.put(items[i]);
+          }
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (err) {
+        try { localStorage.setItem("mitra_spares_items", JSON.stringify(items)); } catch (e) {}
+      }
+    }
+
+    // ==========================================
+    // GITHUB PAGES AUTO-SEED & INITIALIZATION
+    // ==========================================
+    async function fetchHostedRepositoryJson(forceUserSync = false) {
+      const statusPill = document.getElementById('db-status-pill');
+      try {
+        if (statusPill) statusPill.innerText = "Syncing JSON...";
+        const response = await fetch('./spares_data.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error("No hosted spares_data.json found on server.");
+
+        const payload = await response.json();
+        let incomingSpares = [];
+
+        if (Array.isArray(payload)) {
+          incomingSpares = payload;
+        } else if (payload && Array.isArray(payload.spares)) {
+          incomingSpares = payload.spares;
+          if (payload.vessel) {
+            vesselData.name = payload.vessel.name || vesselData.name;
+            vesselData.imo = payload.vessel.imo || vesselData.imo;
+            vesselData.type = payload.vessel.type || vesselData.type;
+            localStorage.setItem("mitra_spares_vessel", vesselData.name);
+            localStorage.setItem("mitra_spares_imo", vesselData.imo);
+            localStorage.setItem("mitra_spares_type", vesselData.type);
+          }
+        }
+
+        if (incomingSpares.length > 0) {
+          sparesData = incomingSpares;
+          await batchSaveToDB(sparesData);
+          updateDomVesselInfo();
+          updateHistoryDatalists();
+          renderInventory();
+          if (statusPill) statusPill.innerText = `Synced (${sparesData.length} SKUs)`;
+          if (forceUserSync) alert(`✓ Successfully synced ${sparesData.length} records from hosted repository!`);
+          return true;
+        }
+      } catch (err) {
+        console.info("Hosted JSON fetch skipped or unavailable:", err.message);
+        if (forceUserSync) alert("Could not fetch hosted JSON: " + err.message);
+        if (statusPill) statusPill.innerText = "Offline Mode";
+      }
+      return false;
+    }
+
+    async function initAppStorage() {
+      const statusPill = document.getElementById('db-status-pill');
+      try {
+        let items = await loadDataFromDB();
+
+        // If local database is completely empty, try auto-seeding from hosted spares_data.json (GitHub Pages)
+        if (!items || items.length === 0) {
+          const synced = await fetchHostedRepositoryJson(false);
+          if (synced) return;
+        }
+
+        if (!items || items.length === 0) {
+          // Default starting onboard samples
+          items = [
+            { id: "sp-1", dept: "engine", machine: "M/E Akasaka-MAN B&W", name: "Exhaust Valve Spindle", partno: "50401-0182", location: "Rack-E1", qty: 2, min: 2, unit: "Pcs", notes: "Stellite coated, overhauled ready", photo: "" },
+            { id: "sp-2", dept: "engine", machine: "Framo Cargo Pumps", name: "Mechanical Shaft Seal", partno: "SD-200-S", location: "Bin-F4", qty: 3, min: 4, unit: "Sets", notes: "For SD200 pumps. Requisition 2 sets.", photo: "" },
+            { id: "sp-3", dept: "electrical", machine: "Main Switchboard (440V)", name: "Air Circuit Breaker Trip Coil", partno: "ACB-TC-24V", location: "ETO-Locker-1", qty: 2, min: 1, unit: "Pcs", notes: "24V DC Shunt Trip for Terasaki ACB", photo: "" },
+            { id: "sp-4", dept: "deck", machine: "Mooring Winches", name: "Hydraulic Brake Lining", partno: "BL-880", location: "Deck-Locker-1", qty: 4, min: 2, unit: "Sets", notes: "Forward winches", photo: "" },
+            { id: "sp-5", dept: "bridge", machine: "IMO Publications", name: "SOLAS Consolidated Edition 2024", partno: "IMO-IF110E", location: "Chart-Shelf-A", qty: 1, min: 1, unit: "Book", notes: "Hardcopy onboard", photo: "" },
+            { id: "sp-6", dept: "engine", machine: "Central Stores", name: "PTFE Pure Thread Seal Tape 19mm x 15m", partno: "812401", location: "Bin-P12", qty: 24, min: 10, unit: "Roll", notes: "IMPA Catalog Consumable", photo: "" }
+          ];
+          await batchSaveToDB(items);
+        }
+
+        sparesData = items;
+        if (statusPill) statusPill.innerText = `Database Active (${sparesData.length})`;
+      } catch (err) {
+        console.error("Storage Initialization Error:", err);
+        sparesData = [];
+      }
+
+      updateDomVesselInfo();
+      updateHistoryDatalists();
+      renderInventory();
+
+      // Debounced search input to avoid keyboard freeze with 1000+ items
+      const searchBox = document.getElementById('search-input');
+      if (searchBox) {
+        searchBox.addEventListener('input', () => {
+          clearTimeout(searchDebounceTimer);
+          searchDebounceTimer = setTimeout(() => {
+            currentPage = 1;
+            renderInventory();
+          }, 200);
+        });
+      }
+    }
+
     function updateHistoryDatalists() {
       const machineryList = Array.from(new Set(sparesData.map(i => i.machine).filter(Boolean))).sort();
       const locationList = Array.from(new Set(sparesData.map(i => i.location).filter(Boolean))).sort();
-
       const machDatalist = document.getElementById('machinery-history-list');
       const locDatalist = document.getElementById('location-history-list');
 
-      if (machDatalist) {
-        machDatalist.innerHTML = machineryList.map(m => `<option value="${m}">`).join('');
-      }
-      if (locDatalist) {
-        locDatalist.innerHTML = locationList.map(l => `<option value="${l}">`).join('');
-      }
+      if (machDatalist) machDatalist.innerHTML = machineryList.map(m => `<option value="${m}">`).join('');
+      if (locDatalist) locDatalist.innerHTML = locationList.map(l => `<option value="${l}">`).join('');
     }
 
     function toggleAdvancedSettings() {
@@ -1057,22 +1398,21 @@
       }
     }
 
-    function factoryResetDatabase() {
+    async function factoryResetDatabase() {
       const confirm1 = confirm("⚠️ ATTENTION CHIEF:\n\nAre you sure you want to permanently clear the onboard spares database?");
       if (!confirm1) return;
       const confirm2 = prompt("Type 'CLEAR' in capital letters to confirm total reset:");
       if (confirm2 === "CLEAR") {
+        await batchSaveToDB([]);
         localStorage.removeItem("mitra_spares_items");
         localStorage.removeItem("mitra_spares_indent");
-        alert("✓ Database wiped clean. Reloading default catalog...");
+        alert("✓ Database wiped clean. Reloading catalog...");
         location.reload();
       }
     }
 
     function triggerScanFeedback() {
-      if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100]);
-      }
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
@@ -1100,7 +1440,7 @@
       document.getElementById('consume-modal').style.display = "flex";
     }
 
-    function confirmConsumption() {
+    async function confirmConsumption() {
       const id = document.getElementById('consume-item-id').value;
       const count = Number(document.getElementById('consume-qty-input').value) || 1;
       const reason = document.getElementById('consume-reason-input').value.trim();
@@ -1112,7 +1452,8 @@
         item.notes = `${item.notes ? item.notes + ' • ' : ''}Used ${count} ${item.unit} (${reason} on ${new Date().toISOString().split('T')[0]})`;
       }
       closeModal('consume-modal');
-      saveToStorage();
+      await saveItemToDB(item);
+      renderInventory();
     }
 
     function toggleIndentItem(itemId) {
@@ -1170,10 +1511,10 @@
       const exportList = items.map(i => ({
         "Vessel Name": vesselData.name,
         "IMO Number": vesselData.imo || "N/A",
-        "Department": i.dept.toUpperCase(),
+        "Department": i.dept === 'engine' ? 'ENGINE DEPARTMENT' : i.dept.toUpperCase(),
         "Machinery / System": i.machine,
         "Part Description": i.name,
-        "Part No / Drawing": i.partno,
+        "Part No / Drawing / IMPA": i.partno,
         "Current ROB": i.qty,
         "Min Safe Threshold": i.min,
         "Recommended Order Qty": Math.max(1, i.min * 2 - i.qty),
@@ -1189,10 +1530,10 @@
 
     function exportMasterExcelBackup() {
       const exportList = sparesData.map(i => ({
-        "Department": i.dept.toUpperCase(),
+        "Department": i.dept === 'engine' ? 'ENGINE DEPARTMENT' : i.dept.toUpperCase(),
         "Machinery / System": i.machine,
         "Part / Publication Name": i.name,
-        "Part No / Plate Ref": i.partno || "",
+        "Part No / Plate Ref / IMPA": i.partno || "",
         "Storage Location": i.location,
         "ROB Quantity": i.qty,
         "Min Threshold": i.min,
@@ -1212,83 +1553,100 @@
       document.getElementById('excel-restore-input').click();
     }
 
-    function handleExcelRestore(event) {
+    async function handleExcelRestore(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(firstSheet);
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
 
           if (!rows || rows.length === 0) {
             alert("The uploaded Excel file contains no readable records.");
             return;
           }
 
-          const overwrite = confirm(
-            `Found ${rows.length} rows in spreadsheet.\n\n` +
-            `Click 'OK' for FULL REPLACE (overwrites existing local inventory).\n` +
-            `Click 'Cancel' for SMART MERGE (keeps existing items and appends new ones).`
+          const isMergeMode = confirm(
+            `Found ${rows.length} rows in "${file.name}".\n\n` +
+            `• Click [OK] for SMART MERGE (Updates existing, appends new).\n` +
+            `• Click [Cancel] for FULL OVERWRITE (Replaces all).`
           );
 
-          if (overwrite) {
-            sparesData = [];
+          let replaceAll = false;
+          if (!isMergeMode) {
+            replaceAll = confirm("⚠️ OVERWRITE CONFIRMATION: Replace ALL records?");
+            if (!replaceAll) {
+              event.target.value = "";
+              return;
+            }
           }
 
-          let loadedCount = 0;
+          if (replaceAll) sparesData = [];
+
           rows.forEach((r, idx) => {
-            const name = r.Name || r.PartName || r["Part Name"] || r["Part / Publication Name"] || r.Description;
-            if (name) {
-              const rawDept = String(r.Dept || r.Department || "engine").toLowerCase();
-              let mappedDept = "engine";
-              if (rawDept.includes("elect")) mappedDept = "electrical";
-              else if (rawDept.includes("bridge") || rawDept.includes("pub")) mappedDept = "bridge";
-              else if (rawDept.includes("deck")) mappedDept = "deck";
-              else if (rawDept.includes("gall")) mappedDept = "galley";
-              else if (rawDept.includes("store")) mappedDept = "store";
+            const name = String(r.Part_Description || r.Name || r.PartName || r["Part Name"] || r["Part / Publication Name"] || r.Description || "").trim();
+            if (!name) return;
 
-              const machine = String(r.Machinery || r["Machinery / System"] || r["Machinery / Category"] || r.Equipment || "General");
-              const partno = String(r.PartNo || r["Part No"] || r["Part No / Plate Ref"] || r.DrawingNo || "");
-              const location = String(r.Location || r["Storage Location"] || r.Rack || r.Bin || "Unassigned");
-              const qty = Number(r.Qty || r.ROB || r["ROB Quantity"] || 1);
-              const min = Number(r.Min || r["Min Threshold"] || 1);
-              const unit = String(r.Unit || "Pcs");
-              const notes = String(r.Notes || r.Remarks || r["Technical Remarks"] || "");
+            const rawDept = String(r.Department || r.Dept || "engine").toLowerCase();
+            let mappedDept = "engine";
+            if (rawDept.includes("elect")) mappedDept = "electrical";
+            else if (rawDept.includes("bridge") || rawDept.includes("pub")) mappedDept = "bridge";
+            else if (rawDept.includes("deck")) mappedDept = "deck";
+            else if (rawDept.includes("gall")) mappedDept = "galley";
+            else if (rawDept.includes("store") || rawDept.includes("safe")) mappedDept = "store";
 
-              if (!overwrite) {
-                const existing = sparesData.find(i => i.name.toLowerCase() === String(name).toLowerCase() && i.partno === partno);
-                if (existing) {
-                  existing.qty = qty;
-                  existing.location = location;
-                  existing.min = min;
-                  return;
-                }
+            const machine = String(r.Machinery || r["Machinery / System"] || r["Machinery / Category"] || r.Equipment || "General Spares").trim();
+            const partno = String(r.Part_No || r.PartNo || r["Part No"] || r["Part No / Plate Ref / IMPA"] || r.DrawingNo || "").trim();
+            const location = String(r.Storage_Location || r.Location || r["Storage Location"] || r.Rack || r.Bin || "Unassigned").trim();
+            const rawQty = r.ROB_Quantity !== undefined ? r.ROB_Quantity : (r.Qty !== undefined ? r.Qty : r.ROB);
+            const qty = isNaN(parseFloat(rawQty)) ? 0 : parseFloat(rawQty);
+            const rawMin = r.Min_Threshold !== undefined ? r.Min_Threshold : (r.Min !== undefined ? r.Min : 1);
+            const min = isNaN(parseFloat(rawMin)) ? 1 : parseFloat(rawMin);
+            const unit = String(r.Unit || "Pcs").trim();
+            const notes = String(r.Notes || r.Remarks || r["Technical Remarks"] || "").trim();
+
+            if (isMergeMode) {
+              const existing = sparesData.find(i => 
+                i.name.toLowerCase() === name.toLowerCase() && 
+                (i.partno.toLowerCase() === partno.toLowerCase() || (!i.partno && !partno))
+              );
+              if (existing) {
+                existing.qty = qty;
+                existing.location = location;
+                existing.min = min;
+                existing.machine = machine || existing.machine;
+                existing.dept = mappedDept || existing.dept;
+                if (notes) existing.notes = notes;
+                return;
               }
-
-              sparesData.push({
-                id: "imp-" + Date.now() + "-" + idx,
-                dept: mappedDept,
-                machine,
-                name: String(name),
-                partno,
-                location,
-                qty,
-                min,
-                unit,
-                notes,
-                photo: ""
-              });
-              loadedCount++;
             }
+
+            sparesData.push({
+              id: r.ID || ("imp-" + Date.now() + "-" + idx),
+              dept: mappedDept,
+              machine: machine,
+              name: name,
+              partno: partno,
+              location: location,
+              qty: qty,
+              min: min,
+              unit: unit,
+              notes: notes,
+              photo: ""
+            });
           });
 
-          saveToStorage();
+          await batchSaveToDB(sparesData);
+          updateHistoryDatalists();
+          currentPage = 1;
+          renderInventory();
           closeModal('settings-modal');
-          alert(`✓ Successfully restored ${loadedCount} items from Excel spreadsheet!`);
+          event.target.value = "";
+          alert(`✓ Processed! Total Database: ${sparesData.length} records.`);
         } catch (err) {
           alert("Error parsing Excel backup file: " + err.message);
         }
@@ -1297,7 +1655,7 @@
     }
 
     // ==========================================
-    // IN-BUILT INTERACTIVE COLUMN MAPPER ENGINE
+    // INTERACTIVE COLUMN MAPPER ENGINE
     // ==========================================
     function openBuiltInMapperModal() {
       closeModal('settings-modal');
@@ -1309,15 +1667,12 @@
       if (!file) return;
 
       document.getElementById('mapper-file-name').innerText = file.name;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         const data = new Uint8Array(e.target.result);
         mapperWorkbook = XLSX.read(data, { type: 'array' });
-
         const sheetSelect = document.getElementById('mapper-sheet-select');
         sheetSelect.innerHTML = mapperWorkbook.SheetNames.map(name => `<option value="${name}">${name}</option>`).join('');
-
         document.getElementById('mapper-sheet-controls').classList.remove('hidden');
         parseMapperSheet();
       };
@@ -1326,7 +1681,6 @@
 
     function parseMapperSheet() {
       if (!mapperWorkbook) return;
-
       const sheetName = document.getElementById('mapper-sheet-select').value;
       const sheet = mapperWorkbook.Sheets[sheetName];
       const headerRowIndex = Math.max(1, parseInt(document.getElementById('mapper-header-row').value) || 1) - 1;
@@ -1347,13 +1701,10 @@
         .concat(mapperHeaders.map((h, idx) => `<option value="${idx}">[Col ${idx + 1}] ${h}</option>`))
         .join('');
 
-      document.querySelectorAll('.mapper-dropdown').forEach(select => {
-        select.innerHTML = options;
-      });
+      document.querySelectorAll('.mapper-dropdown').forEach(select => { select.innerHTML = options; });
 
-      // Auto-Match Heuristic
       autoSelectMapperDropdown("map-fld-name", ["name", "desc", "description", "item", "part name"]);
-      autoSelectMapperDropdown("map-fld-partno", ["part no", "partno", "drawing", "plate", "pos", "ref", "drg"]);
+      autoSelectMapperDropdown("map-fld-partno", ["part no", "partno", "impa", "drawing", "plate", "pos", "ref"]);
       autoSelectMapperDropdown("map-fld-qty", ["qty", "rob", "quantity", "stock", "balance", "avail"]);
       autoSelectMapperDropdown("map-fld-loc", ["location", "loc", "bin", "rack", "store", "shelf"]);
       autoSelectMapperDropdown("map-fld-machine", ["machine", "machinery", "component", "system", "equipment"]);
@@ -1382,7 +1733,6 @@
       const defaultUnit = document.getElementById('mapper-default-unit').value || "Pcs";
 
       const previewBox = document.getElementById('mapper-preview-box');
-
       if (nameIdx === "__NONE__") {
         previewBox.innerHTML = `<span class="text-rose-400">⚠️ Please select at least the "Part Description / Name" column.</span>`;
         return;
@@ -1398,7 +1748,7 @@
       }).join('');
     }
 
-    function executeBuiltInImport(isAppend) {
+    async function executeBuiltInImport(isAppend) {
       const nameIdx = document.getElementById('map-fld-name').value;
       const partIdx = document.getElementById('map-fld-partno').value;
       const qtyIdx = document.getElementById('map-fld-qty').value;
@@ -1416,7 +1766,6 @@
       }
 
       const cleanItems = [];
-
       mapperRawMatrix.forEach((row, idx) => {
         const name = String(row[nameIdx] || "").trim();
         if (!name) return;
@@ -1438,7 +1787,7 @@
           qty: qty,
           min: minQty,
           unit: unit,
-          notes: "Imported via Interactive Mapper",
+          notes: "Imported via Mapper",
           photo: ""
         });
       });
@@ -1454,9 +1803,75 @@
         sparesData = cleanItems;
       }
 
-      saveToStorage();
+      await batchSaveToDB(sparesData);
+      updateHistoryDatalists();
+      currentPage = 1;
+      renderInventory();
       closeModal('mapper-modal');
-      alert(`✓ Successfully loaded ${cleanItems.length} items into miTra Spares Book!`);
+      alert(`✓ Successfully loaded ${cleanItems.length} items!`);
+    }
+
+    // ==========================================
+    // HARDWARE CAMERA VIEWSTREAM CONTROLLER
+    // ==========================================
+    let activeVideoStream = null;
+
+    async function openLiveCameraViewfinder() {
+      const wrap = document.getElementById('live-camera-wrap');
+      const video = document.getElementById('live-camera-stream');
+
+      try {
+        const constraints = {
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        };
+        activeVideoStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = activeVideoStream;
+        wrap.classList.remove('hidden');
+      } catch (err) {
+        console.warn("Direct stream error:", err);
+        const camInput = document.getElementById('item-photo-camera');
+        if (camInput) camInput.click();
+      }
+    }
+
+    function captureLiveSnapshot() {
+      const video = document.getElementById('live-camera-stream');
+      if (!video || !activeVideoStream) return;
+
+      const canvas = document.createElement("canvas");
+      const maxDim = 360;
+      let w = video.videoWidth || 640;
+      let h = video.videoHeight || 480;
+
+      if (w > h) {
+        if (w > maxDim) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        }
+      } else {
+        if (h > maxDim) {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, w, h);
+
+      tempItemPhoto = canvas.toDataURL("image/jpeg", 0.70);
+      displayPhotoPreview(tempItemPhoto);
+      closeLiveCameraStream();
+    }
+
+    function closeLiveCameraStream() {
+      if (activeVideoStream) {
+        activeVideoStream.getTracks().forEach(track => track.stop());
+        activeVideoStream = null;
+      }
+      const wrap = document.getElementById('live-camera-wrap');
+      if (wrap) wrap.classList.add('hidden');
     }
 
     function handlePhotoUpload(event) {
@@ -1468,7 +1883,7 @@
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement("canvas");
-          const maxDim = 320;
+          const maxDim = 360;
           let width = img.width;
           let height = img.height;
 
@@ -1489,12 +1904,13 @@
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, height);
 
-          tempItemPhoto = canvas.toDataURL("image/jpeg", 0.65);
+          tempItemPhoto = canvas.toDataURL("image/jpeg", 0.70);
           displayPhotoPreview(tempItemPhoto);
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+      event.target.value = "";
     }
 
     function displayPhotoPreview(dataUrl) {
@@ -1517,7 +1933,8 @@
 
     function removePhoto() {
       tempItemPhoto = "";
-      document.getElementById("item-photo-input").value = "";
+      document.getElementById("item-photo-file").value = "";
+      document.getElementById("item-photo-camera").value = "";
       displayPhotoPreview("");
     }
 
@@ -1563,25 +1980,24 @@
       renderInventory();
     }
 
-    function selectDepartment(dept) {
+    function selectDepartment(dept, btnElement) {
       currentDept = dept;
       document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+      if (btnElement) btnElement.classList.add('active');
       
       const label = document.getElementById('export-btn-label');
       if (label) {
-        label.innerText = dept === 'all' ? 'Export All Excel' : `Export ${dept.toUpperCase()} Excel`;
+        const titleStr = dept === 'engine' ? 'ENGINE DEPARTMENT' : dept.toUpperCase();
+        label.innerText = dept === 'all' ? 'Export All Excel' : `Export ${titleStr} Excel`;
       }
+      currentPage = 1;
       renderInventory();
     }
 
     function clearLocationFilter() {
       locationFilter = '';
       document.getElementById('active-location-filter').classList.add('hidden');
-      renderInventory();
-    }
-
-    function filterItems() {
+      currentPage = 1;
       renderInventory();
     }
 
@@ -1605,6 +2021,13 @@
       document.getElementById('count-store').innerText = sparesData.filter(i => i.dept === 'store').length;
     }
 
+    function changePage(delta) {
+      currentPage += delta;
+      renderInventory();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // High-performance paginated renderer
     function renderInventory() {
       updateKPIMetrics();
       updateIndentBadge();
@@ -1623,132 +2046,158 @@
         return matchesDept && matchesLoc && matchesSearch;
       });
 
-      if (filtered.length === 0) {
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+
+      // Update Pagination UI
+      const prevBtn = document.getElementById('btn-prev-page');
+      const nextBtn = document.getElementById('btn-next-page');
+      const pageInfo = document.getElementById('pagination-info');
+
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      prevBtn.style.opacity = currentPage === 1 ? '0.4' : '1';
+      nextBtn.style.opacity = currentPage >= totalPages ? '0.4' : '1';
+
+      const displayEnd = Math.min(startIndex + PAGE_SIZE, totalItems);
+      pageInfo.innerText = totalItems > 0 
+        ? `Page ${currentPage} of ${totalPages} (${startIndex + 1}-${displayEnd} of ${totalItems})`
+        : `0 Records`;
+
+      if (totalItems === 0) {
         grid.innerHTML = `<div class="col-span-full glass-card p-8 text-center text-xs text-[var(--text-sub)]">No inventory matches found.</div>`;
         tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-xs text-[var(--text-sub)]">No inventory matches found.</td></tr>`;
         return;
       }
 
-      grid.innerHTML = filtered.map(item => {
-        const isCritical = Number(item.qty) <= Number(item.min);
-        const statusBadge = isCritical 
-          ? `<span class="px-2 py-0.5 rounded-lg text-[9px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30">LOW / REQ</span>` 
-          : `<span class="px-2 py-0.5 rounded-lg text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OPTIMAL</span>`;
+      if (currentViewMode === 'cards') {
+        grid.innerHTML = pageItems.map(item => {
+          const isCritical = Number(item.qty) <= Number(item.min);
+          const statusBadge = isCritical 
+            ? `<span class="px-2 py-0.5 rounded-lg text-[9px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30">LOW / REQ</span>` 
+            : `<span class="px-2 py-0.5 rounded-lg text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OPTIMAL</span>`;
 
-        const isIndented = indentBasket.includes(item.id);
-        const photoElement = item.photo
-          ? `<img src="${item.photo}" onclick="viewFullPhoto('${item.photo}', '${item.name.replace(/'/g, "\\'")}')" class="spare-thumb hover:scale-105 transition" title="Click to view photo" />`
-          : `<div class="w-12 h-12 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex items-center justify-center text-lg text-[var(--text-sub)] flex-shrink-0">📦</div>`;
+          const isIndented = indentBasket.includes(item.id);
+          const photoElement = item.photo
+            ? `<img src="${item.photo}" onclick="viewFullPhoto('${item.photo}', '${item.name.replace(/'/g, "\\'")}')" class="spare-thumb hover:scale-105 transition" title="Click to view photo" />`
+            : `<div class="w-12 h-12 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex items-center justify-center text-lg text-[var(--text-sub)] flex-shrink-0">📦</div>`;
 
-        return `
-          <div class="glass-card p-4 rounded-2xl flex flex-col justify-between space-y-3.5">
-            <div>
-              <div class="flex justify-between items-start gap-2">
-                <div class="flex items-start gap-2.5">
-                  ${photoElement}
-                  <div>
-                    <span class="text-[9px] font-black uppercase text-sky-400 font-mono tracking-wider">${item.machine}</span>
-                    <h4 class="text-sm font-black text-[var(--text-main)] mt-0.5">${item.name}</h4>
-                    <div class="text-[11px] font-mono text-[var(--text-sub)]">Ref/Part: ${item.partno || 'N/A'}</div>
+          return `
+            <div class="glass-card p-4 rounded-2xl flex flex-col justify-between space-y-3.5">
+              <div>
+                <div class="flex justify-between items-start gap-2">
+                  <div class="flex items-start gap-2.5">
+                    ${photoElement}
+                    <div>
+                      <span class="text-[9px] font-black uppercase text-sky-400 font-mono tracking-wider">${item.machine}</span>
+                      <h4 class="text-sm font-black text-[var(--text-main)] mt-0.5">${item.name}</h4>
+                      <div class="text-[11px] font-mono text-[var(--text-sub)]">Ref/Part/IMPA: ${item.partno || 'N/A'}</div>
+                    </div>
+                  </div>
+                  ${statusBadge}
+                </div>
+
+                <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+                  <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex flex-col justify-center">
+                    <span class="text-[9px] uppercase font-bold text-[var(--text-sub)]">STORAGE LOCATION:</span>
+                    <button onclick="filterByLocation('${item.location}')" class="font-black text-amber-400 font-mono underline hover:text-amber-300 truncate text-left text-xs mt-0.5">
+                      📍 ${item.location}
+                    </button>
+                  </div>
+                  
+                  <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex flex-col justify-center text-right">
+                    <span class="text-[9px] uppercase font-bold text-[var(--text-sub)]">STOCK (ROB / MIN):</span>
+                    <div class="font-black font-mono text-sm mt-0.5 ${isCritical ? 'text-rose-400' : 'text-emerald-400'}">
+                      ${item.qty} <span class="text-[10px] text-[var(--text-sub)] font-normal">/ ${item.min} ${item.unit}</span>
+                    </div>
                   </div>
                 </div>
-                ${statusBadge}
+
+                ${item.notes ? `<p class="text-[11px] text-[var(--text-sub)] mt-2 italic">${item.notes}</p>` : ''}
               </div>
 
-              <!-- High-Visibility ROB Banner & Location Bar -->
-              <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
-                <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex flex-col justify-center">
-                  <span class="text-[9px] uppercase font-bold text-[var(--text-sub)]">STORAGE LOCATION:</span>
-                  <button onclick="filterByLocation('${item.location}')" class="font-black text-amber-400 font-mono underline hover:text-amber-300 truncate text-left text-xs mt-0.5">
-                    📍 ${item.location}
+              <div class="flex items-center justify-between border-t border-[var(--border)] pt-2.5 flex-wrap gap-1.5">
+                <div class="flex gap-1.5">
+                  <button onclick="openConsumptionModal('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold text-rose-400 border-rose-400/30">
+                    🔻 Use
+                  </button>
+                  <button onclick="toggleIndentItem('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold ${isIndented ? 'bg-amber-500/20 text-amber-300 border-amber-400' : 'text-amber-400'}">
+                    ${isIndented ? '✓ Indented' : '🛒 +Indent'}
                   </button>
                 </div>
-                
-                <div class="p-2.5 rounded-xl bg-[var(--bg-panel-inner)] border border-[var(--border)] flex flex-col justify-center text-right">
-                  <span class="text-[9px] uppercase font-bold text-[var(--text-sub)]">STOCK (ROB / MIN):</span>
-                  <div class="font-black font-mono text-sm mt-0.5 ${isCritical ? 'text-rose-400' : 'text-emerald-400'}">
-                    ${item.qty} <span class="text-[10px] text-[var(--text-sub)] font-normal">/ ${item.min} ${item.unit}</span>
-                  </div>
+
+                <div class="flex gap-1.5">
+                  <button onclick="openQrModal('${item.location}')" class="btn-action px-2.5 py-1 text-[10px] font-bold">
+                    🏷️ QR
+                  </button>
+                  <button onclick="editItem('${item.id}')" class="btn-action px-3 py-1 text-xs font-bold text-sky-400">
+                    ✏️ Edit
+                  </button>
                 </div>
               </div>
-
-              ${item.notes ? `<p class="text-[11px] text-[var(--text-sub)] mt-2 italic">${item.notes}</p>` : ''}
             </div>
+          `;
+        }).join('');
+      } else {
+        tableBody.innerHTML = pageItems.map(item => {
+          const isCritical = Number(item.qty) <= Number(item.min);
+          const isIndented = indentBasket.includes(item.id);
+          const deptLabel = item.dept === 'engine' ? 'ENGINE DEPARTMENT' : item.dept.toUpperCase();
+          const photoCell = item.photo
+            ? `<img src="${item.photo}" onclick="viewFullPhoto('${item.photo}', '${item.name.replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-lg object-cover mx-auto cursor-pointer border border-[var(--border)]" />`
+            : `<span class="text-xs text-[var(--text-sub)]">--</span>`;
 
-            <!-- Card Actions -->
-            <div class="flex items-center justify-between border-t border-[var(--border)] pt-2.5 flex-wrap gap-1.5">
-              <div class="flex gap-1.5">
-                <button onclick="openConsumptionModal('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold text-rose-400 border-rose-400/30" title="Quickly log consumption">
-                  🔻 Log Use
-                </button>
-                <button onclick="toggleIndentItem('${item.id}')" class="btn-action px-2.5 py-1 text-[11px] font-bold ${isIndented ? 'bg-amber-500/20 text-amber-300 border-amber-400' : 'text-amber-400'}" title="Add to Requisition Order">
-                  ${isIndented ? '✓ Indented' : '🛒 +Indent'}
-                </button>
-              </div>
-
-              <div class="flex gap-1.5">
-                <button onclick="openQrModal('${item.location}')" class="btn-action px-2.5 py-1 text-[10px] font-bold" title="Generate Rack QR">
-                  🏷️ QR
-                </button>
-                <button onclick="editItem('${item.id}')" class="btn-action px-3 py-1 text-xs font-bold text-sky-400">
-                  ✏️ Edit
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      tableBody.innerHTML = filtered.map(item => {
-        const isCritical = Number(item.qty) <= Number(item.min);
-        const isIndented = indentBasket.includes(item.id);
-        const photoCell = item.photo
-          ? `<img src="${item.photo}" onclick="viewFullPhoto('${item.photo}', '${item.name.replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-lg object-cover mx-auto cursor-pointer border border-[var(--border)]" />`
-          : `<span class="text-xs text-[var(--text-sub)]">--</span>`;
-
-        return `
-          <tr class="hover:bg-[var(--bg-hover)] transition">
-            <td class="p-3 text-center">${photoCell}</td>
-            <td class="p-3">
-              <span class="text-[9px] uppercase font-bold text-sky-400 block">${item.dept}</span>
-              <strong>${item.machine}</strong>
-            </td>
-            <td class="p-3">
-              <div class="font-bold text-[var(--text-main)]">${item.name}</div>
-              <div class="text-[11px] text-[var(--text-sub)]">${item.partno || '--'}</div>
-            </td>
-            <td class="p-3">
-              <button onclick="filterByLocation('${item.location}')" class="font-bold text-amber-400 underline">${item.location}</button>
-            </td>
-            <td class="p-3 text-center font-bold ${isCritical ? 'text-rose-400' : 'text-emerald-400'}">
-              ${item.qty} / ${item.min} ${item.unit}
-            </td>
-            <td class="p-3 text-center">
-              ${isCritical 
-                ? `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-400">LOW</span>` 
-                : `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400">OK</span>`}
-            </td>
-            <td class="p-3 text-right">
-              <div class="flex gap-1 justify-end">
-                <button onclick="openConsumptionModal('${item.id}')" class="btn-action px-2 py-0.5 text-[10px] text-rose-400 font-bold">Use</button>
-                <button onclick="toggleIndentItem('${item.id}')" class="btn-action px-2 py-0.5 text-[10px] ${isIndented ? 'text-amber-400 font-bold' : ''}">Indent</button>
-                <button onclick="editItem('${item.id}')" class="btn-action px-2 py-0.5 text-[10px] text-sky-400">Edit</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
+          return `
+            <tr class="hover:bg-[var(--bg-hover)] transition">
+              <td class="p-3 text-center">${photoCell}</td>
+              <td class="p-3">
+                <span class="text-[9px] uppercase font-bold text-sky-400 block">${deptLabel}</span>
+                <strong>${item.machine}</strong>
+              </td>
+              <td class="p-3">
+                <div class="font-bold text-[var(--text-main)]">${item.name}</div>
+                <div class="text-[11px] text-[var(--text-sub)]">${item.partno || '--'}</div>
+              </td>
+              <td class="p-3">
+                <button onclick="filterByLocation('${item.location}')" class="font-bold text-amber-400 underline">${item.location}</button>
+              </td>
+              <td class="p-3 text-center font-bold ${isCritical ? 'text-rose-400' : 'text-emerald-400'}">
+                ${item.qty} / ${item.min} ${item.unit}
+              </td>
+              <td class="p-3 text-center">
+                ${isCritical 
+                  ? `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-400">LOW</span>` 
+                  : `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400">OK</span>`}
+              </td>
+              <td class="p-3 text-right">
+                <div class="flex gap-1 justify-end">
+                  <button onclick="openConsumptionModal('${item.id}')" class="btn-action px-2 py-0.5 text-[10px] text-rose-400 font-bold">Use</button>
+                  <button onclick="toggleIndentItem('${item.id}')" class="btn-action px-2 py-0.5 text-[10px] ${isIndented ? 'text-amber-400 font-bold' : ''}">Indent</button>
+                  <button onclick="editItem('${item.id}')" class="btn-action px-2 py-0.5 text-[10px] text-sky-400">Edit</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
     function filterByLocation(loc) {
       locationFilter = loc;
       document.getElementById('loc-filter-text').innerText = loc;
       document.getElementById('active-location-filter').classList.remove('hidden');
+      currentPage = 1;
       renderInventory();
     }
 
     function openAddItemModal() {
       updateHistoryDatalists();
+      populateImpaDatalist();
       tempItemPhoto = "";
       document.getElementById('edit-item-id').value = "";
       document.getElementById('item-modal-title').innerText = "Add Spare / Inventory Item";
@@ -1761,7 +2210,9 @@
       document.getElementById('item-min').value = "1";
       document.getElementById('item-unit').value = "Pcs";
       document.getElementById('item-notes').value = "";
-      document.getElementById('item-photo-input').value = "";
+      document.getElementById('item-photo-file').value = "";
+      document.getElementById('item-photo-camera').value = "";
+      closeLiveCameraStream();
       displayPhotoPreview("");
       document.getElementById('btn-delete-item').style.display = "none";
       document.getElementById('item-modal').style.display = "flex";
@@ -1771,6 +2222,7 @@
       const item = sparesData.find(i => i.id === id);
       if (!item) return;
       updateHistoryDatalists();
+      populateImpaDatalist();
       document.getElementById('edit-item-id').value = item.id;
       document.getElementById('item-modal-title').innerText = "Edit Item: " + item.name;
       document.getElementById('item-dept').value = item.dept || "engine";
@@ -1782,26 +2234,30 @@
       document.getElementById('item-min').value = item.min;
       document.getElementById('item-unit').value = item.unit || "Pcs";
       document.getElementById('item-notes').value = item.notes || "";
-      document.getElementById('item-photo-input').value = "";
+      document.getElementById('item-photo-file').value = "";
+      document.getElementById('item-photo-camera').value = "";
+      closeLiveCameraStream();
       tempItemPhoto = item.photo || "";
       displayPhotoPreview(tempItemPhoto);
       document.getElementById('btn-delete-item').style.display = "block";
       document.getElementById('item-modal').style.display = "flex";
     }
 
-    function deleteCurrentItem() {
+    async function deleteCurrentItem() {
       const id = document.getElementById('edit-item-id').value;
       if (!id) return;
       if (confirm("Are you sure you want to delete this item record?")) {
         sparesData = sparesData.filter(i => i.id !== id);
         indentBasket = indentBasket.filter(basketId => basketId !== id);
         localStorage.setItem("mitra_spares_indent", JSON.stringify(indentBasket));
+        await removeItemFromDB(id);
         closeModal('item-modal');
-        saveToStorage();
+        updateHistoryDatalists();
+        renderInventory();
       }
     }
 
-    function saveItemForm() {
+    async function saveItemForm() {
       const id = document.getElementById('edit-item-id').value;
       const dept = document.getElementById('item-dept').value;
       const machine = document.getElementById('item-machine').value.trim();
@@ -1814,20 +2270,27 @@
       const notes = document.getElementById('item-notes').value.trim();
       const photo = tempItemPhoto;
 
+      let targetItem = null;
       if (id) {
-        const item = sparesData.find(i => i.id === id);
-        if (item) {
-          Object.assign(item, { dept, machine, name, partno, location, qty, min, unit, notes, photo });
+        targetItem = sparesData.find(i => i.id === id);
+        if (targetItem) {
+          Object.assign(targetItem, { dept, machine, name, partno, location, qty, min, unit, notes, photo });
         }
       } else {
-        sparesData.unshift({
+        targetItem = {
           id: "sp-" + Date.now(),
           dept, machine, name, partno, location, qty, min, unit, notes, photo
-        });
+        };
+        sparesData.unshift(targetItem);
+      }
+
+      if (targetItem) {
+        await saveItemToDB(targetItem);
       }
 
       closeModal('item-modal');
-      saveToStorage();
+      updateHistoryDatalists();
+      renderInventory();
     }
 
     function openLocationManagerModal() {
@@ -1877,11 +2340,53 @@
     }
 
     function printQrLabel() {
-      document.body.classList.remove('printing-pdf-report', 'label-dymo', 'label-dymo-lg');
+      document.body.classList.remove('printing-pdf-report', 'printing-bulk-qr', 'label-dymo', 'label-dymo-lg');
       document.body.classList.add('printing-qr');
       if (currentLabelSize === 'dymo') document.body.classList.add('label-dymo');
       if (currentLabelSize === 'dymo-lg') document.body.classList.add('label-dymo-lg');
       window.print();
+    }
+
+    function printAllRackQrs() {
+      const locations = Array.from(new Set(sparesData.map(i => i.location))).filter(Boolean).sort();
+      if (locations.length === 0) {
+        alert("No storage locations registered yet.");
+        return;
+      }
+
+      const bulkContainer = document.getElementById('bulk-qr-sheet-container');
+      bulkContainer.innerHTML = `
+        <div style="margin-bottom: 12px; border-bottom: 2px solid #0f172a; padding-bottom: 6px;">
+          <h2 style="font-size: 14pt; font-weight: 900; text-transform: uppercase;">${vesselData.name} • Storage Locations QR Sheet</h2>
+          <p style="font-size: 8pt; color: #475569;">Cut labels along dotted lines for bin and shelf tagging</p>
+        </div>
+        <div class="bulk-qr-grid" id="bulk-qr-target-grid"></div>
+      `;
+
+      const grid = document.getElementById('bulk-qr-target-grid');
+      locations.forEach((loc, index) => {
+        const card = document.createElement('div');
+        card.className = 'bulk-qr-card';
+        card.innerHTML = `
+          <div id="bulk-qr-${index}" style="display:flex; justify-content:center; margin-bottom: 4px;"></div>
+          <div style="font-weight: 900; font-family: monospace; font-size: 10pt;">${loc}</div>
+          <div style="font-size: 7pt; color: #64748b;">${vesselData.name}</div>
+        `;
+        grid.appendChild(card);
+
+        new QRCode(document.getElementById(`bulk-qr-${index}`), {
+          text: `MITRA-LOC:${loc}`,
+          width: 90,
+          height: 90,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      });
+
+      document.body.classList.remove('printing-pdf-report', 'printing-qr');
+      document.body.classList.add('printing-bulk-qr');
+      setTimeout(() => window.print(), 100);
     }
 
     function openScannerModal() {
@@ -1891,22 +2396,38 @@
         { facingMode: "environment" },
         { fps: 10, qrbox: 200 },
         (decodedText) => {
-          triggerScanFeedback();
-          if (decodedText.startsWith("MITRA-LOC:")) {
-            const loc = decodedText.replace("MITRA-LOC:", "").trim();
-            stopScanner();
-            filterByLocation(loc);
-          } else {
-            stopScanner();
-            document.getElementById('search-input').value = decodedText;
-            filterItems();
-          }
+          handleDetectedQr(decodedText);
         },
         (error) => {}
       ).catch(err => {
-        alert("Camera error or permission denied: " + err);
-        stopScanner();
+        console.warn("Camera fallback active:", err);
       });
+    }
+
+    function scanQrFromImageFile(file) {
+      if (!file) return;
+      const scanner = new Html5Qrcode("qr-reader-viewport");
+      scanner.scanFile(file, true)
+        .then(decodedText => {
+          handleDetectedQr(decodedText);
+        })
+        .catch(err => {
+          alert("Could not detect a valid QR code in this photo.");
+        });
+    }
+
+    function handleDetectedQr(decodedText) {
+      triggerScanFeedback();
+      if (decodedText.startsWith("MITRA-LOC:")) {
+        const loc = decodedText.replace("MITRA-LOC:", "").trim();
+        stopScanner();
+        filterByLocation(loc);
+      } else {
+        stopScanner();
+        document.getElementById('search-input').value = decodedText;
+        currentPage = 1;
+        renderInventory();
+      }
     }
 
     function stopScanner() {
@@ -1943,10 +2464,11 @@
       }
 
       const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-      const deptHeading = currentDept === 'all' ? 'All Vessel Departments' : currentDept.toUpperCase();
+      const deptHeading = currentDept === 'all' ? 'All Vessel Departments' : (currentDept === 'engine' ? 'ENGINE DEPARTMENT' : currentDept.toUpperCase());
 
       let tableRowsHtml = filtered.map((item, idx) => {
         const isCritical = Number(item.qty) <= Number(item.min);
+        const deptStr = item.dept === 'engine' ? 'ENGINE DEPARTMENT' : item.dept.toUpperCase();
         const photoTag = item.photo
           ? `<img src="${item.photo}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; margin:auto;" />`
           : `<span style="color:#64748b;">--</span>`;
@@ -1956,7 +2478,7 @@
             <td style="text-align:center; font-weight:bold;">${idx + 1}</td>
             <td style="text-align:center;">${photoTag}</td>
             <td>
-              <div style="font-weight:bold; color:#0369a1; font-size:7pt;">${item.dept.toUpperCase()}</div>
+              <div style="font-weight:bold; color:#0369a1; font-size:7pt;">${deptStr}</div>
               <strong>${item.machine}</strong>
             </td>
             <td>
@@ -1988,7 +2510,7 @@
           <div style="text-align:right; font-size:7.5pt; color:#334155;">
             <div><strong>Report Date:</strong> ${dateStr}</div>
             <div><strong>Total Items:</strong> ${filtered.length} Records Listed</div>
-            <div style="color:#64748b;">miTra Spares1 Engine</div>
+            <div style="color:#64748b;">miTraSpares ver 03</div>
           </div>
         </div>
 
@@ -2012,17 +2534,17 @@
 
         <div style="margin-top:14px; border-top:1.5px solid #0f172a; padding-top:6px; font-size:7.5pt; display:flex; justify-content:space-between; align-items:center; color:#475569;">
           <div><strong>${vesselData.name}</strong> • ${vesselData.type} Spares & Logistics Log</div>
-          <div>Safety as a Living Practice • An initiative by rahulDev (<strong>rahuldtr@gmail.com</strong>) • miTra Spares1</div>
+          <div>Safety as a Living Practice • An initiative by rahulDev (<strong>rahuldtr@gmail.com</strong>) • miTraSpares ver 03</div>
         </div>
       `;
 
-      document.body.classList.remove('printing-qr');
+      document.body.classList.remove('printing-qr', 'printing-bulk-qr');
       document.body.classList.add('printing-pdf-report');
       setTimeout(() => window.print(), 50);
     }
 
     window.addEventListener('afterprint', () => {
-      document.body.classList.remove('printing-qr', 'printing-pdf-report');
+      document.body.classList.remove('printing-qr', 'printing-pdf-report', 'printing-bulk-qr');
     });
 
     function exportExcelReport() {
@@ -2047,7 +2569,7 @@
       const exportList = filtered.map(i => ({
         "Vessel Name": vesselData.name,
         "IMO Number": vesselData.imo || "N/A",
-        "Department": i.dept.toUpperCase(),
+        "Department": i.dept === 'engine' ? 'ENGINE DEPARTMENT' : i.dept.toUpperCase(),
         "Machinery / Category": i.machine,
         "Part / Publication Name": i.name,
         "Part No / Drawing / Ref": i.partno,
@@ -2059,7 +2581,7 @@
         "Notes": i.notes
       }));
 
-      const deptTag = currentDept === 'all' ? 'All_Departments' : currentDept.toUpperCase();
+      const deptTag = currentDept === 'all' ? 'All_Departments' : (currentDept === 'engine' ? 'ENGINE_DEPARTMENT' : currentDept.toUpperCase());
       const ws = XLSX.utils.json_to_sheet(exportList);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, deptTag);
@@ -2093,20 +2615,26 @@
     }
 
     function exportDataBackupFile() {
+      const vessel = vesselData.name || 'MT Venus 3';
+      const imoFileTag = vesselData.imo ? `_IMO${vesselData.imo}` : '';
+      const dateTag = new Date().toISOString().split('T')[0];
+
       const backupPayload = {
         vessel: vesselData,
         exportedAt: new Date().toISOString(),
-        version: "miTra Spares1",
+        version: "miTraSpares ver 03",
+        developer: "rahulDev (rahuldtr@gmail.com)",
         spares: sparesData
       };
 
-      const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: "application/octet-stream" });
+      const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: "application/json;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const imoFileTag = vesselData.imo ? `_IMO${vesselData.imo}` : '';
-      a.download = `${vesselData.name.replace(/\s+/g, '_')}${imoFileTag}_Spares_FullBackup_${new Date().toISOString().split('T')[0]}.mitrabackup`;
+      a.download = `${vessel.replace(/\s+/g, '_')}${imoFileTag}_Spares_Backup_${dateTag}.json`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
 
@@ -2114,12 +2642,12 @@
       document.getElementById('restore-file-input').click();
     }
 
-    function handleRestoreFile(event) {
+    async function handleRestoreFile(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
           if (parsed && Array.isArray(parsed.spares)) {
@@ -2138,10 +2666,13 @@
             throw new Error("Invalid backup format structure.");
           }
 
-          saveToStorage();
+          await batchSaveToDB(sparesData);
           updateDomVesselInfo();
+          updateHistoryDatalists();
+          currentPage = 1;
+          renderInventory();
           closeModal('settings-modal');
-          alert(`✓ Backup restored successfully! Loaded ${sparesData.length} item records.`);
+          alert(`✓ Backup restored! Loaded ${sparesData.length} records.`);
         } catch (err) {
           alert("Error restoring backup file: " + err.message);
         }
@@ -2150,13 +2681,18 @@
     }
 
     function closeModal(id) {
+      if (id === 'item-modal') {
+        closeLiveCameraStream();
+      }
       document.getElementById(id).style.display = "none";
     }
 
-    // Initialize DOM
-    updateDomVesselInfo();
-    updateHistoryDatalists();
-    renderInventory();
+    // Startup Initialization
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAppStorage);
+    } else {
+      initAppStorage();
+    }
   </script>
 </body>
 </html>
