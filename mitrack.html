@@ -207,7 +207,7 @@
               <span class="text-sky-600">miTrack</span> <span>Distance</span>
             </h1>
             <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-700 border border-sky-200">
-              DWT & Emissions Suite v10.1
+              M1 Deep-Water Clearance
             </span>
           </div>
         </div>
@@ -488,7 +488,7 @@
         <span class="mx-1">•</span>
         <a href="mailto:rahuldtr@gmail.com" class="text-amber-700 hover:underline font-bold">rahuldtr@gmail.com</a>
         <span class="mx-1">•</span>
-        <span>Version: <strong>miTrack Distance ver 10.1</strong></span>
+        <span>Version: <strong>miTrack Distance ver M1</strong></span>
       </div>
     </footer>
 
@@ -626,7 +626,7 @@
       </div>
 
       <div style="border-top:1px solid #cbd5e1; padding-top:6px; font-size:7pt; display:flex; justify-content:space-between; color:#64748b;">
-        <span>Safety as a Living Practice • Initiative by rahulDev (rahuldtr@gmail.com) • miTrack Distance ver 10.1</span>
+        <span>Safety as a Living Practice • Initiative by rahulDev (rahuldtr@gmail.com) • miTrack Distance ver M1</span>
         <span>Chief Engineer / Master Signature: __________________________________</span>
       </div>
     </div>
@@ -657,7 +657,7 @@
 
     const FALLBACK_SEA_GATES = {
       arabian_sea_mid:     { name: "Central Arabian Sea Transit", lat: 15.00, lon: 65.00 },
-      dondra_head:         { name: "South Sri Lanka (Dondra Head TSS)", lat: 5.20, lon: 80.50 },
+      dondra_head:         { name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 },
       great_channel:       { name: "Great Channel (Nicobar / Sumatra)", lat: 6.00, lon: 94.50 },
       malacca_nw:          { name: "Strait of Malacca North Approach", lat: 5.30, lon: 97.60 },
       one_fathom_bank:     { name: "One Fathom Bank TSS", lat: 2.90, lon: 101.00 },
@@ -976,7 +976,7 @@
     }
 
     // ==========================================
-    // ROBUST COASTAL & PENINSULA CLEARANCE MATRIX
+    // STRICT LAND-AVOIDANCE MATRIX (M1 FIX)
     // ==========================================
     function calculateRoute() {
       const portObjects = voyagePorts.map(p => findPortDetails(p.val)).filter(Boolean);
@@ -1044,10 +1044,10 @@
       const isEastCoastA = (pA.lon > 82 && pA.lat > 15);
       const isWestCoastB = (pB.lon < 75 && pB.lat < 25);
 
-      // India West Coast <---> India East Coast (Strictly round South of Sri Lanka)
+      // India West Coast <---> India East Coast (Strictly round South of Sri Lanka with deep-sea offset)
       if ((isWestCoastA && isEastCoastB) || (isEastCoastA && isWestCoastB)) {
         nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
-        nodes.push({ name: "South of Sri Lanka (Dondra Head TSS)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
         nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 11.00, lon: 86.50 });
         return nodes;
       }
@@ -1055,7 +1055,7 @@
       // India West Coast <---> Far East / Singapore
       if (isWestCoastA && pB.lon > 95) {
         nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
-        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
         nodes.push(FALLBACK_SEA_GATES.great_channel);
         nodes.push(FALLBACK_SEA_GATES.malacca_nw);
         nodes.push(FALLBACK_SEA_GATES.one_fathom_bank);
@@ -1069,7 +1069,7 @@
         nodes.push(FALLBACK_SEA_GATES.one_fathom_bank);
         nodes.push(FALLBACK_SEA_GATES.malacca_nw);
         nodes.push(FALLBACK_SEA_GATES.great_channel);
-        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
         nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
         return nodes;
       }
@@ -1077,7 +1077,7 @@
       // India East Coast <---> Europe / Middle East
       if (isEastCoastA && (pB.lon < 72 || pB.name === "Duqm" || pB.name === "Rotterdam")) {
         nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 11.00, lon: 86.50 });
-        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
         nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
         return nodes;
       }
@@ -1086,10 +1086,9 @@
       const midLat = (pA.lat + pB.lat) / 2;
       const midLon = (pA.lon + pB.lon) / 2;
       
-      // If direct midpoint crosses Indian landmass (roughly between 8°N-25°N and 72°E-85°E), route south of Sri Lanka
       if (pA.lon < 78 && pB.lon > 85 && Math.abs(pA.lat - pB.lat) < 15) {
         nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
-        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
       } else {
         nodes.push({ name: "Open Sea Deep Water Waypoint", lat: midLat, lon: midLon });
       }
@@ -1393,7 +1392,7 @@
           currentText.innerText = "Adverse / Head Current";
           currentText.className = "font-black text-[10px] text-rose-800 uppercase tracking-wider";
           currentSpeedTag.innerText = `-${w.currentKts} kts`;
-          currentSpeedTag.className = "font-mono text-[10px] text-rose-700 font-bold";
+          currentSpeedTag.className = "font-mono text-[10px] text-rose-300 font-bold";
         }
       }
 
