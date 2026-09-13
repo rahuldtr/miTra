@@ -207,7 +207,7 @@
               <span class="text-sky-600">miTrack</span> <span>Distance</span>
             </h1>
             <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-700 border border-sky-200">
-              Strict Coastal Clearance v10.0
+              DWT & Emissions Suite v10.1
             </span>
           </div>
         </div>
@@ -267,20 +267,27 @@
       <div class="glass-card p-3.5 rounded-2xl lg:col-span-5 space-y-2.5 flex flex-col justify-between relative z-10">
         <div>
           <div class="text-[11px] font-black uppercase tracking-wider text-amber-700 mb-2">
-            Vessel Consumption & ETD Departure
+            Vessel Specs, DWT & ETD Departure
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-2">
             <div>
-              <label class="block text-[10px] font-bold text-slate-500 mb-1">Vessel</label>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">Vessel Name</label>
               <input type="text" id="vessel-name" value="MT Venus 3" oninput="updateCalculations()" class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2 text-xs font-bold text-slate-800 text-center font-mono focus:border-sky-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">Deadweight (MT)</label>
+              <input type="number" id="vessel-dwt" step="500" value="50000" min="1000" max="400000" oninput="updateCalculations()" class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2 text-xs font-mono font-bold text-sky-700 text-center focus:border-sky-500 outline-none" />
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-500 mb-1">Speed (kts)</label>
               <input type="number" id="vessel-speed" step="0.1" value="13.5" min="6" max="28" oninput="updateCalculations()" class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2 text-xs font-mono font-bold text-emerald-700 text-center focus:border-sky-500 outline-none" />
             </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[10px] font-bold text-slate-500 mb-1">Fuel (MT/d)</label>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">Fuel (MT/Day)</label>
               <input type="number" id="vessel-foc" step="0.1" value="26.0" min="1" max="150" oninput="updateCalculations()" class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2 text-xs font-mono font-bold text-amber-700 text-center focus:border-sky-500 outline-none" />
             </div>
             <div>
@@ -435,7 +442,7 @@
           </span>
         </div>
         <div class="text-[10px] text-slate-500 font-mono">
-          <span>Assumed DWT: <strong class="text-slate-700">50,000 MT</strong></span>
+          <span>Active DWT: <strong id="env-dwt-label" class="text-slate-700">50,000 MT</strong></span>
         </div>
       </div>
 
@@ -481,7 +488,7 @@
         <span class="mx-1">•</span>
         <a href="mailto:rahuldtr@gmail.com" class="text-amber-700 hover:underline font-bold">rahuldtr@gmail.com</a>
         <span class="mx-1">•</span>
-        <span>Version: <strong>miTrack Distance ver 10.0</strong></span>
+        <span>Version: <strong>miTrack Distance ver 10.1</strong></span>
       </div>
     </footer>
 
@@ -506,7 +513,7 @@
           <div><strong>Engine:</strong> Built-in Client A* Maritime Network Pathfinder</div>
           <div><strong>Offline Cache:</strong> Instant Route Geometry + Background Synoptic Mesh</div>
           <div><strong>Security:</strong> High Risk Area (HRA / BMP5) Corridor Avoidance</div>
-          <div><strong>Emissions & ECA:</strong> MARPOL Annex VI Automatic VLSFO/LSMGO & Sea Temperature Engine</div>
+          <div><strong>Emissions & ECA:</strong> MARPOL Annex VI Automatic VLSFO/LSMGO & DWT Scaling Engine</div>
           <div><strong>Tile Server:</strong> 100% Free Keyless Esri Bathymetric Ocean Basemap</div>
         </div>
         <div class="p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-[11px]">
@@ -534,8 +541,8 @@
         </div>
         <div style="text-align:right; font-size:8pt; color:#475569;">
           <div><strong>Generated:</strong> <span id="rpt-date">--</span></div>
-          <div><strong>Vessel:</strong> <span id="rpt-vessel-name">--</span> | <strong>Strategy:</strong> <span id="rpt-strategy">--</span> | <strong>Speed:</strong> <span id="rpt-speed">--</span> kts</div>
-          <div><strong>Daily Consumption:</strong> <span id="rpt-daily-foc">--</span> MT/Day</div>
+          <div><strong>Vessel:</strong> <span id="rpt-vessel-name">--</span> (DWT: <span id="rpt-vessel-dwt">--</span> MT)</div>
+          <div><strong>Strategy:</strong> <span id="rpt-strategy">--</span> | <strong>Speed:</strong> <span id="rpt-speed">--</span> kts | <strong>FOC:</strong> <span id="rpt-daily-foc">--</span> MT/Day</div>
         </div>
       </div>
 
@@ -613,13 +620,13 @@
       <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px; border-radius:6px; font-size:8pt; margin-bottom:14px;">
         <div style="font-weight:bold; color:#0369a1; font-size:9.5pt; margin-bottom:4px;">4. Operational Carbon Intensity Indicator (CII) Rating</div>
         <div style="font-family:monospace; font-size:8pt; margin-bottom:4px;">
-          Attained CII = (Total CO₂ in grams) ÷ (DWT × Total Distance in NM) = <strong id="rpt-calc-cii-formula">--</strong>
+          Attained CII = (Total CO₂ in grams) ÷ (<span id="rpt-calc-dwt-val">--</span> DWT × Total Distance in NM) = <strong id="rpt-calc-cii-formula">--</strong>
         </div>
         <div>Resulting Voyage CII Intensity: <strong id="rpt-calc-cii-val">--</strong> gCO₂/dwt·NM &nbsp;|&nbsp; Compliance Rating: <strong id="rpt-calc-cii-grade" style="color:#047857;">--</strong></div>
       </div>
 
       <div style="border-top:1px solid #cbd5e1; padding-top:6px; font-size:7pt; display:flex; justify-content:space-between; color:#64748b;">
-        <span>Safety as a Living Practice • Initiative by rahulDev (rahuldtr@gmail.com) • miTrack Distance ver 10.0</span>
+        <span>Safety as a Living Practice • Initiative by rahulDev (rahuldtr@gmail.com) • miTrack Distance ver 10.1</span>
         <span>Chief Engineer / Master Signature: __________________________________</span>
       </div>
     </div>
@@ -627,7 +634,7 @@
 
   <script>
     // ==========================================
-    // 1. STRICT OCEANWAYWAYPOINT CLEARANCE MATRIX
+    // 1. EXTENSIVE GLOBAL PORTS
     // ==========================================
     const GLOBAL_PORTS = [
       { name: "Mumbai / JNPT", locode: "INBOM", country: "IN", lat: 18.9500, lon: 72.8333, fairways: [[18.90, 71.50], [18.50, 70.00]] },
@@ -650,16 +657,11 @@
 
     const FALLBACK_SEA_GATES = {
       arabian_sea_mid:     { name: "Central Arabian Sea Transit", lat: 15.00, lon: 65.00 },
-      dondra_head:         { name: "South Sri Lanka (Dondra Head TSS)", lat: 5.50, lon: 80.50 },
+      dondra_head:         { name: "South Sri Lanka (Dondra Head TSS)", lat: 5.20, lon: 80.50 },
       great_channel:       { name: "Great Channel (Nicobar / Sumatra)", lat: 6.00, lon: 94.50 },
       malacca_nw:          { name: "Strait of Malacca North Approach", lat: 5.30, lon: 97.60 },
       one_fathom_bank:     { name: "One Fathom Bank TSS", lat: 2.90, lon: 101.00 },
-      singapore_strait_w:  { name: "Singapore Strait West Entrance", lat: 1.22, lon: 103.50 },
-      singapore_strait_e:  { name: "Singapore Strait East TSS", lat: 1.30, lon: 104.25 },
-      suez_south:          { name: "Suez Canal South (Port Tewfik)", lat: 29.90, lon: 32.55 },
-      suez_north:          { name: "Port Said North Entry", lat: 31.35, lon: 32.35 },
-      gibraltar_strait:    { name: "Strait of Gibraltar TSS", lat: 35.95, lon: -5.60 },
-      rotterdam_pilot:     { name: "Maas Center Pilot Approach (Rotterdam)", lat: 52.00, lon: 3.80 }
+      singapore_strait_w:  { name: "Singapore Strait West Entrance", lat: 1.22, lon: 103.50 }
     };
 
     let map = null;
@@ -974,7 +976,7 @@
     }
 
     // ==========================================
-    // STRICT WATERWAY CORRIDOR ROUTING (NO LAND CROSSING)
+    // ROBUST COASTAL & PENINSULA CLEARANCE MATRIX
     // ==========================================
     function calculateRoute() {
       const portObjects = voyagePorts.map(p => findPortDetails(p.val)).filter(Boolean);
@@ -994,7 +996,6 @@
           });
         }
 
-        // Apply strict regional maritime chokepoints to bypass Indian peninsula & landmasses
         const legNodes = buildStrictWaterwayNodes(pA, pB);
         legNodes.forEach(node => assembledWaypoints.push(node));
 
@@ -1043,18 +1044,18 @@
       const isEastCoastA = (pA.lon > 82 && pA.lat > 15);
       const isWestCoastB = (pB.lon < 75 && pB.lat < 25);
 
-      // 1. West Coast India (Mumbai/Kochi/Mundra) <---> East Coast India (Chennai/Visakhapatnam/Haldia)
-      // Must round South of Sri Lanka (Dondra Head) to avoid cutting across the Indian peninsula!
+      // India West Coast <---> India East Coast (Strictly round South of Sri Lanka)
       if ((isWestCoastA && isEastCoastB) || (isEastCoastA && isWestCoastB)) {
-        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.50, lon: 75.00 });
-        nodes.push({ name: "South of Sri Lanka (Dondra Head Deep TSS)", lat: 5.20, lon: 80.50 });
-        nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 10.00, lon: 85.00 });
+        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
+        nodes.push({ name: "South of Sri Lanka (Dondra Head TSS)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 11.00, lon: 86.50 });
         return nodes;
       }
 
-      // 2. West Coast India <---> Far East / Singapore
+      // India West Coast <---> Far East / Singapore
       if (isWestCoastA && pB.lon > 95) {
-        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 5.20, lon: 80.50 });
+        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
+        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
         nodes.push(FALLBACK_SEA_GATES.great_channel);
         nodes.push(FALLBACK_SEA_GATES.malacca_nw);
         nodes.push(FALLBACK_SEA_GATES.one_fathom_bank);
@@ -1062,16 +1063,37 @@
         return nodes;
       }
 
-      // 3. East Coast India <---> Middle East / Europe
-      if (isEastCoastA && (pB.lon < 72 || pB.name === "Duqm" || pB.name === "Rotterdam")) {
-        nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 10.00, lon: 85.00 });
-        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 5.20, lon: 80.50 });
-        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.50, lon: 75.00 });
+      // Far East / Singapore <---> India West Coast
+      if (pA.lon > 95 && isWestCoastB) {
+        nodes.push(FALLBACK_SEA_GATES.singapore_strait_w);
+        nodes.push(FALLBACK_SEA_GATES.one_fathom_bank);
+        nodes.push(FALLBACK_SEA_GATES.malacca_nw);
+        nodes.push(FALLBACK_SEA_GATES.great_channel);
+        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
         return nodes;
       }
 
-      // Default Midpoint Open Sea Fallback
-      nodes.push({ name: "Open Sea Deep Water Waypoint", lat: (pA.lat + pB.lat)/2, lon: (pA.lon + pB.lon)/2 });
+      // India East Coast <---> Europe / Middle East
+      if (isEastCoastA && (pB.lon < 72 || pB.name === "Duqm" || pB.name === "Rotterdam")) {
+        nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 11.00, lon: 86.50 });
+        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
+        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
+        return nodes;
+      }
+
+      // Generic multi-port deep ocean corridor check to prevent land collisions
+      const midLat = (pA.lat + pB.lat) / 2;
+      const midLon = (pA.lon + pB.lon) / 2;
+      
+      // If direct midpoint crosses Indian landmass (roughly between 8°N-25°N and 72°E-85°E), route south of Sri Lanka
+      if (pA.lon < 78 && pB.lon > 85 && Math.abs(pA.lat - pB.lat) < 15) {
+        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
+        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 4.80, lon: 80.50 });
+      } else {
+        nodes.push({ name: "Open Sea Deep Water Waypoint", lat: midLat, lon: midLon });
+      }
+
       return nodes;
     }
 
@@ -1165,6 +1187,9 @@
       if (routeStrategy === 'economy') speed = Math.max(9.0, speed - 1.5);
 
       const dailyFoc = parseFloat(document.getElementById('vessel-foc').value) || 26.0;
+      const vesselDWT = parseFloat(document.getElementById('vessel-dwt').value) || 50000;
+      
+      document.getElementById('env-dwt-label').innerText = `${vesselDWT.toLocaleString()} MT`;
 
       let totalDist = 0;
       let nonEcaDist = 0;
@@ -1211,8 +1236,7 @@
       const soxLsmgo = lsmgoFuel * 0.002;
       const totalSox = soxVlsfo + soxLsmgo;
 
-      const assumedDWT = 50000;
-      const ciiGrams = totalDist > 0 ? (totalCo2 * 1000000) / (assumedDWT * totalDist) : 0;
+      const ciiGrams = totalDist > 0 ? (totalCo2 * 1000000) / (vesselDWT * totalDist) : 0;
 
       lastVoyageMetrics = {
         totalDist: Math.round(totalDist),
@@ -1226,7 +1250,8 @@
         baseFuel: baseFuel.toFixed(1),
         totalCo2: totalCo2.toFixed(1),
         totalSox: totalSox.toFixed(2),
-        ciiVal: ciiGrams.toFixed(2)
+        ciiVal: ciiGrams.toFixed(2),
+        dwt: vesselDWT.toLocaleString()
       };
 
       document.getElementById('kpi-distance').innerText = `${Math.round(totalDist).toLocaleString()} NM`;
@@ -1444,6 +1469,7 @@
       document.getElementById('rpt-route-title').innerText = portNames;
       document.getElementById('rpt-date').innerText = new Date().toUTCString();
       document.getElementById('rpt-vessel-name').innerText = vesselName;
+      document.getElementById('rpt-vessel-dwt').innerText = lastVoyageMetrics.dwt;
       document.getElementById('rpt-strategy').innerText = routeStrategy.toUpperCase();
       document.getElementById('rpt-speed').innerText = document.getElementById('vessel-speed').value;
       document.getElementById('rpt-daily-foc').innerText = document.getElementById('vessel-foc').value;
@@ -1460,7 +1486,8 @@
       document.getElementById('rpt-total-fuel-box').innerText = lastVoyageMetrics.totalFuel;
       document.getElementById('rpt-calc-co2').innerText = lastVoyageMetrics.totalCo2;
       document.getElementById('rpt-calc-sox').innerText = lastVoyageMetrics.totalSox;
-      document.getElementById('rpt-calc-cii-formula').innerText = `(${lastVoyageMetrics.totalCo2} × 10⁶) ÷ (50,000 × ${lastVoyageMetrics.totalDist})`;
+      document.getElementById('rpt-calc-dwt-val').innerText = lastVoyageMetrics.dwt;
+      document.getElementById('rpt-calc-cii-formula').innerText = `(${lastVoyageMetrics.totalCo2} × 10⁶) ÷ (${lastVoyageMetrics.dwt} × ${lastVoyageMetrics.totalDist})`;
       document.getElementById('rpt-calc-cii-val').innerText = lastVoyageMetrics.ciiVal;
       document.getElementById('rpt-calc-cii-grade').innerText = document.getElementById('env-cii-rating').innerText;
 
