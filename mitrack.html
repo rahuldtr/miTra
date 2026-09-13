@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>miTrack Distance - Passage Planner & Weather Router</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet Core CSS & JS (Keyless, 100% Free) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --panel: #ffffff;
+      --border: #cbd5e1;
+      --primary: #0284c7;
+      --text: #0f172a;
+      --muted: #64748b;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .glass-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    }
+    .leaflet-container {
+      background: #e2e8f0 !important;
+      font-family: inherit;
+    }
+
+    /* Dynamic Weather Glow Aura */
+    .ship-weather-halo {
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      margin-left: -65px;
+      margin-top: -65px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: all 0.35s ease;
+      z-index: 400;
+    }
+    .halo-calm {
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0.04) 60%, transparent 100%);
+      border: 1px dashed rgba(2, 132, 199, 0.45);
+      animation: rotateSlow 14s linear infinite;
+    }
+    .halo-rough {
+      background: radial-gradient(circle, rgba(225, 29, 72, 0.28) 0%, rgba(225, 29, 72, 0.08) 65%, transparent 100%);
+      border: 2px dashed rgba(225, 29, 72, 0.7);
+      animation: pulseRough 1.8s ease-in-out infinite alternate;
+    }
+    @keyframes rotateSlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes pulseRough {
+      0% { transform: scale(0.92); opacity: 0.6; }
+      100% { transform: scale(1.12); opacity: 1; }
+    }
+
+    .stream-arrow {
+      position: absolute;
+      font-size: 18px;
+      line-height: 1;
+      transform-origin: center center;
+      transition: transform 0.25s ease-out;
+      pointer-events: none;
+    }
+
+    #smoke-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 550;
+    }
+
+    input[type=range] {
+      accent-color: #0284c7;
+    }
+
+    /* Floating Autocomplete Dropdown */
+    .port-dropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #ffffff;
+      border: 1px solid #94a3b8;
+      border-radius: 0.75rem;
+      z-index: 9999;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    }
+    .port-dropdown-item {
+      padding: 8px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+      color: #1e293b;
+    }
+    .port-dropdown-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 16px;
+    }
+
+    #print-voyage-report {
+      display: none;
+    }
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+      body * {
+        visibility: hidden !important;
+      }
+      #print-voyage-report, #print-voyage-report * {
+        visibility: visible !important;
+      }
+      #print-voyage-report {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 8pt !important;
+      }
+      .page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+      .plan-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 8px !important;
+      }
+      .plan-table th, .plan-table td {
+        border: 1px solid #cbd5e1 !important;
+        padding: 4px 5px !important;
+        text-align: left;
+      }
+      .plan-table th {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        font-size: 7.5pt !important;
+      }
+      .plan-table tr:nth-child(even) td {
+        background-color: #f8fafc !important;
+      }
+    }
+  </style>
+</head>
+<body class="p-2 md:p-4 space-y-3 flex flex-col items-center">
+
+  <div class="max-w-7xl w-full space-y-3">
+    <!-- Header -->
+    <header class="glass-card p-3.5 md:p-4 rounded-2xl flex justify-between items-center flex-wrap gap-2">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-100 border border-sky-300 flex items-center justify-center text-xl text-sky-700 shadow-sm">
+          🧭
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base md:text-lg font-black tracking-tight text-slate-800">
+              <span class="text-sky-600">miTrack</span> <span>Distance</span>
+            </h1>
+            <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-700 border border-sky-200">
+              Strict Coastal Clearance v10.0
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openAboutModal()" class="px-3 py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-200 transition flex items-center gap-1.5">
+          ℹ️ <span>About</span>
+        </button>
+        <button onclick="printVoyagePlanPdf()" class="px-3.5 py-2 rounded-xl bg-emerald-600 border border-emerald-700 text-white text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5 transition shadow-sm">
+          🖨️ <span>Print Plan PDF</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Controls Panel -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
+      
+      <!-- Waypoint Sequence & Port Ingestion -->
+      <div class="glass-card p-3.5 rounded-2xl lg:col-span-7 space-y-3 relative z-30">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-black uppercase tracking-wider text-sky-700">Voyage Port Sequence</span>
+          <button onclick="addIntermediatePortRow()" class="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-300 px-2 py-1 rounded-lg hover:bg-emerald-100 transition">
+            ➕ Add Port / Waypoint
+          </button>
+        </div>
+
+        <div id="ports-container" class="space-y-2.5"></div>
+
+        <div class="pt-2 border-t border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Optimization Strategy</span>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer text-[10px] font-bold bg-rose-50 border border-rose-200 px-2 py-1 rounded-lg">
+              <input type="checkbox" id="chk-avoid-hra" onchange="calculateRoute()" class="rounded border-rose-400 text-rose-600 focus:ring-0">
+              <span class="text-rose-700 font-black">AVOID HRA (via Cape of Good Hope)</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200">
+            <button id="btn-route-best" onclick="setRouteStrategy('best')" class="py-1.5 px-2 rounded-lg text-xs font-black transition bg-sky-600 text-white shadow-sm">
+              ⚡ Best Route
+            </button>
+            <button id="btn-route-econ" onclick="setRouteStrategy('economy')" class="py-1.5 px-2 rounded-lg text-xs font-black transition text-slate-600 hover:text-slate-900">
+              🌱 Economy
+            </button>
+            <button id="btn-route-calm" onclick="setRouteStrategy('calm')" class="py-1.5 px-2 rounded-lg text-xs font-black transition text-slate-600 hover:text-slate-900">
+              🌊 Calm Sea
+            </button>
+          </div>
+          <div class="text-[10px] text-slate-500 font-mono italic" id="strategy-desc">
+            Direct water-mesh navigation via shortest sea graph path.
+          </div>
+        </div>
+      </div>
+
+      <!-- Vessel Performance & Departure Date -->
+      <div class="glass-card p-3.5 rounded-2xl lg:col-span-5 space-y-2.5 flex flex-col justify-between relative z-10">
+        <div>
+          <div class="text-[11px] font-black uppercase tracking-wider text-amber-700 mb-2">
+            Vessel Consumption & ETD Departure
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">Vessel</label>
+              <input type="text" id="vessel-name" value="MT Venus 3" oninput="updateCalculations()" class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2 text-xs font-bold text-slate-800 text-center font-mono focus:border-sky-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">Speed (kts)</label>
+              <input type="number" id="vessel-speed" step="0.1" value="13.5" min="6" max="28" oninput="updateCalculations()" class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2 text-xs font-mono font-bold text-emerald-700 text-center focus:border-sky-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">Fuel (MT/d)</label>
+              <input type="number" id="vessel-foc" step="0.1" value="26.0" min="1" max="150" oninput="updateCalculations()" class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2 text-xs font-mono font-bold text-amber-700 text-center focus:border-sky-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-sky-700 mb-1">ETD Date</label>
+              <input type="date" id="voyage-etd" onchange="calculateRoute()" class="w-full h-9 bg-slate-50 border border-sky-300 rounded-xl px-1.5 text-[11px] font-mono font-bold text-slate-800 text-center focus:border-sky-500 outline-none" />
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+          <div class="flex justify-between">
+            <span class="text-slate-600">Weather Margin Added:</span>
+            <span id="weather-factor-badge" class="font-mono font-bold text-sky-700">+5.0%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">Bunker Breakdown (VLSFO / LSMGO):</span>
+            <span id="kpi-bunker-split" class="font-mono font-black text-amber-700">-- MT</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px]">
+            <input type="checkbox" id="chk-suez" checked onchange="calculateRoute()" class="rounded border-slate-300 text-sky-600 focus:ring-0">
+            <span class="font-bold text-slate-700">Allow Suez Canal</span>
+          </label>
+          <button onclick="calculateRoute()" class="px-4 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition shadow-sm">
+            Recalculate
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KPI Summary Ribbon -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <div class="glass-card p-3 rounded-xl">
+        <div class="text-[10px] font-bold uppercase text-slate-500">Total Steaming Distance</div>
+        <div class="text-lg font-black font-mono text-sky-700 mt-0.5" id="kpi-distance">0 NM</div>
+      </div>
+      <div class="glass-card p-3 rounded-xl">
+        <div class="text-[10px] font-bold uppercase text-slate-500">Voyage Duration</div>
+        <div class="text-lg font-black font-mono text-emerald-700 mt-0.5" id="kpi-time">0.0 Days</div>
+      </div>
+      <div class="glass-card p-3 rounded-xl">
+        <div class="text-[10px] font-bold uppercase text-slate-500">Total Bunker Required</div>
+        <div class="text-lg font-black font-mono text-amber-700 mt-0.5" id="kpi-fuel">0.0 MT</div>
+      </div>
+      <div class="glass-card p-3 rounded-xl">
+        <div class="text-[10px] font-bold uppercase text-slate-500">Avg Significant Wave</div>
+        <div class="text-lg font-black font-mono text-rose-700 mt-0.5" id="kpi-avg-wave">-- m</div>
+      </div>
+    </div>
+
+    <!-- Map & Animated HUD Layer -->
+    <div class="glass-card rounded-2xl overflow-hidden border border-slate-300 relative">
+      <div id="map" class="w-full h-[500px] md:h-[580px]"></div>
+      <canvas id="smoke-canvas"></canvas>
+
+      <!-- Live Synoptic Weather Status -->
+      <div class="absolute top-3 right-3 z-[1000] bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl border border-sky-300 text-[11px] flex items-center gap-2 shadow-md">
+        <span class="w-2 h-2 rounded-full bg-sky-600 animate-ping"></span>
+        <span id="map-weather-status" class="font-bold text-slate-700">Ready</span>
+      </div>
+
+      <!-- Real-Time Radar HUD -->
+      <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur p-3 rounded-xl border border-slate-300 shadow-lg space-y-2 hidden sm:block w-72">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-1">
+          <span class="text-[10px] font-black uppercase text-sky-700">Ship Position Radar</span>
+          <span id="hud-leg-name" class="font-mono text-[9px] text-amber-700 truncate max-w-[120px]">Departure</span>
+        </div>
+        
+        <div id="hud-current-status-banner" class="p-1.5 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span id="hud-current-icon" class="text-xs">🟢</span>
+            <span id="hud-current-text" class="font-black text-[10px] text-emerald-800 uppercase tracking-wider">Favourable Current</span>
+          </div>
+          <span id="hud-current-speed-tag" class="font-mono text-[10px] text-emerald-700 font-bold">+1.2 kts</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 font-mono text-[10px] text-slate-600">
+          <div>Wind: <strong id="hud-wind" class="text-emerald-700">-- kts</strong></div>
+          <div>Current: <strong id="hud-current" class="text-sky-700">-- kts</strong></div>
+          <div>Wave (Hs): <strong id="hud-wave" class="text-rose-700">-- m</strong></div>
+          <div>Water Temp: <strong id="hud-temp" class="text-cyan-700">-- °C</strong></div>
+        </div>
+      </div>
+
+      <!-- Scrubber Bar -->
+      <div class="absolute bottom-3 left-3 right-3 z-[1000] bg-white/95 backdrop-blur p-3 rounded-xl border border-slate-300 shadow-lg space-y-2">
+        <div class="flex justify-between items-center text-xs flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🚢</span>
+            <span class="font-bold text-slate-800">Voyage Simulation:</span>
+            <span id="slider-day-label" class="font-mono text-sky-700 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">Day 0.0 of 0.0</span>
+            <span id="slider-eta-label" class="font-mono text-[10px] text-slate-500 ml-1">ETA: --</span>
+          </div>
+          <div class="flex items-center gap-3 font-mono text-[11px] text-slate-600 flex-wrap">
+            <span>Pos: <strong id="slider-pos" class="text-amber-700">--</strong></span>
+            <span>Wave: <strong id="slider-wave" class="text-sky-700">-- m</strong></span>
+            <span>Wind: <strong id="slider-wind" class="text-emerald-700">-- kts</strong></span>
+            <span>Temp: <strong id="slider-temp" class="text-cyan-700">-- °C</strong></span>
+            <span>Fuel: <strong id="slider-fuel" class="text-amber-700">-- MT</strong></span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="btn-play-pause" onclick="toggleVoyageAnimation()" class="px-3 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-sm">
+            ▶ Play
+          </button>
+          <input type="range" id="voyage-slider" min="0" max="100" value="0" step="0.25" class="w-full cursor-pointer h-2 bg-slate-200 rounded-lg" oninput="onSliderMove(this.value)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Waypoint Table -->
+    <div class="glass-card p-3.5 rounded-2xl space-y-2">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Passage Waypoints, Marine Environment & Bunker Log</h3>
+        <span class="text-[10px] font-mono text-slate-500" id="table-waypoint-count">0 Waypoints</span>
+      </div>
+      <div class="overflow-x-auto max-h-56 custom-scrollbar">
+        <table class="w-full text-[11px] text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 text-[10px] font-black uppercase text-slate-500 bg-slate-50">
+              <th class="p-2">#</th>
+              <th class="p-2">Waypoint / Landmark</th>
+              <th class="p-2">Coordinates</th>
+              <th class="p-2">Leg (NM)</th>
+              <th class="p-2">Total (NM)</th>
+              <th class="p-2">Estimated Date/Time</th>
+              <th class="p-2">Sig Wave (Hs)</th>
+              <th class="p-2">Wind (Force/Dir)</th>
+              <th class="p-2">Water Temp</th>
+              <th class="p-2">Leg Fuel (MT)</th>
+            </tr>
+          </thead>
+          <tbody id="waypoints-table-body" class="divide-y divide-slate-100 font-mono text-slate-700">
+            <tr><td colspan="10" class="p-4 text-center text-slate-400">Calculate route to display passage plan.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bottom Environmental Tab (CO2, CII, SOx) -->
+    <div class="glass-card p-3.5 rounded-2xl space-y-2 border border-emerald-300 bg-emerald-50/40">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-sm">🌱</span>
+          <span class="text-xs font-black uppercase tracking-wider text-emerald-800">MARPOL Annex VI & Emissions Report</span>
+          <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+            ECA Automatic Detection
+          </span>
+        </div>
+        <div class="text-[10px] text-slate-500 font-mono">
+          <span>Assumed DWT: <strong class="text-slate-700">50,000 MT</strong></span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <!-- CO2 Metric -->
+        <div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-sm">
+          <div>
+            <div class="text-[9px] uppercase font-bold text-slate-500">Total CO2 Emission</div>
+            <div class="text-base font-black font-mono text-emerald-700 mt-0.5" id="env-co2">-- MT</div>
+          </div>
+          <div class="text-xl opacity-60">☁️</div>
+        </div>
+
+        <!-- Voyage Operational CII Metric -->
+        <div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-sm">
+          <div>
+            <div class="text-[9px] uppercase font-bold text-slate-500">Voyage CII Intensity</div>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-base font-black font-mono text-sky-700" id="env-cii">--</span>
+              <span id="env-cii-rating" class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-sky-100 text-sky-800 border border-sky-300">Rating --</span>
+            </div>
+            <div class="text-[8px] font-mono text-slate-400">gCO2 / dwt·NM</div>
+          </div>
+          <div class="text-xl opacity-60">📊</div>
+        </div>
+
+        <!-- SOx Metric -->
+        <div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-sm">
+          <div>
+            <div class="text-[9px] uppercase font-bold text-slate-500">Total SOx Emission</div>
+            <div class="text-base font-black font-mono text-amber-700 mt-0.5" id="env-sox">-- MT</div>
+          </div>
+          <div class="text-xl opacity-60">⚗️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-slate-500 space-y-1.5 py-4 border-t border-slate-200">
+      <div>An initiative by <strong>rahulDev</strong> • Dedicated to Seafarers Worldwide</div>
+      <div class="font-mono text-[11px]">
+        <button onclick="openAboutModal()" class="text-sky-700 hover:underline font-bold">About miTrack Distance</button>
+        <span class="mx-1">•</span>
+        <a href="mailto:rahuldtr@gmail.com" class="text-amber-700 hover:underline font-bold">rahuldtr@gmail.com</a>
+        <span class="mx-1">•</span>
+        <span>Version: <strong>miTrack Distance ver 10.0</strong></span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- About Modal -->
+  <div id="about-modal" class="modal-overlay" onclick="if(event.target===this) closeAboutModal()">
+    <div class="glass-card max-w-md w-full p-5 rounded-3xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🧭</span>
+          <h3 class="text-sm font-black uppercase tracking-wider text-slate-800">About miTrack Distance</h3>
+        </div>
+        <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="text-xs text-slate-600 space-y-2.5 leading-relaxed">
+        <p>
+          <strong>miTrack Distance</strong> is an offline-first passage planning and weather routing suite built for shipboard operations.
+        </p>
+        <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 font-mono text-[11px]">
+          <div><strong>Engine:</strong> Built-in Client A* Maritime Network Pathfinder</div>
+          <div><strong>Offline Cache:</strong> Instant Route Geometry + Background Synoptic Mesh</div>
+          <div><strong>Security:</strong> High Risk Area (HRA / BMP5) Corridor Avoidance</div>
+          <div><strong>Emissions & ECA:</strong> MARPOL Annex VI Automatic VLSFO/LSMGO & Sea Temperature Engine</div>
+          <div><strong>Tile Server:</strong> 100% Free Keyless Esri Bathymetric Ocean Basemap</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-[11px]">
+          <div>Initiative & Development: <strong>rahulDev</strong></div>
+          <div>Feedback & Support: <a href="mailto:rahuldtr@gmail.com" class="text-amber-700 underline font-bold">rahuldtr@gmail.com</a></div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-1">
+        <button onclick="closeAboutModal()" class="px-4 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- A4 Print Layout -->
+  <div id="print-voyage-report">
+    <!-- Page 1: Passage Plan Table -->
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:10px;">
+        <div>
+          <div style="font-size:15pt; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">miTrack Distance • VOYAGE PASSAGE PLAN</div>
+          <div style="font-size:9pt; font-weight:bold; color:#0369a1;" id="rpt-route-title">VOYAGE ROUTE</div>
+        </div>
+        <div style="text-align:right; font-size:8pt; color:#475569;">
+          <div><strong>Generated:</strong> <span id="rpt-date">--</span></div>
+          <div><strong>Vessel:</strong> <span id="rpt-vessel-name">--</span> | <strong>Strategy:</strong> <span id="rpt-strategy">--</span> | <strong>Speed:</strong> <span id="rpt-speed">--</span> kts</div>
+          <div><strong>Daily Consumption:</strong> <span id="rpt-daily-foc">--</span> MT/Day</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px; background:#f1f5f9; padding:6px 10px; border-radius:6px; font-weight:bold; font-size:8pt;">
+        <div>Total Distance: <span id="rpt-dist">--</span> NM</div>
+        <div>Steaming Duration: <span id="rpt-time">--</span> Days</div>
+        <div>Total Bunker: <span id="rpt-fuel">--</span> MT</div>
+        <div>Weather Margin: <span id="rpt-margin">--</span>%</div>
+      </div>
+
+      <table class="plan-table">
+        <thead>
+          <tr>
+            <th style="width:3%;">#</th>
+            <th style="width:22%;">Waypoint / Chokepoint</th>
+            <th style="width:15%;">Coordinates</th>
+            <th style="width:7%;">Leg (NM)</th>
+            <th style="width:7%;">Total</th>
+            <th style="width:13%;">Waypoint ETA</th>
+            <th style="width:10%;">Wave (Hs)</th>
+            <th style="width:12%;">Wind Speed/Dir</th>
+            <th style="width:11%;">Water Temp</th>
+          </tr>
+        </thead>
+        <tbody id="rpt-table-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Page 2: Step-by-Step Emission Calculation Methodology -->
+    <div class="page-break" style="padding-top:10px;">
+      <div style="border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:12px;">
+        <div style="font-size:14pt; font-weight:900; text-transform:uppercase;">ANNEX: VOYAGE EMISSION & DECARBONIZATION CALCULATION METHODOLOGY</div>
+        <div style="font-size:8.5pt; color:#475569;">MARPOL Annex VI Compliance & Regulatory Formula Breakdown</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:8pt; margin-bottom:12px;">
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px 10px; border-radius:6px;">
+          <div style="font-weight:bold; color:#0369a1; margin-bottom:4px; font-size:9pt;">1. Distance & Fuel Allocation (ECA vs Non-ECA)</div>
+          <div>• Non-ECA Distance: <strong id="rpt-non-eca-dist">--</strong> NM</div>
+          <div>• ECA Distance: <strong id="rpt-eca-dist">--</strong> NM</div>
+          <div>• Base Fuel (w/ Margin): <strong id="rpt-base-fuel">--</strong> MT</div>
+          <div style="margin-top:4px; font-size:7.5pt; color:#64748b;">Fuel is dynamically split between VLSFO (0.50% S) for open ocean and LSMGO (0.10% S) inside designated Emission Control Areas (ECA).</div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px 10px; border-radius:6px;">
+          <div style="font-weight:bold; color:#0369a1; margin-bottom:4px; font-size:9pt;">2. Bunker Consumption Breakdown</div>
+          <div>• VLSFO Required: <strong id="rpt-vlsfo-fuel">--</strong> MT</div>
+          <div>• LSMGO Required (ECA): <strong id="rpt-lsmgo-fuel">--</strong> MT</div>
+          <div>• Total Combined Bunker: <strong id="rpt-total-fuel-box">--</strong> MT</div>
+        </div>
+      </div>
+
+      <div style="background:#ecfdf5; border:1px solid #a7f3d0; padding:10px; border-radius:6px; font-size:8pt; margin-bottom:12px; color:#065f46;">
+        <div style="font-weight:bold; font-size:9.5pt; margin-bottom:6px;">3. Step-by-Step CO₂ & SOₓ Emission Calculations</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <strong>CO₂ Emissions (IMO MEPC.308(73)):</strong>
+            <div style="margin-top:3px; font-family:monospace; font-size:7.5pt; background:#ffffff; padding:4px; border:1px solid #a7f3d0; border-radius:4px;">
+              VLSFO CO₂ = VLSFO Fuel × 3.114<br>
+              LSMGO CO₂ = LSMGO Fuel × 3.206<br>
+              <strong>Total CO₂ = <span id="rpt-calc-co2">--</span> MT</strong>
+            </div>
+          </div>
+          <div>
+            <strong>SOₓ Emissions (MARPOL Annex VI):</strong>
+            <div style="margin-top:3px; font-family:monospace; font-size:7.5pt; background:#ffffff; padding:4px; border:1px solid #a7f3d0; border-radius:4px;">
+              VLSFO SOₓ = VLSFO Fuel × (0.50% × 2) = Fuel × 0.01<br>
+              LSMGO SOₓ = LSMGO Fuel × (0.10% × 2) = Fuel × 0.002<br>
+              <strong>Total SOₓ = <span id="rpt-calc-sox">--</span> MT</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px; border-radius:6px; font-size:8pt; margin-bottom:14px;">
+        <div style="font-weight:bold; color:#0369a1; font-size:9.5pt; margin-bottom:4px;">4. Operational Carbon Intensity Indicator (CII) Rating</div>
+        <div style="font-family:monospace; font-size:8pt; margin-bottom:4px;">
+          Attained CII = (Total CO₂ in grams) ÷ (DWT × Total Distance in NM) = <strong id="rpt-calc-cii-formula">--</strong>
+        </div>
+        <div>Resulting Voyage CII Intensity: <strong id="rpt-calc-cii-val">--</strong> gCO₂/dwt·NM &nbsp;|&nbsp; Compliance Rating: <strong id="rpt-calc-cii-grade" style="color:#047857;">--</strong></div>
+      </div>
+
+      <div style="border-top:1px solid #cbd5e1; padding-top:6px; font-size:7pt; display:flex; justify-content:space-between; color:#64748b;">
+        <span>Safety as a Living Practice • Initiative by rahulDev (rahuldtr@gmail.com) • miTrack Distance ver 10.0</span>
+        <span>Chief Engineer / Master Signature: __________________________________</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. STRICT OCEANWAYWAYPOINT CLEARANCE MATRIX
+    // ==========================================
+    const GLOBAL_PORTS = [
+      { name: "Mumbai / JNPT", locode: "INBOM", country: "IN", lat: 18.9500, lon: 72.8333, fairways: [[18.90, 71.50], [18.50, 70.00]] },
+      { name: "Kochi / Cochin", locode: "INCOK", country: "IN", lat: 9.9312, lon: 76.2673, fairways: [[9.80, 75.00], [9.00, 74.00]] },
+      { name: "Chennai", locode: "INMAA", country: "IN", lat: 13.0827, lon: 80.2707, fairways: [[13.10, 81.50], [12.50, 82.50]] },
+      { name: "Haldia / Kolkata", locode: "INHAL", country: "IN", lat: 22.0330, lon: 88.0667, fairways: [[20.50, 88.00], [19.50, 87.50]] },
+      { name: "Visakhapatnam", locode: "INVTZ", country: "IN", lat: 17.6868, lon: 83.2185, fairways: [[17.50, 84.00], [16.80, 85.00]] },
+      { name: "Mundra", locode: "INMUN", country: "IN", lat: 22.7500, lon: 69.7000, fairways: [[22.20, 68.00], [21.50, 67.00]] },
+      { name: "Colombo", locode: "LKCMB", country: "LK", lat: 6.9500, lon: 79.8500, fairways: [[6.50, 80.00], [5.50, 80.50]] },
+      { name: "Singapore", locode: "SGSIN", country: "SG", lat: 1.2903, lon: 103.8520, fairways: [[1.20, 104.00], [1.30, 104.50]] },
+      { name: "Duqm", locode: "OMDQM", country: "OM", lat: 19.6683, lon: 57.7050, fairways: [[19.50, 58.50], [19.00, 59.50]] },
+      { name: "Rotterdam", locode: "NLRTM", country: "NL", lat: 51.9244, lon: 4.4777, fairways: [[52.00, 3.80], [52.50, 3.00]] }
+    ];
+
+    const HRA_POLYGON = [
+      [12.0, 43.0], [15.5, 41.5], [22.5, 38.0], [27.8, 34.5], [22.0, 39.0],
+      [13.0, 48.0], [15.0, 56.0], [22.0, 64.0], [18.0, 68.0], [10.0, 65.0],
+      [5.0, 52.0], [10.0, 45.0]
+    ];
+
+    const FALLBACK_SEA_GATES = {
+      arabian_sea_mid:     { name: "Central Arabian Sea Transit", lat: 15.00, lon: 65.00 },
+      dondra_head:         { name: "South Sri Lanka (Dondra Head TSS)", lat: 5.50, lon: 80.50 },
+      great_channel:       { name: "Great Channel (Nicobar / Sumatra)", lat: 6.00, lon: 94.50 },
+      malacca_nw:          { name: "Strait of Malacca North Approach", lat: 5.30, lon: 97.60 },
+      one_fathom_bank:     { name: "One Fathom Bank TSS", lat: 2.90, lon: 101.00 },
+      singapore_strait_w:  { name: "Singapore Strait West Entrance", lat: 1.22, lon: 103.50 },
+      singapore_strait_e:  { name: "Singapore Strait East TSS", lat: 1.30, lon: 104.25 },
+      suez_south:          { name: "Suez Canal South (Port Tewfik)", lat: 29.90, lon: 32.55 },
+      suez_north:          { name: "Port Said North Entry", lat: 31.35, lon: 32.35 },
+      gibraltar_strait:    { name: "Strait of Gibraltar TSS", lat: 35.95, lon: -5.60 },
+      rotterdam_pilot:     { name: "Maas Center Pilot Approach (Rotterdam)", lat: 52.00, lon: 3.80 }
+    };
+
+    let map = null;
+    let routePolyline = null;
+    let shipMarker = null;
+    let hraLayer = null;
+    let activeWaypoints = [];
+    let currentRouteWeather = [];
+    let routeStrategy = 'best';
+    let isPlaying = false;
+    let animationTimer = null;
+    let isOnline = navigator.onLine;
+
+    const WEATHER_CACHE = new Map();
+
+    let voyagePorts = [
+      { id: "p1", val: "Kochi / Cochin (INCOK)" },
+      { id: "p2", val: "Haldia / Kolkata (INHAL)" }
+    ];
+
+    let smokeParticles = [];
+    let currentApparentWind = { speed: 10, angle: 180 };
+    let currentExhaustSeverity = 0.0;
+
+    function checkIsECA(lat, lon) {
+      if (lat >= 48.0 && lat <= 62.0 && lon >= -8.0 && lon <= 15.0) return true;
+      if (lat >= 53.0 && lat <= 66.0 && lon >= 10.0 && lon <= 30.0) return true;
+      return false;
+    }
+
+    function calcDistanceNM(lat1, lon1, lat2, lon2) {
+      const R = 3440.065;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    function calcBearing(lat1, lon1, lat2, lon2) {
+      const y = Math.sin((lon2 - lon1) * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
+      const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+                Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos((lon2 - lon1) * Math.PI / 180);
+      return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    }
+
+    function initMap() {
+      map = L.map('map', {
+        zoomControl: true,
+        attributionControl: false,
+        worldCopyJump: true,
+        minZoom: 2,
+        maxZoom: 13
+      }).setView([15.0, 80.0], 4);
+
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 13
+      }).addTo(map);
+
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 13,
+        opacity: 0.85
+      }).addTo(map);
+
+      hraLayer = L.polygon(HRA_POLYGON, {
+        color: '#f43f5e',
+        fillColor: '#f43f5e',
+        fillOpacity: 0.12,
+        weight: 1.5,
+        dashArray: '6, 6'
+      }).addTo(map);
+      hraLayer.bindTooltip("⚠️ High Risk Area (HRA / BMP5 Guarded Zone)", { sticky: true });
+
+      const shipContainer = L.divIcon({
+        className: 'vessel-dynamic-marker',
+        html: `
+          <div id="ship-halo" class="ship-weather-halo halo-calm"></div>
+          <div id="ship-wind-vector" class="stream-arrow" style="color:#0284c7; top:-38px; left:6px;">➤</div>
+          <div id="ship-current-vector" class="stream-arrow" style="color:#06b6d4; bottom:-38px; left:6px;">➤</div>
+          <div id="ship-glyph" style="width:36px; height:36px; transform-origin: center center; position:relative; z-index:500; display:flex; align-items:center; justify-content:center;">
+            <svg viewBox="0 0 40 40" width="34" height="34">
+              <path d="M20,2 L27,10 L27,32 L20,38 L13,32 L13,10 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
+              <rect x="17" y="16" width="6" height="12" fill="#ffffff" rx="1.5" />
+              <circle cx="20" cy="8" r="2.5" fill="#facc15" />
+            </svg>
+          </div>
+        `,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+
+      shipMarker = L.marker([0, 0], { icon: shipContainer, zIndexOffset: 2000 }).addTo(map);
+
+      const etdInput = document.getElementById('voyage-etd');
+      if (etdInput) etdInput.value = new Date().toISOString().split('T')[0];
+
+      initSmokePhysics();
+      renderPortRowsUI();
+      calculateRoute();
+    }
+
+    function initSmokePhysics() {
+      const canvas = document.getElementById('smoke-canvas');
+      const container = document.getElementById('map');
+      if (!canvas || !container) return;
+
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+
+      window.addEventListener('resize', () => {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+      });
+
+      map.on('move', () => {
+        smokeParticles = [];
+      });
+
+      function animateParticles() {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (shipMarker && map) {
+          const latlng = shipMarker.getLatLng();
+          const p = map.latLngToContainerPoint(latlng);
+
+          if (p.x >= 0 && p.x <= canvas.width && p.y >= 0 && p.y <= canvas.height) {
+            const rad = (currentApparentWind.angle + 180) * Math.PI / 180;
+            const windDriftX = Math.sin(rad) * (currentApparentWind.speed * 0.08);
+            const windDriftY = -Math.cos(rad) * (currentApparentWind.speed * 0.08);
+
+            const redCh = Math.round(255 - currentExhaustSeverity * (255 - 148));
+            const greenCh = Math.round(255 - currentExhaustSeverity * (255 - 163));
+            const blueCh = Math.round(255 - currentExhaustSeverity * (255 - 184));
+
+            smokeParticles.push({
+              x: p.x,
+              y: p.y,
+              vx: windDriftX + (Math.random() - 0.5) * 0.4,
+              vy: windDriftY + (Math.random() - 0.5) * 0.4,
+              size: 3.5,
+              opacity: 0.75,
+              r: redCh,
+              g: greenCh,
+              b: blueCh,
+              age: 0
+            });
+          }
+        }
+
+        for (let i = smokeParticles.length - 1; i >= 0; i--) {
+          const s = smokeParticles[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.size += 0.35;
+          s.opacity -= 0.012;
+          s.age += 1;
+
+          if (s.opacity <= 0 || s.age > 70) {
+            smokeParticles.splice(i, 1);
+            continue;
+          }
+
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.r}, ${s.g}, ${s.b}, ${s.opacity})`;
+          ctx.fill();
+        }
+
+        requestAnimationFrame(animateParticles);
+      }
+      requestAnimationFrame(animateParticles);
+    }
+
+    function renderPortRowsUI() {
+      const container = document.getElementById('ports-container');
+      if (!container) return;
+
+      container.innerHTML = voyagePorts.map((port, idx) => {
+        const isStart = idx === 0;
+        const isEnd = idx === voyagePorts.length - 1;
+        const label = isStart ? "Departure (Start Port)" : (isEnd ? "Final Destination" : `Intermediate Port Stop ${idx}`);
+        const tagColor = isStart ? "text-emerald-700" : (isEnd ? "text-sky-700" : "text-amber-700");
+
+        return `
+          <div class="relative" id="wrapper-${port.id}">
+            <div class="flex items-center gap-2">
+              <div class="flex-1 relative">
+                <label class="block text-[9px] font-black uppercase ${tagColor} mb-0.5">${label}</label>
+                <input 
+                  type="text" 
+                  id="input-${port.id}"
+                  value="${port.val}" 
+                  onfocus="showPortDropdown('${port.id}')"
+                  oninput="filterPortDropdown('${port.id}', this.value)"
+                  placeholder="Search Port or UN/LOCODE..." 
+                  autocomplete="off"
+                  class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2.5 font-bold text-xs text-slate-800 outline-none focus:border-sky-500 font-mono transition" 
+                />
+              </div>
+              ${!isStart && !isEnd ? `
+                <button onclick="removeIntermediatePort('${port.id}')" class="mt-3.5 w-8 h-8 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 font-bold text-sm hover:bg-rose-100 transition flex items-center justify-center" title="Remove stop">
+                  &times;
+                </button>
+              ` : ''}
+            </div>
+
+            <div id="dropdown-${port.id}" class="port-dropdown-list hidden"></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showPortDropdown(id) {
+      document.querySelectorAll('.port-dropdown-list').forEach(el => el.classList.add('hidden'));
+      const inputEl = document.getElementById(`input-${id}`);
+      filterPortDropdown(id, inputEl ? inputEl.value : '');
+    }
+
+    function filterPortDropdown(id, query) {
+      const dd = document.getElementById(`dropdown-${id}`);
+      if (!dd) return;
+
+      const q = (query || "").toLowerCase().trim();
+      const matches = GLOBAL_PORTS.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        p.locode.toLowerCase().includes(q) ||
+        p.country.toLowerCase().includes(q)
+      );
+
+      if (matches.length === 0) {
+        dd.innerHTML = `<div class="p-3 text-slate-400 text-center text-xs">No matching ports found.</div>`;
+      } else {
+        dd.innerHTML = matches.map(p => `
+          <div class="port-dropdown-item" onclick="selectPortChoice('${id}', '${p.name} (${p.locode})')">
+            <span><strong>${p.name}</strong> <span class="text-slate-400">(${p.country})</span></span>
+            <span class="font-mono text-sky-700 font-bold text-[10px] bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">${p.locode}</span>
+          </div>
+        `).join('');
+      }
+
+      dd.classList.remove('hidden');
+    }
+
+    function selectPortChoice(id, val) {
+      const target = voyagePorts.find(p => p.id === id);
+      if (target) {
+        target.val = val;
+      }
+      const input = document.getElementById(`input-${id}`);
+      if (input) input.value = val;
+
+      const dd = document.getElementById(`dropdown-${id}`);
+      if (dd) dd.classList.add('hidden');
+
+      calculateRoute();
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#ports-container')) {
+        document.querySelectorAll('.port-dropdown-list').forEach(el => el.classList.add('hidden'));
+      }
+    });
+
+    function addIntermediatePortRow() {
+      const newId = "p" + Date.now();
+      voyagePorts.splice(voyagePorts.length - 1, 0, { id: newId, val: "Singapore (SGSIN)" });
+      renderPortRowsUI();
+      calculateRoute();
+    }
+
+    function removeIntermediatePort(id) {
+      voyagePorts = voyagePorts.filter(p => p.id !== id);
+      renderPortRowsUI();
+      calculateRoute();
+    }
+
+    function findPortDetails(inputVal) {
+      if (!inputVal) return null;
+      const match = inputVal.match(/\(([A-Z0-9]{3,6})\)/);
+      if (match) {
+        const found = GLOBAL_PORTS.find(p => p.locode === match[1]);
+        if (found) return found;
+      }
+      return GLOBAL_PORTS.find(p => p.name.toLowerCase().includes(inputVal.toLowerCase().trim())) || null;
+    }
+
+    function setRouteStrategy(strat) {
+      routeStrategy = strat;
+      const bBest = document.getElementById('btn-route-best');
+      const bEcon = document.getElementById('btn-route-econ');
+      const bCalm = document.getElementById('btn-route-calm');
+      const desc = document.getElementById('strategy-desc');
+
+      [bBest, bEcon, bCalm].forEach(b => {
+        b.className = "py-1.5 px-2 rounded-lg text-xs font-black transition text-slate-600 hover:text-slate-900";
+      });
+
+      if (strat === 'best') {
+        bBest.className = "py-1.5 px-2 rounded-lg text-xs font-black transition bg-sky-600 text-white shadow-sm";
+        desc.innerText = "Direct water-mesh navigation via shortest sea graph path.";
+      } else if (strat === 'economy') {
+        bEcon.className = "py-1.5 px-2 rounded-lg text-xs font-black transition bg-emerald-600 text-white shadow-sm";
+        desc.innerText = "Engine speed optimized by -1.5 kts to minimize fuel consumption.";
+      } else {
+        bCalm.className = "py-1.5 px-2 rounded-lg text-xs font-black transition bg-amber-600 text-white shadow-sm";
+        desc.innerText = "Diverts around high-swell zones (Arabian Sea / Bay of Biscay).";
+      }
+
+      calculateRoute();
+    }
+
+    // ==========================================
+    // STRICT WATERWAY CORRIDOR ROUTING (NO LAND CROSSING)
+    // ==========================================
+    function calculateRoute() {
+      const portObjects = voyagePorts.map(p => findPortDetails(p.val)).filter(Boolean);
+      if (portObjects.length < 2) return;
+
+      let assembledWaypoints = [];
+
+      for (let i = 0; i < portObjects.length - 1; i++) {
+        const pA = portObjects[i];
+        const pB = portObjects[i+1];
+        
+        assembledWaypoints.push({ name: `${pA.name} [Port]`, lat: pA.lat, lon: pA.lon });
+
+        if (pA.fairways && pA.fairways.length > 0) {
+          pA.fairways.forEach((f, fIdx) => {
+            assembledWaypoints.push({ name: `${pA.name} Safe Deep-Sea Gate ${fIdx + 1}`, lat: f[0], lon: f[1] });
+          });
+        }
+
+        // Apply strict regional maritime chokepoints to bypass Indian peninsula & landmasses
+        const legNodes = buildStrictWaterwayNodes(pA, pB);
+        legNodes.forEach(node => assembledWaypoints.push(node));
+
+        if (pB.fairways && pB.fairways.length > 0) {
+          const revFairways = [...pB.fairways].reverse();
+          revFairways.forEach((f, fIdx) => {
+            assembledWaypoints.push({ name: `${pB.name} Inbound Gate ${fIdx + 1}`, lat: f[0], lon: f[1] });
+          });
+        }
+      }
+
+      const lastPort = portObjects[portObjects.length - 1];
+      assembledWaypoints.push({ name: `${lastPort.name} [Destination]`, lat: lastPort.lat, lon: lastPort.lon });
+
+      activeWaypoints = assembledWaypoints;
+
+      const speed = parseFloat(document.getElementById('vessel-speed').value) || 13.5;
+      const etdVal = document.getElementById('voyage-etd').value || new Date().toISOString().split('T')[0];
+      const departureDate = new Date(etdVal + "T08:00:00Z");
+      let cumulativeHours = 0;
+
+      currentRouteWeather = activeWaypoints.map((wp, idx) => {
+        if (idx > 0) {
+          const legNM = calcDistanceNM(activeWaypoints[idx-1].lat, activeWaypoints[idx-1].lon, wp.lat, wp.lon);
+          cumulativeHours += (legNM / speed);
+        }
+        wp.eta = new Date(departureDate.getTime() + cumulativeHours * 3600 * 1000);
+
+        const cacheKey = `wx_${wp.lat.toFixed(1)}_${wp.lon.toFixed(1)}_${wp.eta.toISOString().slice(0, 13)}`;
+        if (WEATHER_CACHE.has(cacheKey)) {
+          return WEATHER_CACHE.get(cacheKey);
+        }
+
+        return getBaselineSynopticWeather(wp);
+      });
+
+      renderRouteOnMap();
+      updateCalculations();
+      fetchMarineWeatherDataAsync();
+    }
+
+    function buildStrictWaterwayNodes(pA, pB) {
+      const nodes = [];
+      const isWestCoastA = (pA.lon < 75 && pA.lat < 25);
+      const isEastCoastB = (pB.lon > 82 && pB.lat > 15);
+      const isEastCoastA = (pA.lon > 82 && pA.lat > 15);
+      const isWestCoastB = (pB.lon < 75 && pB.lat < 25);
+
+      // 1. West Coast India (Mumbai/Kochi/Mundra) <---> East Coast India (Chennai/Visakhapatnam/Haldia)
+      // Must round South of Sri Lanka (Dondra Head) to avoid cutting across the Indian peninsula!
+      if ((isWestCoastA && isEastCoastB) || (isEastCoastA && isWestCoastB)) {
+        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.50, lon: 75.00 });
+        nodes.push({ name: "South of Sri Lanka (Dondra Head Deep TSS)", lat: 5.20, lon: 80.50 });
+        nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 10.00, lon: 85.00 });
+        return nodes;
+      }
+
+      // 2. West Coast India <---> Far East / Singapore
+      if (isWestCoastA && pB.lon > 95) {
+        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 5.20, lon: 80.50 });
+        nodes.push(FALLBACK_SEA_GATES.great_channel);
+        nodes.push(FALLBACK_SEA_GATES.malacca_nw);
+        nodes.push(FALLBACK_SEA_GATES.one_fathom_bank);
+        nodes.push(FALLBACK_SEA_GATES.singapore_strait_w);
+        return nodes;
+      }
+
+      // 3. East Coast India <---> Middle East / Europe
+      if (isEastCoastA && (pB.lon < 72 || pB.name === "Duqm" || pB.name === "Rotterdam")) {
+        nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 10.00, lon: 85.00 });
+        nodes.push({ name: "South of Sri Lanka (Dondra Head)", lat: 5.20, lon: 80.50 });
+        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.50, lon: 75.00 });
+        return nodes;
+      }
+
+      // Default Midpoint Open Sea Fallback
+      nodes.push({ name: "Open Sea Deep Water Waypoint", lat: (pA.lat + pB.lat)/2, lon: (pA.lon + pB.lon)/2 });
+      return nodes;
+    }
+
+    function getBaselineSynopticWeather(wp) {
+      let waveHeight = 1.2, windSpeed = 12, windDir = 50, currentKts = 0.8, currentDir = 210, waterTemp = 27.5;
+      if (wp.lat < 10 && wp.lon > 80) {
+        waterTemp = 28.5;
+      } else if (wp.lat > 20) {
+        waterTemp = 26.0;
+      }
+      return { waveHeight, windSpeed, windDir, currentKts, currentDir, waterTemp };
+    }
+
+    async function fetchMarineWeatherDataAsync() {
+      const statusEl = document.getElementById('map-weather-status');
+      if (!isOnline) {
+        if (statusEl) statusEl.innerText = "✓ Synoptic Mesh Active (Offline)";
+        return;
+      }
+
+      if (statusEl) statusEl.innerText = "Syncing Marine GFS & SST...";
+      let hasUpdates = false;
+
+      for (let i = 0; i < activeWaypoints.length; i++) {
+        const wp = activeWaypoints[i];
+        const dateStr = wp.eta.toISOString().split('T')[0];
+        const hourIdx = Math.min(23, wp.eta.getUTCHours());
+        const cacheKey = `wx_${wp.lat.toFixed(1)}_${wp.lon.toFixed(1)}_${wp.eta.toISOString().slice(0, 13)}`;
+
+        if (WEATHER_CACHE.has(cacheKey)) continue;
+
+        try {
+          const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${wp.lat.toFixed(2)}&longitude=${wp.lon.toFixed(2)}&start_date=${dateStr}&end_date=${dateStr}&hourly=wave_height,wave_direction,wind_wave_height,water_temperature`;
+          const res = await fetch(url);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.hourly && data.hourly.wave_height && data.hourly.wave_height.length > 0) {
+              const waveHeight = Number(data.hourly.wave_height[hourIdx]) || 1.3;
+              const windDir = Number(data.hourly.wave_direction[hourIdx]) || 60;
+              const windSpeed = Math.round(waveHeight * 8.5 + 4);
+              const waterTemp = data.hourly.water_temperature && data.hourly.water_temperature[hourIdx] != null ? Number(data.hourly.water_temperature[hourIdx]) : 27.0;
+              const currentKts = currentRouteWeather[i] ? currentRouteWeather[i].currentKts : 0.8;
+              const currentDir = currentRouteWeather[i] ? currentRouteWeather[i].currentDir : 210;
+
+              const liveData = {
+                waveHeight: Number(waveHeight.toFixed(1)),
+                windSpeed: Math.round(windSpeed),
+                windDir: Math.round(windDir),
+                waterTemp: Number(waterTemp.toFixed(1)),
+                currentKts: Number(currentKts.toFixed(1)),
+                currentDir: Math.round(currentDir)
+              };
+
+              WEATHER_CACHE.set(cacheKey, liveData);
+              currentRouteWeather[i] = liveData;
+              hasUpdates = true;
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (statusEl) statusEl.innerText = "✓ Live Marine Weather & SST Synced";
+      if (hasUpdates) updateCalculations();
+    }
+
+    function renderRouteOnMap() {
+      if (!map) return;
+      if (routePolyline) map.removeLayer(routePolyline);
+
+      const latlngs = activeWaypoints.map(w => [w.lat, w.lon]);
+      const trackColor = routeStrategy === 'economy' ? '#059669' : (routeStrategy === 'calm' ? '#d97706' : '#0284c7');
+
+      routePolyline = L.polyline(latlngs, {
+        color: trackColor,
+        weight: 3.5,
+        opacity: 0.9,
+        dashArray: '6, 6'
+      }).addTo(map);
+
+      map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
+
+      if (latlngs.length > 0 && shipMarker) {
+        shipMarker.setLatLng(latlngs[0]);
+      }
+    }
+
+    let lastVoyageMetrics = {};
+
+    function updateCalculations() {
+      let speed = parseFloat(document.getElementById('vessel-speed').value) || 13.5;
+      if (routeStrategy === 'economy') speed = Math.max(9.0, speed - 1.5);
+
+      const dailyFoc = parseFloat(document.getElementById('vessel-foc').value) || 26.0;
+
+      let totalDist = 0;
+      let nonEcaDist = 0;
+      let ecaDist = 0;
+      let legDistances = [];
+
+      for (let i = 0; i < activeWaypoints.length - 1; i++) {
+        const p1 = activeWaypoints[i];
+        const p2 = activeWaypoints[i+1];
+        const d = calcDistanceNM(p1.lat, p1.lon, p2.lat, p2.lon);
+        legDistances.push(d);
+        totalDist += d;
+
+        const midLat = (p1.lat + p2.lat) / 2;
+        const midLon = (p1.lon + p2.lon) / 2;
+        if (checkIsECA(midLat, midLon)) {
+          ecaDist += d;
+        } else {
+          nonEcaDist += d;
+        }
+      }
+
+      let avgWave = 1.2;
+      if (currentRouteWeather.length > 0) {
+        avgWave = currentRouteWeather.reduce((a, b) => a + (b.waveHeight || 1.2), 0) / currentRouteWeather.length;
+      }
+
+      let weatherMargin = 5.0;
+      if (avgWave > 3.0) weatherMargin = 16.0;
+      else if (avgWave > 2.0) weatherMargin = 10.0;
+
+      const steamingDays = totalDist / (speed * 24);
+      const baseFuel = steamingDays * dailyFoc * (1 + weatherMargin / 100);
+
+      const vlsfoFuel = totalDist > 0 ? baseFuel * (nonEcaDist / totalDist) : baseFuel;
+      const lsmgoFuel = totalDist > 0 ? baseFuel * (ecaDist / totalDist) : 0;
+      const totalFuel = vlsfoFuel + lsmgoFuel;
+
+      const co2Vlsfo = vlsfoFuel * 3.114;
+      const co2Lsmgo = lsmgoFuel * 3.206;
+      const totalCo2 = co2Vlsfo + co2Lsmgo;
+
+      const soxVlsfo = vlsfoFuel * 0.01;
+      const soxLsmgo = lsmgoFuel * 0.002;
+      const totalSox = soxVlsfo + soxLsmgo;
+
+      const assumedDWT = 50000;
+      const ciiGrams = totalDist > 0 ? (totalCo2 * 1000000) / (assumedDWT * totalDist) : 0;
+
+      lastVoyageMetrics = {
+        totalDist: Math.round(totalDist),
+        steamingDays: steamingDays.toFixed(1),
+        totalFuel: totalFuel.toFixed(1),
+        vlsfoFuel: vlsfoFuel.toFixed(1),
+        lsmgoFuel: lsmgoFuel.toFixed(1),
+        weatherMargin: weatherMargin.toFixed(1),
+        nonEcaDist: Math.round(nonEcaDist),
+        ecaDist: Math.round(ecaDist),
+        baseFuel: baseFuel.toFixed(1),
+        totalCo2: totalCo2.toFixed(1),
+        totalSox: totalSox.toFixed(2),
+        ciiVal: ciiGrams.toFixed(2)
+      };
+
+      document.getElementById('kpi-distance').innerText = `${Math.round(totalDist).toLocaleString()} NM`;
+      document.getElementById('kpi-time').innerText = `${steamingDays.toFixed(1)} Days`;
+      document.getElementById('kpi-fuel').innerText = `${totalFuel.toFixed(1)} MT`;
+      document.getElementById('kpi-bunker-split').innerText = `${vlsfoFuel.toFixed(1)} V / ${lsmgoFuel.toFixed(1)} L`;
+      document.getElementById('kpi-avg-wave').innerText = `${avgWave.toFixed(1)} m`;
+      document.getElementById('weather-factor-badge').innerText = `+${weatherMargin.toFixed(1)}%`;
+
+      document.getElementById('env-co2').innerText = `${totalCo2.toFixed(1)} MT`;
+      document.getElementById('env-sox').innerText = `${totalSox.toFixed(2)} MT`;
+      document.getElementById('env-cii').innerText = `${ciiGrams.toFixed(2)}`;
+
+      const ciiRatingBadge = document.getElementById('env-cii-rating');
+      if (ciiGrams <= 4.0) {
+        ciiRatingBadge.innerText = "Rating A (Superior)";
+        ciiRatingBadge.className = "px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+      } else if (ciiGrams <= 5.5) {
+        ciiRatingBadge.innerText = "Rating B (Good)";
+        ciiRatingBadge.className = "px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+      } else if (ciiGrams <= 7.0) {
+        ciiRatingBadge.innerText = "Rating C (Moderate)";
+        ciiRatingBadge.className = "px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-sky-100 text-sky-800 border border-sky-300";
+      } else if (ciiGrams <= 8.5) {
+        ciiRatingBadge.innerText = "Rating D (Inferior)";
+        ciiRatingBadge.className = "px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300";
+      } else {
+        ciiRatingBadge.innerText = "Rating E (Non-Compliant)";
+        ciiRatingBadge.className = "px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-300";
+      }
+
+      const tbody = document.getElementById('waypoints-table-body');
+      let runningDist = 0;
+
+      tbody.innerHTML = activeWaypoints.map((wp, idx) => {
+        const leg = idx === 0 ? 0 : legDistances[idx - 1];
+        runningDist += leg;
+        const w = currentRouteWeather[idx] || { waveHeight: 1.2, windSpeed: 12, windDir: 45, waterTemp: 27.5, currentKts: 0.8, currentDir: 180 };
+        const legFuel = (leg / (speed * 24)) * dailyFoc * (1 + weatherMargin / 100);
+        const etaStr = wp.eta ? wp.eta.toUTCString().slice(5, 22) : "--";
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-2 text-slate-400 font-bold">${idx + 1}</td>
+            <td class="p-2 font-bold text-slate-800">${wp.name}</td>
+            <td class="p-2 text-amber-700 font-mono">${formatCoords(wp.lat, wp.lon)}</td>
+            <td class="p-2 text-emerald-700 font-bold">${Math.round(leg)}</td>
+            <td class="p-2 text-slate-600 font-bold">${Math.round(runningDist)}</td>
+            <td class="p-2 text-sky-700 font-mono text-[10px]">${etaStr}</td>
+            <td class="p-2 font-bold ${w.waveHeight > 2.5 ? 'text-rose-700' : 'text-sky-700'}">${w.waveHeight} m</td>
+            <td class="p-2 text-slate-600">${w.windSpeed} kts (${w.windDir}°)</td>
+            <td class="p-2 text-cyan-700 font-bold">${w.waterTemp || 27.5} °C</td>
+            <td class="p-2 text-amber-700 font-bold">${legFuel.toFixed(1)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('table-waypoint-count').innerText = `${activeWaypoints.length} Waypoints Listed`;
+      document.getElementById('voyage-slider').value = 0;
+      onSliderMove(0);
+    }
+
+    function formatCoords(lat, lon) {
+      const latCard = lat >= 0 ? 'N' : 'S';
+      const lonCard = lon >= 0 ? 'E' : 'W';
+      return `${Math.abs(lat).toFixed(2)}°${latCard}, ${Math.abs(lon).toFixed(2)}°${lonCard}`;
+    }
+
+    function onSliderMove(val) {
+      const pct = parseFloat(val) / 100;
+      if (activeWaypoints.length < 2) return;
+
+      const totalDist = parseFloat(document.getElementById('kpi-distance').innerText.replace(/[^0-9.]/g, '')) || 1000;
+      let speed = parseFloat(document.getElementById('vessel-speed').value) || 13.5;
+      if (routeStrategy === 'economy') speed = Math.max(9.0, speed - 1.5);
+
+      const totalDays = totalDist / (speed * 24);
+      const currentDay = totalDays * pct;
+
+      document.getElementById('slider-day-label').innerText = `Day ${currentDay.toFixed(1)} of ${totalDays.toFixed(1)}`;
+
+      const etdVal = document.getElementById('voyage-etd').value || new Date().toISOString().split('T')[0];
+      const currentSimTime = new Date(new Date(etdVal + "T08:00:00Z").getTime() + currentDay * 24 * 3600 * 1000);
+      document.getElementById('slider-eta-label').innerText = `Sim Date: ${currentSimTime.toUTCString().slice(5, 22)} UTC`;
+
+      const targetDist = totalDist * pct;
+      let accumulated = 0;
+      let targetLat = activeWaypoints[0].lat;
+      let targetLon = activeWaypoints[0].lon;
+      let matchedIdx = 0;
+      let heading = 90;
+
+      for (let i = 0; i < activeWaypoints.length - 1; i++) {
+        const d = calcDistanceNM(activeWaypoints[i].lat, activeWaypoints[i].lon, activeWaypoints[i+1].lat, activeWaypoints[i+1].lon);
+        if (accumulated + d >= targetDist) {
+          const legFrac = (targetDist - accumulated) / (d || 1);
+          targetLat = activeWaypoints[i].lat + (activeWaypoints[i+1].lat - activeWaypoints[i].lat) * legFrac;
+          targetLon = activeWaypoints[i].lon + (activeWaypoints[i+1].lon - activeWaypoints[i].lon) * legFrac;
+          heading = calcBearing(activeWaypoints[i].lat, activeWaypoints[i].lon, activeWaypoints[i+1].lat, activeWaypoints[i+1].lon);
+          matchedIdx = i;
+          break;
+        }
+        accumulated += d;
+      }
+
+      if (shipMarker) shipMarker.setLatLng([targetLat, targetLon]);
+
+      const w = currentRouteWeather[matchedIdx] || { waveHeight: 1.2, windSpeed: 12, windDir: 45, waterTemp: 27.5, currentKts: 0.8, currentDir: 200 };
+      const totalFuel = parseFloat(document.getElementById('kpi-fuel').innerText.replace(/[^0-9.]/g, '')) || 0;
+
+      currentApparentWind.speed = w.windSpeed;
+      currentApparentWind.angle = w.windDir;
+
+      let angleDiff = Math.abs(heading - w.currentDir);
+      if (angleDiff > 180) angleDiff = 360 - angleDiff;
+      const isFavourable = angleDiff < 90;
+
+      let adverseScore = 0.0;
+      if (!isFavourable) adverseScore += 0.45;
+      if (w.waveHeight > 2.0) adverseScore += Math.min(0.55, (w.waveHeight - 2.0) / 2.0);
+      currentExhaustSeverity = Math.min(1.0, adverseScore);
+
+      const currentBanner = document.getElementById('hud-current-status-banner');
+      const currentIcon = document.getElementById('hud-current-icon');
+      const currentText = document.getElementById('hud-current-text');
+      const currentSpeedTag = document.getElementById('hud-current-speed-tag');
+
+      if (currentBanner) {
+        if (isFavourable) {
+          currentBanner.className = "p-1.5 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-between";
+          currentIcon.innerText = "🟢";
+          currentText.innerText = "Favourable Current";
+          currentText.className = "font-black text-[10px] text-emerald-800 uppercase tracking-wider";
+          currentSpeedTag.innerText = `+${w.currentKts} kts`;
+          currentSpeedTag.className = "font-mono text-[10px] text-emerald-700 font-bold";
+        } else {
+          currentBanner.className = "p-1.5 rounded-lg bg-rose-50 border border-rose-300 flex items-center justify-between";
+          currentIcon.innerText = "🔴";
+          currentText.innerText = "Adverse / Head Current";
+          currentText.className = "font-black text-[10px] text-rose-800 uppercase tracking-wider";
+          currentSpeedTag.innerText = `-${w.currentKts} kts`;
+          currentSpeedTag.className = "font-mono text-[10px] text-rose-700 font-bold";
+        }
+      }
+
+      document.getElementById('slider-pos').innerText = formatCoords(targetLat, targetLon);
+      document.getElementById('slider-wave').innerText = `${w.waveHeight} m`;
+      document.getElementById('slider-wind').innerText = `${w.windSpeed} kts`;
+      document.getElementById('slider-temp').innerText = `${w.waterTemp || 27.5} °C`;
+      document.getElementById('slider-fuel').innerText = `${(totalFuel * pct).toFixed(1)} MT`;
+
+      document.getElementById('hud-leg-name').innerText = activeWaypoints[matchedIdx].name;
+      document.getElementById('hud-wind').innerText = `${w.windSpeed} kts (${w.windDir}°)`;
+      document.getElementById('hud-current').innerText = `${w.currentKts} kts (${w.currentDir}°)`;
+      document.getElementById('hud-wave').innerText = `${w.waveHeight} m`;
+      document.getElementById('hud-temp').innerText = `${w.waterTemp || 27.5} °C`;
+      document.getElementById('hud-heading').innerText = `${Math.round(heading)}°`;
+
+      const halo = document.getElementById('ship-halo');
+      const windVector = document.getElementById('ship-wind-vector');
+      const currentVector = document.getElementById('ship-current-vector');
+      const shipGlyph = document.getElementById('ship-glyph');
+
+      if (halo && windVector && currentVector && shipGlyph) {
+        shipGlyph.style.transform = `rotate(${Math.round(heading)}deg)`;
+
+        if (w.waveHeight > 2.5) {
+          halo.className = "ship-weather-halo halo-rough";
+        } else {
+          halo.className = "ship-weather-halo halo-calm";
+        }
+
+        windVector.style.transform = `rotate(${w.windDir}deg)`;
+        currentVector.style.transform = `rotate(${w.currentDir}deg)`;
+      }
+    }
+
+    function toggleVoyageAnimation() {
+      const btn = document.getElementById('btn-play-pause');
+      isPlaying = !isPlaying;
+
+      if (isPlaying) {
+        btn.innerText = "⏸ Pause";
+        btn.className = "px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-sm";
+        const slider = document.getElementById('voyage-slider');
+
+        animationTimer = setInterval(() => {
+          let curr = parseFloat(slider.value);
+          if (curr >= 100) {
+            slider.value = 0;
+            curr = 0;
+          }
+          slider.value = curr + 0.5;
+          onSliderMove(slider.value);
+        }, 200);
+      } else {
+        btn.innerText = "▶ Play";
+        btn.className = "px-3 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-sm";
+        clearInterval(animationTimer);
+      }
+    }
+
+    function openAboutModal() {
+      document.getElementById('about-modal').style.display = 'flex';
+    }
+
+    function closeAboutModal() {
+      document.getElementById('about-modal').style.display = 'none';
+    }
+
+    function printVoyagePlanPdf() {
+      const portNames = voyagePorts.map(p => p.val).join(" ➔ ");
+      const vesselName = document.getElementById('vessel-name').value || "MT Venus 3";
+
+      document.getElementById('rpt-route-title').innerText = portNames;
+      document.getElementById('rpt-date').innerText = new Date().toUTCString();
+      document.getElementById('rpt-vessel-name').innerText = vesselName;
+      document.getElementById('rpt-strategy').innerText = routeStrategy.toUpperCase();
+      document.getElementById('rpt-speed').innerText = document.getElementById('vessel-speed').value;
+      document.getElementById('rpt-daily-foc').innerText = document.getElementById('vessel-foc').value;
+      document.getElementById('rpt-dist').innerText = document.getElementById('kpi-distance').innerText;
+      document.getElementById('rpt-time').innerText = document.getElementById('kpi-time').innerText;
+      document.getElementById('rpt-fuel').innerText = document.getElementById('kpi-fuel').innerText;
+      document.getElementById('rpt-margin').innerText = document.getElementById('weather-factor-badge').innerText;
+
+      document.getElementById('rpt-non-eca-dist').innerText = lastVoyageMetrics.nonEcaDist;
+      document.getElementById('rpt-eca-dist').innerText = lastVoyageMetrics.ecaDist;
+      document.getElementById('rpt-base-fuel').innerText = lastVoyageMetrics.baseFuel;
+      document.getElementById('rpt-vlsfo-fuel').innerText = lastVoyageMetrics.vlsfoFuel;
+      document.getElementById('rpt-lsmgo-fuel').innerText = lastVoyageMetrics.lsmgoFuel;
+      document.getElementById('rpt-total-fuel-box').innerText = lastVoyageMetrics.totalFuel;
+      document.getElementById('rpt-calc-co2').innerText = lastVoyageMetrics.totalCo2;
+      document.getElementById('rpt-calc-sox').innerText = lastVoyageMetrics.totalSox;
+      document.getElementById('rpt-calc-cii-formula').innerText = `(${lastVoyageMetrics.totalCo2} × 10⁶) ÷ (50,000 × ${lastVoyageMetrics.totalDist})`;
+      document.getElementById('rpt-calc-cii-val').innerText = lastVoyageMetrics.ciiVal;
+      document.getElementById('rpt-calc-cii-grade').innerText = document.getElementById('env-cii-rating').innerText;
+
+      let runningDist = 0;
+      let rowsHtml = '';
+
+      for (let i = 0; i < activeWaypoints.length; i++) {
+        const wp = activeWaypoints[i];
+        let leg = 0;
+        if (i > 0) {
+          leg = calcDistanceNM(activeWaypoints[i-1].lat, activeWaypoints[i-1].lon, wp.lat, wp.lon);
+        }
+        runningDist += leg;
+        const w = currentRouteWeather[i] || { waveHeight: 1.2, windSpeed: 12, windDir: 45, waterTemp: 27.5, currentKts: 0.8, currentDir: 180 };
+        const etaStr = wp.eta ? wp.eta.toUTCString().slice(5, 22) : "--";
+
+        rowsHtml += `
+          <tr>
+            <td style="text-align:center; font-weight:bold;">${i + 1}</td>
+            <td style="font-weight:bold;">${wp.name}</td>
+            <td style="font-family:monospace;">${formatCoords(wp.lat, wp.lon)}</td>
+            <td style="text-align:right;">${Math.round(leg)}</td>
+            <td style="text-align:right; font-weight:bold;">${Math.round(runningDist)}</td>
+            <td style="font-family:monospace; font-size:7pt;">${etaStr}</td>
+            <td style="text-align:center; font-weight:bold;">${w.waveHeight} m</td>
+            <td style="text-align:center;">${w.windSpeed} kts (${w.windDir}°)</td>
+            <td style="text-align:center; font-weight:bold; color:#0284c7;">${w.waterTemp || 27.5} °C</td>
+          </tr>
+        `;
+      }
+      document.getElementById('rpt-table-body').innerHTML = rowsHtml;
+      window.print();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initMap();
+    });
+  </script>
+</body>
+</html>
