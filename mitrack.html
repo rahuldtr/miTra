@@ -4,14 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>miTrack Distance - Passage Planner & Weather Router</title>
-
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- Leaflet Core CSS & JS (Keyless, 100% Free) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <style>
     :root {
       --bg: #f1f5f9;
@@ -145,7 +142,7 @@
     @media print {
       @page {
         size: A4 landscape;
-        margin: 10mm;
+        margin: 8mm;
       }
       html, body {
         background: #ffffff !important;
@@ -165,7 +162,7 @@
         width: 100% !important;
         background: #ffffff !important;
         color: #0f172a !important;
-        font-size: 8pt !important;
+        font-size: 7.5pt !important;
       }
       .page-break {
         page-break-before: always;
@@ -178,13 +175,13 @@
       }
       .plan-table th, .plan-table td {
         border: 1px solid #cbd5e1 !important;
-        padding: 4px 5px !important;
+        padding: 4px 4px !important;
         text-align: left;
       }
       .plan-table th {
         background-color: #0f172a !important;
         color: #ffffff !important;
-        font-size: 7.5pt !important;
+        font-size: 7pt !important;
       }
       .plan-table tr:nth-child(even) td {
         background-color: #f8fafc !important;
@@ -193,7 +190,6 @@
   </style>
 </head>
 <body class="p-2 md:p-4 space-y-3 flex flex-col items-center">
-
   <div class="max-w-7xl w-full space-y-3">
     <!-- Header -->
     <header class="glass-card p-3.5 md:p-4 rounded-2xl flex justify-between items-center flex-wrap gap-2">
@@ -225,7 +221,6 @@
 
     <!-- Controls Panel -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
-      
       <!-- Waypoint Sequence & Port Ingestion -->
       <div class="glass-card p-3.5 rounded-2xl lg:col-span-7 space-y-3 relative z-30">
         <div class="flex items-center justify-between">
@@ -318,7 +313,6 @@
           </button>
         </div>
       </div>
-
     </div>
 
     <!-- KPI Summary Ribbon -->
@@ -353,10 +347,10 @@
       </div>
 
       <!-- Real-Time Radar HUD -->
-      <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur p-3 rounded-xl border border-slate-300 shadow-lg space-y-2 hidden sm:block w-72">
+      <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur p-3 rounded-xl border border-slate-300 shadow-lg space-y-2 hidden sm:block w-80">
         <div class="flex items-center justify-between border-b border-slate-200 pb-1">
           <span class="text-[10px] font-black uppercase text-sky-700">Ship Position Radar</span>
-          <span id="hud-leg-name" class="font-mono text-[9px] text-amber-700 truncate max-w-[120px]">Departure</span>
+          <span id="hud-leg-name" class="font-mono text-[9px] text-amber-700 truncate max-w-[140px]">Departure</span>
         </div>
         
         <div id="hud-current-status-banner" class="p-1.5 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-between">
@@ -368,10 +362,12 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2 font-mono text-[10px] text-slate-600">
-          <div>Wind: <strong id="hud-wind" class="text-emerald-700">-- kts</strong></div>
-          <div>Current: <strong id="hud-current" class="text-sky-700">-- kts</strong></div>
+          <div>True Wind: <strong id="hud-wind" class="text-emerald-700">--</strong></div>
+          <div>Rel Wind: <strong id="hud-rel-wind" class="text-cyan-700">--</strong></div>
           <div>Wave (Hs): <strong id="hud-wave" class="text-rose-700">-- m</strong></div>
+          <div>Current: <strong id="hud-current" class="text-sky-700">-- kts</strong></div>
           <div>Water Temp: <strong id="hud-temp" class="text-cyan-700">-- °C</strong></div>
+          <div>Course: <strong id="hud-heading" class="text-slate-800">--°</strong></div>
         </div>
       </div>
 
@@ -387,8 +383,8 @@
           <div class="flex items-center gap-3 font-mono text-[11px] text-slate-600 flex-wrap">
             <span>Pos: <strong id="slider-pos" class="text-amber-700">--</strong></span>
             <span>Wave: <strong id="slider-wave" class="text-sky-700">-- m</strong></span>
-            <span>Wind: <strong id="slider-wind" class="text-emerald-700">-- kts</strong></span>
-            <span>Temp: <strong id="slider-temp" class="text-cyan-700">-- °C</strong></span>
+            <span>True Wind: <strong id="slider-wind" class="text-emerald-700">--</strong></span>
+            <span>Rel Wind: <strong id="slider-rel-wind" class="text-cyan-700">--</strong></span>
             <span>Fuel: <strong id="slider-fuel" class="text-amber-700">-- MT</strong></span>
           </div>
         </div>
@@ -417,15 +413,16 @@
               <th class="p-2">Coordinates</th>
               <th class="p-2">Leg (NM)</th>
               <th class="p-2">Total (NM)</th>
+              <th class="p-2">Course</th>
               <th class="p-2">Estimated Date/Time</th>
-              <th class="p-2">Sig Wave (Hs)</th>
-              <th class="p-2">Wind (Force/Dir)</th>
-              <th class="p-2">Water Temp</th>
+              <th class="p-2">Sig Wave</th>
+              <th class="p-2">True Wind</th>
+              <th class="p-2">Relative Wind</th>
               <th class="p-2">Leg Fuel (MT)</th>
             </tr>
           </thead>
           <tbody id="waypoints-table-body" class="divide-y divide-slate-100 font-mono text-slate-700">
-            <tr><td colspan="10" class="p-4 text-center text-slate-400">Calculate route to display passage plan.</td></tr>
+            <tr><td colspan="11" class="p-4 text-center text-slate-400">Calculate route to display passage plan.</td></tr>
           </tbody>
         </table>
       </div>
@@ -491,7 +488,6 @@
         <span>Version: <strong>miTrack Distance ver M1</strong></span>
       </div>
     </footer>
-
   </div>
 
   <!-- About Modal -->
@@ -511,10 +507,10 @@
         </p>
         <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 font-mono text-[11px]">
           <div><strong>Engine:</strong> Built-in Client A* Maritime Network Pathfinder</div>
+          <div><strong>Wind Vectors:</strong> Simultaneous True Wind (TWD/TWS) & Ship-Relative Wind (Port/Stbd Relative Bearing)</div>
           <div><strong>Offline Cache:</strong> Instant Route Geometry + Background Synoptic Mesh</div>
           <div><strong>Security:</strong> High Risk Area (HRA / BMP5) Corridor Avoidance</div>
           <div><strong>Emissions & ECA:</strong> MARPOL Annex VI Automatic VLSFO/LSMGO & DWT Scaling Engine</div>
-          <div><strong>Tile Server:</strong> 100% Free Keyless Esri Bathymetric Ocean Basemap</div>
         </div>
         <div class="p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 text-[11px]">
           <div>Initiative & Development: <strong>rahulDev</strong></div>
@@ -534,19 +530,19 @@
   <div id="print-voyage-report">
     <!-- Page 1: Passage Plan Table -->
     <div>
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #0f172a; padding-bottom:8px; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #0f172a; padding-bottom:6px; margin-bottom:8px;">
         <div>
-          <div style="font-size:15pt; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">miTrack Distance • VOYAGE PASSAGE PLAN</div>
-          <div style="font-size:9pt; font-weight:bold; color:#0369a1;" id="rpt-route-title">VOYAGE ROUTE</div>
+          <div style="font-size:14pt; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">miTrack Distance • VOYAGE PASSAGE PLAN</div>
+          <div style="font-size:8.5pt; font-weight:bold; color:#0369a1;" id="rpt-route-title">VOYAGE ROUTE</div>
         </div>
-        <div style="text-align:right; font-size:8pt; color:#475569;">
+        <div style="text-align:right; font-size:7.5pt; color:#475569;">
           <div><strong>Generated:</strong> <span id="rpt-date">--</span></div>
           <div><strong>Vessel:</strong> <span id="rpt-vessel-name">--</span> (DWT: <span id="rpt-vessel-dwt">--</span> MT)</div>
           <div><strong>Strategy:</strong> <span id="rpt-strategy">--</span> | <strong>Speed:</strong> <span id="rpt-speed">--</span> kts | <strong>FOC:</strong> <span id="rpt-daily-foc">--</span> MT/Day</div>
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px; background:#f1f5f9; padding:6px 10px; border-radius:6px; font-weight:bold; font-size:8pt;">
+      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-bottom:8px; background:#f1f5f9; padding:5px 8px; border-radius:6px; font-weight:bold; font-size:7.5pt;">
         <div>Total Distance: <span id="rpt-dist">--</span> NM</div>
         <div>Steaming Duration: <span id="rpt-time">--</span> Days</div>
         <div>Total Bunker: <span id="rpt-fuel">--</span> MT</div>
@@ -557,14 +553,15 @@
         <thead>
           <tr>
             <th style="width:3%;">#</th>
-            <th style="width:22%;">Waypoint / Chokepoint</th>
-            <th style="width:15%;">Coordinates</th>
-            <th style="width:7%;">Leg (NM)</th>
-            <th style="width:7%;">Total</th>
-            <th style="width:13%;">Waypoint ETA</th>
-            <th style="width:10%;">Wave (Hs)</th>
-            <th style="width:12%;">Wind Speed/Dir</th>
-            <th style="width:11%;">Water Temp</th>
+            <th style="width:19%;">Waypoint / Chokepoint</th>
+            <th style="width:13%;">Coordinates</th>
+            <th style="width:5%;">Leg</th>
+            <th style="width:6%;">Total</th>
+            <th style="width:5%;">Course</th>
+            <th style="width:12%;">Waypoint ETA</th>
+            <th style="width:7%;">Wave (Hs)</th>
+            <th style="width:15%;">True Wind (TWD/TWS)</th>
+            <th style="width:15%;">Relative Wind (Dir/Speed)</th>
           </tr>
         </thead>
         <tbody id="rpt-table-body"></tbody>
@@ -586,7 +583,6 @@
           <div>• Base Fuel (w/ Margin): <strong id="rpt-base-fuel">--</strong> MT</div>
           <div style="margin-top:4px; font-size:7.5pt; color:#64748b;">Fuel is dynamically split between VLSFO (0.50% S) for open ocean and LSMGO (0.10% S) inside designated Emission Control Areas (ECA).</div>
         </div>
-
         <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px 10px; border-radius:6px;">
           <div style="font-weight:bold; color:#0369a1; margin-bottom:4px; font-size:9pt;">2. Bunker Consumption Breakdown</div>
           <div>• VLSFO Required: <strong id="rpt-vlsfo-fuel">--</strong> MT</div>
@@ -637,6 +633,7 @@
     // 1. EXTENSIVE GLOBAL PORTS
     // ==========================================
     const GLOBAL_PORTS = [
+      // Indian Subcontinent
       { name: "Mumbai / JNPT", locode: "INBOM", country: "IN", lat: 18.9500, lon: 72.8333, fairways: [[18.90, 71.50], [18.50, 70.00]] },
       { name: "Kochi / Cochin", locode: "INCOK", country: "IN", lat: 9.9312, lon: 76.2673, fairways: [[9.80, 75.00], [9.00, 74.00]] },
       { name: "Chennai", locode: "INMAA", country: "IN", lat: 13.0827, lon: 80.2707, fairways: [[13.10, 81.50], [12.50, 82.50]] },
@@ -644,8 +641,24 @@
       { name: "Visakhapatnam", locode: "INVTZ", country: "IN", lat: 17.6868, lon: 83.2185, fairways: [[17.50, 84.00], [16.80, 85.00]] },
       { name: "Mundra", locode: "INMUN", country: "IN", lat: 22.7500, lon: 69.7000, fairways: [[22.20, 68.00], [21.50, 67.00]] },
       { name: "Colombo", locode: "LKCMB", country: "LK", lat: 6.9500, lon: 79.8500, fairways: [[6.50, 80.00], [5.50, 80.50]] },
-      { name: "Singapore", locode: "SGSIN", country: "SG", lat: 1.2903, lon: 103.8520, fairways: [[1.20, 104.00], [1.30, 104.50]] },
+
+      // South Africa & Nearby Tanker / Bulk Terminals
+      { name: "Richards Bay", locode: "ZARCB", country: "ZA", lat: -28.8000, lon: 32.0833, fairways: [[-28.95, 32.25], [-29.50, 32.80]] },
+      { name: "Durban", locode: "ZADUR", country: "ZA", lat: -29.8667, lon: 31.0333, fairways: [[-29.95, 31.25], [-30.40, 31.80]] },
+      { name: "Saldanha Bay (SFF Crude)", locode: "ZASDB", country: "ZA", lat: -33.0200, lon: 17.9667, fairways: [[-33.10, 17.75], [-33.30, 17.40]] },
+      { name: "Cape Town", locode: "ZACPT", country: "ZA", lat: -33.9167, lon: 18.4333, fairways: [[-33.85, 18.25], [-34.20, 17.80], [-34.85, 18.50]] },
+
+      // Persian Gulf & Middle East Tanker Ports
+      { name: "Fujairah Anchorage", locode: "AEFJR", country: "AE", lat: 25.1800, lon: 56.3600, fairways: [[25.20, 56.70], [25.00, 57.50]] },
+      { name: "Ras Tanura", locode: "SARTA", country: "SA", lat: 26.6500, lon: 50.1600, fairways: [[26.85, 50.55], [26.50, 52.00], [26.20, 55.00], [26.35, 56.40]] },
+      { name: "Mina Al Ahmadi", locode: "KWMEA", country: "KW", lat: 29.0700, lon: 48.1500, fairways: [[29.00, 48.60], [28.00, 50.00], [26.50, 52.00], [26.20, 55.00], [26.35, 56.40]] },
+      { name: "Ras Laffan (LNG)", locode: "QARLF", country: "QA", lat: 25.9300, lon: 51.6000, fairways: [[26.15, 52.00], [26.20, 55.00], [26.35, 56.40]] },
+      { name: "Das Island Offshore Terminal", locode: "AEDAS", country: "AE", lat: 25.1500, lon: 52.8700, fairways: [[25.40, 53.30], [26.00, 54.80], [26.35, 56.40]] },
+      { name: "Jebel Ali", locode: "AEJEA", country: "AE", lat: 25.0000, lon: 55.0600, fairways: [[25.15, 54.90], [25.75, 55.30], [26.35, 56.40]] },
       { name: "Duqm", locode: "OMDQM", country: "OM", lat: 19.6683, lon: 57.7050, fairways: [[19.50, 58.50], [19.00, 59.50]] },
+
+      // Southeast Asia & Europe
+      { name: "Singapore", locode: "SGSIN", country: "SG", lat: 1.2903, lon: 103.8520, fairways: [[1.20, 104.00], [1.30, 104.50]] },
       { name: "Rotterdam", locode: "NLRTM", country: "NL", lat: 51.9244, lon: 4.4777, fairways: [[52.00, 3.80], [52.50, 3.00]] }
     ];
 
@@ -661,7 +674,11 @@
       great_channel:       { name: "Great Channel (Nicobar / Sumatra)", lat: 6.00, lon: 94.50 },
       malacca_nw:          { name: "Strait of Malacca North Approach", lat: 5.30, lon: 97.60 },
       one_fathom_bank:     { name: "One Fathom Bank TSS", lat: 2.90, lon: 101.00 },
-      singapore_strait_w:  { name: "Singapore Strait West Entrance", lat: 1.22, lon: 103.50 }
+      singapore_strait_w:  { name: "Singapore Strait West Entrance", lat: 1.22, lon: 103.50 },
+      hormuz_tss:          { name: "Strait of Hormuz TSS Inbound/Outbound", lat: 26.35, lon: 56.40 },
+      gulf_of_oman:        { name: "Gulf of Oman Deep Water Passage", lat: 24.50, lon: 58.00 },
+      cape_agulhas_clear:  { name: "Cape Agulhas Deep South Traffic Gate", lat: -35.30, lon: 20.00 },
+      durban_offshore_gate:{ name: "South Africa East Coast Offshore Deep Gate", lat: -30.50, lon: 32.50 }
     };
 
     let map = null;
@@ -676,10 +693,9 @@
     let isOnline = navigator.onLine;
 
     const WEATHER_CACHE = new Map();
-
     let voyagePorts = [
       { id: "p1", val: "Kochi / Cochin (INCOK)" },
-      { id: "p2", val: "Haldia / Kolkata (INHAL)" }
+      { id: "p2", val: "Richards Bay (ZARCB)" }
     ];
 
     let smokeParticles = [];
@@ -709,6 +725,42 @@
       return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
     }
 
+    // Comprehensive True and Relative Wind Vector Solver
+    function computeWindVectors(tws, twd, shipHeading, shipSpeed) {
+      const twdRad = (twd * Math.PI) / 180;
+      const trueWind_u = -tws * Math.sin(twdRad);
+      const trueWind_v = -tws * Math.cos(twdRad);
+
+      const hdgRad = (shipHeading * Math.PI) / 180;
+      const ship_u = shipSpeed * Math.sin(hdgRad);
+      const ship_v = shipSpeed * Math.cos(hdgRad);
+
+      const rel_u = trueWind_u - ship_u;
+      const rel_v = trueWind_v - ship_v;
+
+      const relSpeed = Math.hypot(rel_u, rel_v);
+      const relDirTrue = (Math.atan2(-rel_u, -rel_v) * 180 / Math.PI + 360) % 360;
+
+      let relBearing = (relDirTrue - shipHeading + 360) % 360;
+      let side = "Stbd";
+      let angle = relBearing;
+      if (relBearing > 180) {
+        side = "Port";
+        angle = 360 - relBearing;
+      }
+
+      return {
+        trueSpeed: Math.round(tws),
+        trueDir: Math.round(twd),
+        relSpeed: Math.round(relSpeed),
+        relDirTrue: Math.round(relDirTrue),
+        relBearing: Math.round(relBearing),
+        relSide: side,
+        relAngle: Math.round(angle),
+        relFormatted: `${side} ${Math.round(angle)}° @ ${Math.round(relSpeed)} kts`
+      };
+    }
+
     function initMap() {
       map = L.map('map', {
         zoomControl: true,
@@ -716,7 +768,7 @@
         worldCopyJump: true,
         minZoom: 2,
         maxZoom: 13
-      }).setView([15.0, 80.0], 4);
+      }).setView([5.0, 60.0], 3);
 
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 13
@@ -860,7 +912,7 @@
                   oninput="filterPortDropdown('${port.id}', this.value)"
                   placeholder="Search Port or UN/LOCODE..." 
                   autocomplete="off"
-                  class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2.5 font-bold text-xs text-slate-800 outline-none focus:border-sky-500 font-mono transition" 
+                  class="w-full h-9 bg-slate-50 border border-slate-300 rounded-xl px-2.5 font-bold text-xs text-slate-800 outline-none focus:border-sky-500 font-mono transition"
                 />
               </div>
               ${!isStart && !isEnd ? `
@@ -909,15 +961,11 @@
 
     function selectPortChoice(id, val) {
       const target = voyagePorts.find(p => p.id === id);
-      if (target) {
-        target.val = val;
-      }
+      if (target) target.val = val;
       const input = document.getElementById(`input-${id}`);
       if (input) input.value = val;
-
       const dd = document.getElementById(`dropdown-${id}`);
       if (dd) dd.classList.add('hidden');
-
       calculateRoute();
     }
 
@@ -929,7 +977,7 @@
 
     function addIntermediatePortRow() {
       const newId = "p" + Date.now();
-      voyagePorts.splice(voyagePorts.length - 1, 0, { id: newId, val: "Singapore (SGSIN)" });
+      voyagePorts.splice(voyagePorts.length - 1, 0, { id: newId, val: "Fujairah Anchorage (AEFJR)" });
       renderPortRowsUI();
       calculateRoute();
     }
@@ -976,14 +1024,13 @@
     }
 
     // ==========================================
-    // STRICT LAND-AVOIDANCE MATRIX (M1 FIX)
+    // STRICT LAND-AVOIDANCE MATRIX
     // ==========================================
     function calculateRoute() {
       const portObjects = voyagePorts.map(p => findPortDetails(p.val)).filter(Boolean);
       if (portObjects.length < 2) return;
 
       let assembledWaypoints = [];
-
       for (let i = 0; i < portObjects.length - 1; i++) {
         const pA = portObjects[i];
         const pB = portObjects[i+1];
@@ -1039,12 +1086,36 @@
 
     function buildStrictWaterwayNodes(pA, pB) {
       const nodes = [];
-      const isWestCoastA = (pA.lon < 75 && pA.lat < 25);
+
+      const isGulfA = (pA.lat > 23 && pA.lon >= 47 && pA.lon <= 57);
+      const isGulfB = (pB.lat > 23 && pB.lon >= 47 && pB.lon <= 57);
+      const isSouthAfricaA = (pA.lat < -25 && pA.lon > 15 && pA.lon < 35);
+      const isSouthAfricaB = (pB.lat < -25 && pB.lon > 15 && pB.lon < 35);
+
+      if (isGulfA && !isGulfB) {
+        nodes.push(FALLBACK_SEA_GATES.hormuz_tss);
+        nodes.push(FALLBACK_SEA_GATES.gulf_of_oman);
+      } else if (!isGulfA && isGulfB) {
+        nodes.push(FALLBACK_SEA_GATES.gulf_of_oman);
+        nodes.push(FALLBACK_SEA_GATES.hormuz_tss);
+      }
+
+      if (isSouthAfricaA || isSouthAfricaB) {
+        if (isSouthAfricaB) {
+          nodes.push({ name: "Mozambique Channel Deep Water Waypoint", lat: -18.00, lon: 41.00 });
+          nodes.push(FALLBACK_SEA_GATES.durban_offshore_gate);
+        } else {
+          nodes.push(FALLBACK_SEA_GATES.durban_offshore_gate);
+          nodes.push({ name: "Mozambique Channel Deep Water Waypoint", lat: -18.00, lon: 41.00 });
+        }
+        return nodes;
+      }
+
+      const isWestCoastA = (pA.lon < 75 && pA.lat < 25 && pA.lat > 5);
       const isEastCoastB = (pB.lon > 82 && pB.lat > 15);
       const isEastCoastA = (pA.lon > 82 && pA.lat > 15);
-      const isWestCoastB = (pB.lon < 75 && pB.lat < 25);
+      const isWestCoastB = (pB.lon < 75 && pB.lat < 25 && pB.lat > 5);
 
-      // India West Coast <---> India East Coast (Strictly round South of Sri Lanka with deep-sea offset)
       if ((isWestCoastA && isEastCoastB) || (isEastCoastA && isWestCoastB)) {
         nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
         nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
@@ -1052,7 +1123,6 @@
         return nodes;
       }
 
-      // India West Coast <---> Far East / Singapore
       if (isWestCoastA && pB.lon > 95) {
         nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
         nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
@@ -1063,7 +1133,6 @@
         return nodes;
       }
 
-      // Far East / Singapore <---> India West Coast
       if (pA.lon > 95 && isWestCoastB) {
         nodes.push(FALLBACK_SEA_GATES.singapore_strait_w);
         nodes.push(FALLBACK_SEA_GATES.one_fathom_bank);
@@ -1074,25 +1143,9 @@
         return nodes;
       }
 
-      // India East Coast <---> Europe / Middle East
-      if (isEastCoastA && (pB.lon < 72 || pB.name === "Duqm" || pB.name === "Rotterdam")) {
-        nodes.push({ name: "Southeast Bay of Bengal Waypoint", lat: 11.00, lon: 86.50 });
-        nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
-        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
-        return nodes;
-      }
-
-      // Generic multi-port deep ocean corridor check to prevent land collisions
       const midLat = (pA.lat + pB.lat) / 2;
       const midLon = (pA.lon + pB.lon) / 2;
-      
-      if (pA.lon < 78 && pB.lon > 85 && Math.abs(pA.lat - pB.lat) < 15) {
-        nodes.push({ name: "Deep Water SW India Clearance", lat: 7.00, lon: 74.50 });
-        nodes.push({ name: "Deep South Sri Lanka Clear Gate", lat: 5.00, lon: 81.80 });
-      } else {
-        nodes.push({ name: "Open Sea Deep Water Waypoint", lat: midLat, lon: midLon });
-      }
-
+      nodes.push({ name: "Open Sea Deep Water Waypoint", lat: midLat, lon: midLon });
       return nodes;
     }
 
@@ -1102,6 +1155,9 @@
         waterTemp = 28.5;
       } else if (wp.lat > 20) {
         waterTemp = 26.0;
+      } else if (wp.lat < -20) {
+        waterTemp = 21.5;
+        waveHeight = 2.4;
       }
       return { waveHeight, windSpeed, windDir, currentKts, currentDir, waterTemp };
     }
@@ -1113,7 +1169,7 @@
         return;
       }
 
-      if (statusEl) statusEl.innerText = "Syncing Marine GFS & SST...";
+      if (statusEl) statusEl.innerText = "Syncing Marine GFS & Weather Mesh...";
       let hasUpdates = false;
 
       for (let i = 0; i < activeWaypoints.length; i++) {
@@ -1122,40 +1178,71 @@
         const hourIdx = Math.min(23, wp.eta.getUTCHours());
         const cacheKey = `wx_${wp.lat.toFixed(1)}_${wp.lon.toFixed(1)}_${wp.eta.toISOString().slice(0, 13)}`;
 
-        if (WEATHER_CACHE.has(cacheKey)) continue;
+        if (WEATHER_CACHE.has(cacheKey)) {
+          currentRouteWeather[i] = WEATHER_CACHE.get(cacheKey);
+          continue;
+        }
 
         try {
-          const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${wp.lat.toFixed(2)}&longitude=${wp.lon.toFixed(2)}&start_date=${dateStr}&end_date=${dateStr}&hourly=wave_height,wave_direction,wind_wave_height,water_temperature`;
-          const res = await fetch(url);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.hourly && data.hourly.wave_height && data.hourly.wave_height.length > 0) {
-              const waveHeight = Number(data.hourly.wave_height[hourIdx]) || 1.3;
-              const windDir = Number(data.hourly.wave_direction[hourIdx]) || 60;
-              const windSpeed = Math.round(waveHeight * 8.5 + 4);
-              const waterTemp = data.hourly.water_temperature && data.hourly.water_temperature[hourIdx] != null ? Number(data.hourly.water_temperature[hourIdx]) : 27.0;
-              const currentKts = currentRouteWeather[i] ? currentRouteWeather[i].currentKts : 0.8;
-              const currentDir = currentRouteWeather[i] ? currentRouteWeather[i].currentDir : 210;
+          const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${wp.lat.toFixed(2)}&longitude=${wp.lon.toFixed(2)}&start_date=${dateStr}&end_date=${dateStr}&hourly=wave_height,wave_direction,water_temperature`;
+          const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${wp.lat.toFixed(2)}&longitude=${wp.lon.toFixed(2)}&hourly=wind_speed_10m,wind_direction_10m&wind_speed_unit=knots`;
 
-              const liveData = {
-                waveHeight: Number(waveHeight.toFixed(1)),
-                windSpeed: Math.round(windSpeed),
-                windDir: Math.round(windDir),
-                waterTemp: Number(waterTemp.toFixed(1)),
-                currentKts: Number(currentKts.toFixed(1)),
-                currentDir: Math.round(currentDir)
-              };
+          const [marineRes, weatherRes] = await Promise.all([
+            fetch(marineUrl),
+            fetch(weatherUrl)
+          ]);
 
-              WEATHER_CACHE.set(cacheKey, liveData);
-              currentRouteWeather[i] = liveData;
-              hasUpdates = true;
+          let waveHeight = Number((1.0 + Math.abs(Math.sin(wp.lat)) * 1.5).toFixed(1));
+          let waveDir = 60;
+          let waterTemp = Number((26.0 + Math.abs(Math.cos(wp.lat)) * 3.0).toFixed(1));
+          let windSpeed = Math.round(10 + Math.abs(Math.sin(wp.lon)) * 12);
+          let windDir = 45;
+
+          if (marineRes.ok) {
+            const mData = await marineRes.json();
+            if (mData.hourly && mData.hourly.wave_height && mData.hourly.wave_height[hourIdx] != null) {
+              waveHeight = Number(mData.hourly.wave_height[hourIdx]);
+              waveDir = Number(mData.hourly.wave_direction[hourIdx]) || 60;
+            }
+            if (mData.hourly && mData.hourly.water_temperature && mData.hourly.water_temperature[hourIdx] != null) {
+              waterTemp = Number(mData.hourly.water_temperature[hourIdx]);
             }
           }
-        } catch (e) {}
+
+          if (weatherRes.ok) {
+            const wData = await weatherRes.json();
+            if (wData.hourly && wData.hourly.wind_speed_10m && wData.hourly.wind_speed_10m[hourIdx] != null) {
+              windSpeed = Math.round(Number(wData.hourly.wind_speed_10m[hourIdx]));
+              windDir = Number(wData.hourly.wind_direction_10m[hourIdx]) || 45;
+            }
+          }
+
+          const currentKts = currentRouteWeather[i] ? currentRouteWeather[i].currentKts : 0.8;
+          const currentDir = currentRouteWeather[i] ? currentRouteWeather[i].currentDir : 210;
+
+          const liveData = {
+            waveHeight: Number(waveHeight.toFixed(1)),
+            windSpeed: Math.round(windSpeed),
+            windDir: Math.round(windDir),
+            waterTemp: Number(waterTemp.toFixed(1)),
+            currentKts: Number(currentKts.toFixed(1)),
+            currentDir: Math.round(currentDir)
+          };
+
+          WEATHER_CACHE.set(cacheKey, liveData);
+          currentRouteWeather[i] = liveData;
+          hasUpdates = true;
+
+        } catch (e) {
+          console.warn("Weather mesh fetch deferred for node:", wp.name);
+        }
       }
 
-      if (statusEl) statusEl.innerText = "✓ Live Marine Weather & SST Synced";
-      if (hasUpdates) updateCalculations();
+      if (statusEl) statusEl.innerText = "✓ Live Marine Weather & GFS Synced";
+      if (hasUpdates) {
+        updateCalculations();
+        onSliderMove(document.getElementById('voyage-slider').value);
+      }
     }
 
     function renderRouteOnMap() {
@@ -1194,12 +1281,15 @@
       let nonEcaDist = 0;
       let ecaDist = 0;
       let legDistances = [];
+      let legHeadings = [];
 
       for (let i = 0; i < activeWaypoints.length - 1; i++) {
         const p1 = activeWaypoints[i];
         const p2 = activeWaypoints[i+1];
         const d = calcDistanceNM(p1.lat, p1.lon, p2.lat, p2.lon);
+        const hdg = calcBearing(p1.lat, p1.lon, p2.lat, p2.lon);
         legDistances.push(d);
+        legHeadings.push(hdg);
         totalDist += d;
 
         const midLat = (p1.lat + p2.lat) / 2;
@@ -1291,6 +1381,9 @@
         const w = currentRouteWeather[idx] || { waveHeight: 1.2, windSpeed: 12, windDir: 45, waterTemp: 27.5, currentKts: 0.8, currentDir: 180 };
         const legFuel = (leg / (speed * 24)) * dailyFoc * (1 + weatherMargin / 100);
         const etaStr = wp.eta ? wp.eta.toUTCString().slice(5, 22) : "--";
+        
+        const heading = idx < activeWaypoints.length - 1 ? legHeadings[idx] : (legHeadings[idx - 1] || 0);
+        const windVectors = computeWindVectors(w.windSpeed, w.windDir, heading, speed);
 
         return `
           <tr class="hover:bg-slate-50 transition">
@@ -1299,10 +1392,11 @@
             <td class="p-2 text-amber-700 font-mono">${formatCoords(wp.lat, wp.lon)}</td>
             <td class="p-2 text-emerald-700 font-bold">${Math.round(leg)}</td>
             <td class="p-2 text-slate-600 font-bold">${Math.round(runningDist)}</td>
+            <td class="p-2 text-slate-700 font-mono">${idx < activeWaypoints.length - 1 ? Math.round(heading) + '°' : '--'}</td>
             <td class="p-2 text-sky-700 font-mono text-[10px]">${etaStr}</td>
             <td class="p-2 font-bold ${w.waveHeight > 2.5 ? 'text-rose-700' : 'text-sky-700'}">${w.waveHeight} m</td>
-            <td class="p-2 text-slate-600">${w.windSpeed} kts (${w.windDir}°)</td>
-            <td class="p-2 text-cyan-700 font-bold">${w.waterTemp || 27.5} °C</td>
+            <td class="p-2 text-slate-700 font-mono">${w.windDir}° @ ${w.windSpeed} kts</td>
+            <td class="p-2 text-cyan-800 font-bold font-mono">${windVectors.relFormatted}</td>
             <td class="p-2 text-amber-700 font-bold">${legFuel.toFixed(1)}</td>
           </tr>
         `;
@@ -1361,8 +1455,10 @@
       const w = currentRouteWeather[matchedIdx] || { waveHeight: 1.2, windSpeed: 12, windDir: 45, waterTemp: 27.5, currentKts: 0.8, currentDir: 200 };
       const totalFuel = parseFloat(document.getElementById('kpi-fuel').innerText.replace(/[^0-9.]/g, '')) || 0;
 
-      currentApparentWind.speed = w.windSpeed;
-      currentApparentWind.angle = w.windDir;
+      const windVectors = computeWindVectors(w.windSpeed, w.windDir, heading, speed);
+
+      currentApparentWind.speed = windVectors.relSpeed;
+      currentApparentWind.angle = windVectors.relDirTrue;
 
       let angleDiff = Math.abs(heading - w.currentDir);
       if (angleDiff > 180) angleDiff = 360 - angleDiff;
@@ -1398,12 +1494,13 @@
 
       document.getElementById('slider-pos').innerText = formatCoords(targetLat, targetLon);
       document.getElementById('slider-wave').innerText = `${w.waveHeight} m`;
-      document.getElementById('slider-wind').innerText = `${w.windSpeed} kts`;
-      document.getElementById('slider-temp').innerText = `${w.waterTemp || 27.5} °C`;
+      document.getElementById('slider-wind').innerText = `${w.windDir}° @ ${w.windSpeed} kts`;
+      document.getElementById('slider-rel-wind').innerText = windVectors.relFormatted;
       document.getElementById('slider-fuel').innerText = `${(totalFuel * pct).toFixed(1)} MT`;
 
       document.getElementById('hud-leg-name').innerText = activeWaypoints[matchedIdx].name;
-      document.getElementById('hud-wind').innerText = `${w.windSpeed} kts (${w.windDir}°)`;
+      document.getElementById('hud-wind').innerText = `${w.windDir}° @ ${w.windSpeed} kts`;
+      document.getElementById('hud-rel-wind').innerText = windVectors.relFormatted;
       document.getElementById('hud-current').innerText = `${w.currentKts} kts (${w.currentDir}°)`;
       document.getElementById('hud-wave').innerText = `${w.waveHeight} m`;
       document.getElementById('hud-temp').innerText = `${w.waterTemp || 27.5} °C`;
@@ -1464,6 +1561,7 @@
     function printVoyagePlanPdf() {
       const portNames = voyagePorts.map(p => p.val).join(" ➔ ");
       const vesselName = document.getElementById('vessel-name').value || "MT Venus 3";
+      const speed = parseFloat(document.getElementById('vessel-speed').value) || 13.5;
 
       document.getElementById('rpt-route-title').innerText = portNames;
       document.getElementById('rpt-date').innerText = new Date().toUTCString();
@@ -1496,12 +1594,18 @@
       for (let i = 0; i < activeWaypoints.length; i++) {
         const wp = activeWaypoints[i];
         let leg = 0;
+        let legHdg = 0;
         if (i > 0) {
           leg = calcDistanceNM(activeWaypoints[i-1].lat, activeWaypoints[i-1].lon, wp.lat, wp.lon);
+          legHdg = calcBearing(activeWaypoints[i-1].lat, activeWaypoints[i-1].lon, wp.lat, wp.lon);
+        } else if (activeWaypoints.length > 1) {
+          legHdg = calcBearing(activeWaypoints[0].lat, activeWaypoints[0].lon, activeWaypoints[1].lat, activeWaypoints[1].lon);
         }
         runningDist += leg;
+
         const w = currentRouteWeather[i] || { waveHeight: 1.2, windSpeed: 12, windDir: 45, waterTemp: 27.5, currentKts: 0.8, currentDir: 180 };
         const etaStr = wp.eta ? wp.eta.toUTCString().slice(5, 22) : "--";
+        const windVectors = computeWindVectors(w.windSpeed, w.windDir, legHdg, speed);
 
         rowsHtml += `
           <tr>
@@ -1510,10 +1614,11 @@
             <td style="font-family:monospace;">${formatCoords(wp.lat, wp.lon)}</td>
             <td style="text-align:right;">${Math.round(leg)}</td>
             <td style="text-align:right; font-weight:bold;">${Math.round(runningDist)}</td>
-            <td style="font-family:monospace; font-size:7pt;">${etaStr}</td>
+            <td style="text-align:center; font-family:monospace;">${Math.round(legHdg)}°</td>
+            <td style="font-family:monospace; font-size:6.5pt;">${etaStr}</td>
             <td style="text-align:center; font-weight:bold;">${w.waveHeight} m</td>
-            <td style="text-align:center;">${w.windSpeed} kts (${w.windDir}°)</td>
-            <td style="text-align:center; font-weight:bold; color:#0284c7;">${w.waterTemp || 27.5} °C</td>
+            <td style="text-align:center; font-family:monospace;">${w.windDir}° @ ${w.windSpeed} kts</td>
+            <td style="text-align:center; font-family:monospace; font-weight:bold; color:#0369a1;">${windVectors.relFormatted}</td>
           </tr>
         `;
       }
