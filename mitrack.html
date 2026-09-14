@@ -75,38 +75,82 @@
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     }
 
-    /* Strict A4 Portrait International Textbook Print Engine */
+    /* Strict A4 Portrait International Corporate Textbook Print Engine */
     @media print {
       @page {
         size: A4 portrait;
-        margin: 12mm 15mm 12mm 15mm;
+        margin: 10mm 12mm 10mm 12mm;
       }
       body {
         background: #ffffff !important;
         color: #0f172a !important;
-        font-family: 'Times New Roman', Times, serif, sans-serif !important;
-        font-size: 9pt !important;
-        line-height: 1.4 !important;
+        font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        font-size: 8.5pt !important;
+        line-height: 1.35 !important;
       }
       .no-print { display: none !important; }
       .print-only { display: block !important; }
       .page-break { page-break-after: always; break-after: page; }
       
+      /* Corporate Framed Container */
+      .corporate-print-frame {
+        border: 1.5pt solid #0a192f !important;
+        padding: 10mm !important;
+        box-sizing: border-box !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        position: relative !important;
+        background: transparent !important;
+      }
+
+      /* Corporate Background Watermark Positioned Near Bottom */
+      .corporate-watermark {
+        position: absolute !important;
+        bottom: 48mm !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        font-size: 32pt !important;
+        font-weight: 900 !important;
+        color: rgba(10, 25, 47, 0.05) !important;
+        letter-spacing: 3px !important;
+        z-index: 0 !important;
+        pointer-events: none !important;
+        white-space: nowrap !important;
+        font-family: 'Inter', sans-serif !important;
+      }
+
+      .corporate-content-layer {
+        position: relative !important;
+        z-index: 1 !important;
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+      }
+
       table.print-table {
         width: 100% !important;
         border-collapse: collapse !important;
-        font-size: 8pt !important;
+        font-size: 7.5pt !important;
       }
       table.print-table th, table.print-table td {
-        border: 0.5pt solid #334155 !important;
-        padding: 3pt 4pt !important;
+        border: 0.5pt solid #cbd5e1 !important;
+        padding: 2.5pt 3.5pt !important;
         text-align: left !important;
       }
       table.print-table th {
-        background-color: #f1f5f9 !important;
-        color: #0f172a !important;
+        background-color: #0a192f !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
       }
+      table.print-table tr:nth-child(even) td {
+        background-color: #f8fafc !important;
+      }
+
       .textbook-page {
         height: 100vh;
         display: flex;
@@ -117,25 +161,25 @@
         box-sizing: border-box;
       }
       .textbook-card {
-        border: 0.75pt solid #475569 !important;
-        padding: 10pt 12pt !important;
+        border: 1pt solid #cbd5e1 !important;
+        padding: 8pt 10pt !important;
         border-radius: 4pt !important;
         background-color: #ffffff !important;
-        margin-bottom: 10pt;
+        margin-bottom: 8pt;
         box-shadow: none !important;
       }
       .textbook-header {
-        border-bottom: 1.5pt solid #0f172a;
-        padding-bottom: 6pt;
-        margin-bottom: 12pt;
+        border-bottom: 2pt solid #0a192f;
+        padding-bottom: 5pt;
+        margin-bottom: 10pt;
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
       }
       .textbook-footer {
-        border-top: 0.75pt solid #94a3b8;
-        padding-top: 6pt;
-        font-size: 7.5pt;
+        border-top: 1pt solid #cbd5e1;
+        padding-top: 5pt;
+        font-size: 7pt;
         font-family: 'Inter', sans-serif;
         color: #475569;
         display: flex;
@@ -204,6 +248,11 @@
 
     <!-- Quick Action / Print Tools / Interactive Route Pen -->
     <div class="flex items-center space-x-2">
+      <input type="file" id="csvRouteFileInput" accept=".csv" class="hidden" onchange="window.handleCSVRouteUpload(event)">
+      <button onclick="document.getElementById('csvRouteFileInput').click()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer" title="Load Route Waypoints from CSV">
+        <i class="fa-solid fa-file-arrow-up text-indigo-600"></i>
+        <span>Load CSV</span>
+      </button>
       <button id="routeEditorToggleBtn" onclick="window.toggleRouteEditor()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer" title="Drag and adjust route waypoints">
         <i class="fa-solid fa-pen-nib text-sky-600" id="routeEditorIcon"></i>
         <span id="routeEditorLabel">Edit Route</span>
@@ -243,7 +292,7 @@
 
         <div id="portSequenceContainer" class="space-y-2"></div>
         <div class="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
-          <span><i class="fa-solid fa-circle-info text-sky-600 mr-1"></i>Search ports or enter Lat, Lon.</span>
+          <span><i class="fa-solid fa-circle-info text-sky-600 mr-1"></i>Search ports or load CSV route.</span>
           <span id="geoStatusBadge" class="text-emerald-700 font-mono font-bold">READY</span>
         </div>
       </div>
@@ -700,78 +749,90 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- STRICT A4 PORTRAIT INTERNATIONAL TEXTBOOK PRINT DOCUMENTS                 -->
+  <!-- STRICT A4 PORTRAIT CORPORATE TEXTBOOK PRINT DOCUMENTS                     -->
   <!-- ========================================================================= -->
   <div id="printContainer" class="print-only">
     
     <!-- PRINT DOCUMENT 1: MASTER PASSAGE PLAN -->
     <div id="printDocPassagePlan">
       <div class="page-break">
-        <div style="border-bottom: 2pt solid #0f172a; padding-bottom: 4pt; margin-bottom: 6pt; display: flex; justify-content: space-between; align-items: flex-end;">
-          <div>
-            <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-              <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-              <span style="font-size: 11pt; font-weight: 800; color: #0f172a; margin-left: 4pt;">• MASTER VOYAGE PASSAGE PLAN</span>
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
+            <div>
+              <!-- Corporate Header -->
+              <div style="background-color: #0a192f; color: #ffffff; padding: 8pt 10pt; margin-bottom: 8pt; display: flex; justify-content: space-between; align-items: center; border-radius: 3pt;">
+                <div>
+                  <div style="font-size: 11pt; font-weight: 900; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#ffffff;">mi</span><span style="color:#38bdf8;">Track</span> <span style="color:#cbd5e1; font-style:italic; font-weight:700;">Distance</span>
+                    <span style="font-size: 8.5pt; font-weight: 600; color: #38bdf8; margin-left: 6pt;">• PASSAGE PLAN REPORT</span>
+                  </div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 6.5pt; color: #94a3b8;">
+                  <div>GENERATED: <span id="printPlanGenDate"></span></div>
+                  <div>VERSION: VER M2</div>
+                </div>
+              </div>
+
+              <!-- Vessel Particulars Corporate Grid -->
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4pt; margin-bottom: 8pt; font-family: monospace; font-size: 6.5pt; background-color: #f8fafc; border: 0.75pt solid #cbd5e1; padding: 5pt; border-radius: 3pt;">
+                <div>
+                  <div><b>VESSEL:</b> <span id="printPlanVesselName">M/V VESSEL</span></div>
+                  <div><b>TYPE:</b> <span id="printPlanVesselType">TANKER</span></div>
+                  <div><b>DWT:</b> <span id="printPlanDwt">150,000</span> T</div>
+                </div>
+                <div>
+                  <div><b>PITCH:</b> <span id="printPlanPitch">5.70</span> m</div>
+                  <div><b>RPM:</b> <span id="printPlanRpm">74.0</span></div>
+                  <div><b>V_ENG:</b> <span id="printPlanVEng">13.7</span> kn</div>
+                </div>
+                <div>
+                  <div><b>TOTAL DIST:</b> <span id="printPlanDist">0</span> NM</div>
+                  <div><b>TIME:</b> <span id="printPlanDays">0.0</span> DAYS</div>
+                  <div><b>WAVE Hs:</b> <span id="printPlanAvgWave">0.0</span> m</div>
+                </div>
+                <div>
+                  <div><b>SST:</b> <span id="printPlanAvgSeaTemp">0.0</span> °C</div>
+                  <div><b>BUNKER:</b> <span id="printPlanTotalFuel">0.0</span> MT</div>
+                  <div><b>CII:</b> <span id="printPlanCii">A (0.00)</span></div>
+                </div>
+              </div>
+
+              <!-- Waypoints Table -->
+              <table class="print-table" id="printWaypointTable">
+                <thead>
+                  <tr>
+                    <th style="width: 3%; text-align: center;">#</th>
+                    <th style="width: 17%;">Waypoint / Fairway Gate</th>
+                    <th style="width: 9%;">Latitude</th>
+                    <th style="width: 9%;">Longitude</th>
+                    <th style="width: 5%; text-align: right;">Leg</th>
+                    <th style="width: 5%; text-align: right;">Total</th>
+                    <th style="width: 5%; text-align: right;">Course</th>
+                    <th style="width: 5%; text-align: right;">SOG</th>
+                    <th style="width: 5%; text-align: right;">Slip %</th>
+                    <th style="width: 7%; text-align: center;">Sea Temp</th>
+                    <th style="width: 8%; text-align: center;">Sig Wave (Hs)</th>
+                    <th style="width: 8%; text-align: center;">Current</th>
+                    <th style="width: 8%; text-align: center;">Rel Wind</th>
+                    <th style="width: 6%; text-align: right;">Fuel</th>
+                  </tr>
+                </thead>
+                <tbody id="printWaypointTableBody"></tbody>
+              </table>
             </div>
-            <div style="font-size: 7.2pt; color: #475569; font-family: monospace;">IMO STCW A-VIII/2 & SOLAS CHAPTER V SAFETY OF NAVIGATION SPECIFICATION • VER M2</div>
-          </div>
-          <div style="text-align: right; font-family: monospace; font-size: 7pt;">
-            <div>GENERATED: <span id="printPlanGenDate"></span></div>
-            <div>STATUS: <b>OFFICIAL BRIDGE RECORD</b></div>
-          </div>
-        </div>
 
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5pt; margin-bottom: 5pt; font-family: monospace; font-size: 6.8pt; background-color: #f8fafc; border: 0.5pt solid #cbd5e1; padding: 3.5pt;">
-          <div>
-            <div><b>VESSEL:</b> <span id="printPlanVesselName">M/V VESSEL</span></div>
-            <div><b>TYPE:</b> <span id="printPlanVesselType">TANKER</span></div>
-            <div><b>DEADWEIGHT:</b> <span id="printPlanDwt">150,000</span> DWT</div>
+            <!-- Corporate Footer without Signature Matrix -->
+            <div>
+              <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f; padding-top: 6pt;">
+                <div>
+                  <b style="color: #0a192f;">SAFETY FIRST • SAFETY ALWAYS</b> &nbsp;|&nbsp; 
+                  <i>miTrack Distance ver M2 &bull; Developed by rahulDev.</i>
+                </div>
+                <div style="font-family: monospace; font-weight: bold; color: #0a192f;">PAGE 1 OF 2</div>
+              </div>
+            </div>
           </div>
-          <div>
-            <div><b>PROPELLER PITCH:</b> <span id="printPlanPitch">5.70</span> m</div>
-            <div><b>SERVICE RPM:</b> <span id="printPlanRpm">74.0</span></div>
-            <div><b>THEO V_ENG:</b> <span id="printPlanVEng">13.7</span> kn</div>
-          </div>
-          <div>
-            <div><b>TOTAL DIST:</b> <span id="printPlanDist">0</span> NM</div>
-            <div><b>STEAMING TIME:</b> <span id="printPlanDays">0.0</span> DAYS</div>
-            <div><b>AVG WAVE Hs:</b> <span id="printPlanAvgWave">0.0</span> m</div>
-          </div>
-          <div>
-            <div><b>AVG SEA TEMP:</b> <span id="printPlanAvgSeaTemp">0.0</span> °C</div>
-            <div><b>EST. BUNKER:</b> <span id="printPlanTotalFuel">0.0</span> MT</div>
-            <div><b>CII RATING:</b> <span id="printPlanCii">A (0.00)</span></div>
-          </div>
-        </div>
-
-        <table class="print-table" id="printWaypointTable">
-          <thead>
-            <tr>
-              <th style="width: 3%; text-align: center;">#</th>
-              <th style="width: 17%;">Waypoint / Fairway Gate</th>
-              <th style="width: 9%;">Latitude</th>
-              <th style="width: 9%;">Longitude</th>
-              <th style="width: 5%; text-align: right;">Leg</th>
-              <th style="width: 5%; text-align: right;">Total</th>
-              <th style="width: 5%; text-align: right;">Course</th>
-              <th style="width: 5%; text-align: right;">SOG</th>
-              <th style="width: 5%; text-align: right;">Slip %</th>
-              <th style="width: 7%; text-align: center;">Sea Temp</th>
-              <th style="width: 8%; text-align: center;">Sig Wave (Hs)</th>
-              <th style="width: 8%; text-align: center;">Current</th>
-              <th style="width: 8%; text-align: center;">Rel Wind</th>
-              <th style="width: 6%; text-align: right;">Fuel</th>
-            </tr>
-          </thead>
-          <tbody id="printWaypointTableBody"></tbody>
-        </table>
-        
-        <div class="report-footer-banner">
-          <div>
-            <b>SAFETY FIRST • SAFETY ALWAYS</b> &nbsp;|&nbsp; 
-            <i>This application is provided for free educational and passage planning assistance. Developed as a courtesy to the maritime community by rahulDev.</i>
-          </div>
-          <div style="font-family: monospace; font-weight: bold;">PAGE 1 OF 2</div>
         </div>
       </div>
     </div>
@@ -781,379 +842,411 @@
       
       <!-- PAGE 1: PROPELLER KINEMATICS & SLIP -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 4pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.1 • KINEMATIC PROPELLER DYNAMICS & APPARENT SLIP</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>VESSEL: <b id="f-vessel-name-p1" class="text-slate-900">M/V VESSEL</b></div>
+                  <div><b>CHAPTER 1 • PAGE 1</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.1 • KINEMATIC PROPELLER DYNAMICS & APPARENT SLIP</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  1.1 Theoretical Principles & Governing Equations
+                </div>
+                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
+                  In marine engineering and naval architecture, a screw propeller operating in a fluid medium advances a theoretical distance equal to its face pitch per revolution. Because water is a dynamic fluid subject to boundary layer displacement and wake streams, the observed speed over ground ($V_{\text{obs}}$) deviates from the pitch advance speed ($V_{\text{eng}}$). This discrepancy is quantified as apparent slip.
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  <b>Advance Speed:</b> V_eng = (N [RPM] × P [m] × 60) / 1852 [knots]<br>
+                  <b>Apparent Slip:</b> S_apparent = [(V_eng - V_obs) / V_eng] × 100 [%]<br>
+                  <b>True Slip (Taylor Wake):</b> S_true = [(V_eng - V_a) / V_eng] × 100 [%] &nbsp;|&nbsp; V_a = V_obs / (1 - w)
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-slip" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7pt; color: #64748b;">
-              <div>VESSEL: <b id="f-vessel-name-p1" class="text-slate-900">M/V VESSEL</b></div>
-              <div><b>CHAPTER 1 • PAGE 1</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Textbook Reference:</b> SNAME Principles of Naval Architecture (PNA Vol. II) &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 1</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              1.1 Theoretical Principles & Governing Equations
-            </div>
-            <div style="font-size: 8.5pt; color: #334155; line-height: 1.5; margin-bottom: 8pt;">
-              In marine engineering and naval architecture, a screw propeller operating in a fluid medium advances a theoretical distance equal to its face pitch per revolution. Because water is a dynamic fluid subject to boundary layer displacement and wake streams, the observed speed over ground ($V_{\text{obs}}$) deviates from the pitch advance speed ($V_{\text{eng}}$). This discrepancy is quantified as apparent slip.
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              <b>Advance Speed:</b> V_eng = (N [RPM] × P [m] × 60) / 1852 [knots]<br>
-              <b>Apparent Slip:</b> S_apparent = [(V_eng - V_obs) / V_eng] × 100 [%]<br>
-              <b>True Slip (Taylor Wake):</b> S_true = [(V_eng - V_a) / V_eng] × 100 [%] &nbsp;|&nbsp; V_a = V_obs / (1 - w)
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-slip" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Textbook Reference:</b> SNAME Principles of Naval Architecture (PNA Vol. II) &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 1</b></div>
         </div>
       </div>
 
       <!-- PAGE 2: WAVE ADDED RESISTANCE & CURRENT -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 4pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.2 • HYDRODYNAMIC ADDED RESISTANCE & SPECTRAL ENERGY</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>STATUTORY REFERENCE</div>
+                  <div><b>CHAPTER 1 • PAGE 2</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.2 • HYDRODYNAMIC ADDED RESISTANCE & SPECTRAL ENERGY</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  1.2 Significant Wave Height ($H_s$) & Current Drift Formulations (Climatological Atlas Matrix)
+                </div>
+                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
+                  Seaway resistance increments result from wave reflection and ship motion damping. Following the semi-empirical Holtrop & Mennen formulation combined with monthly historical climatology datasets, added resistance and seasonal monsoon current vectors scale dynamically with the selected ETD month.
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  <b>Wave Added Resistance Speed Loss:</b> ΔV_wave = 0.24 · (H_s,month)^1.85 · max(0, cos(θ_wave)) [knots]<br>
+                  <b>Seasonal Climatology Vector:</b> V_drift = V_current(month) · cos(Dir_current - Course_ship) [knots]
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-wave" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7pt; color: #64748b;">
-              <div>STATUTORY REFERENCE</div>
-              <div><b>CHAPTER 1 • PAGE 2</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Textbook Reference:</b> NOAA NCEI Climatological Atlas & IOC UNESCO Wave Statistics &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 2</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              1.2 Significant Wave Height ($H_s$) & Current Drift Formulations (Climatological Atlas Matrix)
-            </div>
-            <div style="font-size: 8.5pt; color: #334155; line-height: 1.5; margin-bottom: 8pt;">
-              Seaway resistance increments result from wave reflection and ship motion damping. Following the semi-empirical Holtrop & Mennen formulation combined with monthly historical climatology datasets, added resistance and seasonal monsoon current vectors scale dynamically with the selected ETD month.
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              <b>Wave Added Resistance Speed Loss:</b> ΔV_wave = 0.24 · (H_s,month)^1.85 · max(0, cos(θ_wave)) [knots]<br>
-              <b>Seasonal Climatology Vector:</b> V_drift = V_current(month) · cos(Dir_current - Course_ship) [knots]
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-wave" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Textbook Reference:</b> NOAA NCEI Climatological Atlas & IOC UNESCO Wave Statistics &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 2</b></div>
         </div>
       </div>
 
       <!-- PAGE 3: APPARENT WIND TRIANGLE -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 3pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.3 • APPARENT WIND VECTOR TRIANGLE & CARTESIAN RESOLUTION</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>NAVIGATIONAL METEOROLOGY</div>
+                  <div><b>CHAPTER 1 • PAGE 3</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.3 • APPARENT WIND VECTOR TRIANGLE & CARTESIAN RESOLUTION</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  1.3 Bridge Wind Vector Triangle & Aerodynamic Drag
+                </div>
+                <div style="display: flex; gap: 10pt; align-items: center; margin-bottom: 8pt;">
+                  <div style="flex: 1; font-size: 8.5pt; color: #334155; line-height: 1.45;">
+                    <b>Vector Proof:</b> The apparent wind experienced over the bridge deck ($\vec{V}_{\text{app}}$) is the vector difference between true wind velocity ($\vec{V}_{\text{true}}$) and ship velocity over ground ($\vec{V}_{\text{ship}}$). Resolving into Cartesian components ($u, v$) allows precise aerodynamic superstructure drag calculations.
+                  </div>
+                  <!-- Inline SVG: Large Detailed Wind Triangle -->
+                  <svg width="140" height="75" viewBox="0 0 160 90" style="background:#f8fafc; border:0.75pt solid #cbd5e1; border-radius:3pt; shrink: 0;">
+                    <defs>
+                      <marker id="th" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" />
+                      </marker>
+                      <marker id="thr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#e11d48" />
+                      </marker>
+                      <marker id="the" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+                      </marker>
+                    </defs>
+                    <line x1="20" y1="75" x2="80" y2="75" stroke="#059669" stroke-width="2" marker-end="url(#the)" />
+                    <text x="40" y="85" font-size="7.5" font-family="monospace" fill="#059669">V_ship</text>
+                    <line x1="80" y1="75" x2="135" y2="20" stroke="#e11d48" stroke-width="2" marker-end="url(#thr)" />
+                    <text x="112" y="52" font-size="7.5" font-family="monospace" fill="#e11d48">V_true</text>
+                    <line x1="20" y1="75" x2="132" y2="23" stroke="#0284c7" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#th)" />
+                    <text x="60" y="42" font-size="7.5" font-family="monospace" fill="#0284c7">V_app</text>
+                  </svg>
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  u_rel = (-V_true · sin(TWD)) - (V_sog · sin(HDG))<br>
+                  v_rel = (-V_true · cos(TWD)) - (V_sog · cos(HDG))<br>
+                  <b>Apparent Speed:</b> V_app = √(u_rel² + v_rel²) | <b>Aerodynamic Drag:</b> ΔV_wind = 0.0032 · (V_app)^1.62
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-wind" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7pt; color: #64748b;">
-              <div>NAVIGATIONAL METEOROLOGY</div>
-              <div><b>CHAPTER 1 • PAGE 3</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Textbook Reference:</b> Admiralty Manual of Navigation (BR 45) &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 3</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              1.3 Bridge Wind Vector Triangle & Aerodynamic Drag
-            </div>
-            <div style="display: flex; gap: 10pt; align-items: center; margin-bottom: 8pt;">
-              <div style="flex: 1; font-size: 8.5pt; color: #334155; line-height: 1.5;">
-                <b>Vector Proof:</b> The apparent wind experienced over the bridge deck ($\vec{V}_{\text{app}}$) is the vector difference between true wind velocity ($\vec{V}_{\text{true}}$) and ship velocity over ground ($\vec{V}_{\text{ship}}$). Resolving into Cartesian components ($u, v$) allows precise aerodynamic superstructure drag calculations.
-              </div>
-              <!-- Inline SVG: Large Detailed Wind Triangle -->
-              <svg width="150" height="85" viewBox="0 0 160 90" style="background:#f8fafc; border:0.75pt solid #cbd5e1; border-radius:3pt; shrink: 0;">
-                <defs>
-                  <marker id="th" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" />
-                  </marker>
-                  <marker id="thr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#e11d48" />
-                  </marker>
-                  <marker id="the" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
-                  </marker>
-                </defs>
-                <line x1="20" y1="75" x2="80" y2="75" stroke="#059669" stroke-width="2" marker-end="url(#the)" />
-                <text x="40" y="85" font-size="7.5" font-family="monospace" fill="#059669">V_ship</text>
-                <line x1="80" y1="75" x2="135" y2="20" stroke="#e11d48" stroke-width="2" marker-end="url(#thr)" />
-                <text x="112" y="52" font-size="7.5" font-family="monospace" fill="#e11d48">V_true</text>
-                <line x1="20" y1="75" x2="132" y2="23" stroke="#0284c7" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#th)" />
-                <text x="60" y="42" font-size="7.5" font-family="monospace" fill="#0284c7">V_app</text>
-              </svg>
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              u_rel = (-V_true · sin(TWD)) - (V_sog · sin(HDG))<br>
-              v_rel = (-V_true · cos(TWD)) - (V_sog · cos(HDG))<br>
-              <b>Apparent Speed:</b> V_app = √(u_rel² + v_rel²) | <b>Aerodynamic Drag:</b> ΔV_wind = 0.0032 · (V_app)^1.62
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-wind" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Textbook Reference:</b> Admiralty Manual of Navigation (BR 45) &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 3</b></div>
         </div>
       </div>
 
       <!-- PAGE 4: SFOC & BRAKE POWER -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 3pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.4 • THERMODYNAMIC SFOC & DIESEL BRAKE POWER BALANCE</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>MARINE ENGINEERING</div>
+                  <div><b>CHAPTER 1 • PAGE 4</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.4 • THERMODYNAMIC SFOC & DIESEL BRAKE POWER BALANCE</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  1.4 Specific Fuel Oil Consumption (SFOC) & Thermal Efficiency
+                </div>
+                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
+                  Marine slow-speed two-stroke diesel engines convert chemical fuel energy into mechanical shaft power. Specific Fuel Oil Consumption (SFOC) measures mass flow rate per unit of brake power output, directly reflecting thermal brake efficiency ($\eta_{\text{th}} = \frac{3600}{\text{SFOC} \times \text{LCV}}$).
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  <b>Engine Brake Power:</b> P_B = P_MCR × (RPM / RPM_MCR)³ [kW]<br>
+                  <b>Specific Fuel Consumption:</b> SFOC = (FOC_daily [MT] × 10⁶ [g]) / (P_B [kW] × 24 [h]) [g/kWh]
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-sfoc" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7pt; color: #64748b;">
-              <div>MARINE ENGINEERING</div>
-              <div><b>CHAPTER 1 • PAGE 4</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Textbook Reference:</b> Pounder’s Marine Diesel Engines and Gas Turbines &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 4</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              1.4 Specific Fuel Oil Consumption (SFOC) & Thermal Efficiency
-            </div>
-            <div style="font-size: 8.5pt; color: #334155; line-height: 1.5; margin-bottom: 8pt;">
-              Marine slow-speed two-stroke diesel engines convert chemical fuel energy into mechanical shaft power. Specific Fuel Oil Consumption (SFOC) measures mass flow rate per unit of brake power output, directly reflecting thermal brake efficiency ($\eta_{\text{th}} = \frac{3600}{\text{SFOC} \times \text{LCV}}$).
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              <b>Engine Brake Power:</b> P_B = P_MCR × (RPM / RPM_MCR)³ [kW]<br>
-              <b>Specific Fuel Consumption:</b> SFOC = (FOC_daily [MT] × 10⁶ [g]) / (P_B [kW] × 24 [h]) [g/kWh]
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-sfoc" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Textbook Reference:</b> Pounder’s Marine Diesel Engines and Gas Turbines &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 4</b></div>
         </div>
       </div>
 
       <!-- PAGE 5: ADMIRALTY CUBIC LAW -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 3pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.1 • ADMIRALTY COEFFICIENT & CUBIC POWER LAW SCALING</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>NAVAL ARCHITECTURE</div>
+                  <div><b>CHAPTER 2 • PAGE 5</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.1 • ADMIRALTY COEFFICIENT & CUBIC POWER LAW SCALING</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  2.1 Admiralty Coefficient & Cubic Speed Scaling
+                </div>
+                <div style="display: flex; gap: 10pt; align-items: center; margin-bottom: 8pt;">
+                  <div style="flex: 1; font-size: 8.5pt; color: #334155; line-height: 1.45;">
+                    <b>Proof:</b> For displacement hulls operating below hull speed limits, wave-making and frictional resistance scale with $V^2$, yielding effective power $P_E \propto V^3$. Consequently, daily bunker consumption scales directly with the cube of the speed ratio.
+                  </div>
+                  <!-- Inline SVG: Power/FOC Cubic Law Curve -->
+                  <svg width="140" height="70" viewBox="0 0 140 70" style="background:#f8fafc; border:0.75pt solid #cbd5e1; border-radius:3pt; shrink: 0;">
+                    <line x1="20" y1="10" x2="20" y2="58" stroke="#cbd5e1" stroke-width="1" />
+                    <line x1="20" y1="58" x2="130" y2="58" stroke="#cbd5e1" stroke-width="1" />
+                    <path d="M 20 58 Q 75 56 125 14" fill="none" stroke="#0284c7" stroke-width="2.5" />
+                    <circle cx="82" cy="45" r="3.5" fill="#059669" />
+                    <text x="88" y="47" font-size="6.5" font-family="monospace" fill="#059669">Econ V³</text>
+                    <circle cx="112" cy="24" r="3.5" fill="#e11d48" />
+                    <text x="92" y="20" font-size="6.5" font-family="monospace" fill="#e11d48">100% MCR</text>
+                  </svg>
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  Admiralty Coeff: A_c = (Δ^(2/3) · V³) / P_B<br>
+                  Daily FOC Scaling: FOC_eff = FOC_rated × (V_eff / V_rated)³ [MT/day]
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-admiralty" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7pt; color: #64748b;">
-              <div>NAVAL ARCHITECTURE</div>
-              <div><b>CHAPTER 2 • PAGE 5</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Textbook Reference:</b> SNAME Principles of Naval Architecture &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 5</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              2.1 Admiralty Coefficient & Cubic Speed Scaling
-            </div>
-            <div style="display: flex; gap: 10pt; align-items: center; margin-bottom: 8pt;">
-              <div style="flex: 1; font-size: 8.5pt; color: #334155; line-height: 1.5;">
-                <b>Proof:</b> For displacement hulls operating below hull speed limits, wave-making and frictional resistance scale with $V^2$, yielding effective power $P_E \propto V^3$. Consequently, daily bunker consumption scales directly with the cube of the speed ratio.
-              </div>
-              <!-- Inline SVG: Power/FOC Cubic Law Curve -->
-              <svg width="150" height="75" viewBox="0 0 140 70" style="background:#f8fafc; border:0.75pt solid #cbd5e1; border-radius:3pt; shrink: 0;">
-                <line x1="20" y1="10" x2="20" y2="58" stroke="#cbd5e1" stroke-width="1" />
-                <line x1="20" y1="58" x2="130" y2="58" stroke="#cbd5e1" stroke-width="1" />
-                <path d="M 20 58 Q 75 56 125 14" fill="none" stroke="#0284c7" stroke-width="2.5" />
-                <circle cx="82" cy="45" r="3.5" fill="#059669" />
-                <text x="88" y="47" font-size="6.5" font-family="monospace" fill="#059669">Econ V³</text>
-                <circle cx="112" cy="24" r="3.5" fill="#e11d48" />
-                <text x="92" y="20" font-size="6.5" font-family="monospace" fill="#e11d48">100% MCR</text>
-              </svg>
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              Admiralty Coeff: A_c = (Δ^(2/3) · V³) / P_B<br>
-              Daily FOC Scaling: FOC_eff = FOC_rated × (V_eff / V_rated)³ [MT/day]
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-admiralty" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Textbook Reference:</b> SNAME Principles of Naval Architecture &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 5</b></div>
         </div>
       </div>
 
       <!-- PAGE 6: MARPOL ANNEX VI CO2 -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 3pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.2 • STOICHIOMETRIC CARBON COMBUSTION & CO₂ EMISSIONS</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>STATUTORY COMPLIANCE</div>
+                  <div><b>CHAPTER 2 • PAGE 6</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.2 • STOICHIOMETRIC CARBON COMBUSTION & CO₂ EMISSIONS</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  2.2 Stoichiometric Carbon Dioxide ($CO_2$) Emissions (MEPC.308(73))
+                </div>
+                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
+                  Under MARPOL Annex VI, carbon dioxide emissions are directly proportional to fuel consumption through a standardized carbon conversion factor ($C_F$). Complete combustion of hydrocarbon fuels yields stoichiometric carbon ratios based on carbon mass percentages.
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  VLSFO (84.93% Carbon): C_F = 3.1144 MT-CO₂ / MT-Fuel<br>
+                  LSMGO (87.44% Carbon): C_F = 3.2060 MT-CO₂ / MT-Fuel<br>
+                  Total Gross CO₂ = (Fuel_VLSFO × 3.1144) + (Fuel_LSMGO × 3.2060) [MT]
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-co2" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7pt; color: #64748b;">
-              <div>STATUTORY COMPLIANCE</div>
-              <div><b>CHAPTER 2 • PAGE 6</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Statutory Reference:</b> IMO MEPC.308(73) Guidelines for Calculation of CO₂ Emissions &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 6</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              2.2 Stoichiometric Carbon Dioxide ($CO_2$) Emissions (MEPC.308(73))
-            </div>
-            <div style="font-size: 8.5pt; color: #334155; line-height: 1.5; margin-bottom: 8pt;">
-              Under MARPOL Annex VI, carbon dioxide emissions are directly proportional to fuel consumption through a standardized carbon conversion factor ($C_F$). Complete combustion of hydrocarbon fuels yields stoichiometric carbon ratios based on carbon mass percentages.
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              VLSFO (84.93% Carbon): C_F = 3.1144 MT-CO₂ / MT-Fuel<br>
-              LSMGO (87.44% Carbon): C_F = 3.2060 MT-CO₂ / MT-Fuel<br>
-              Total Gross CO₂ = (Fuel_VLSFO × 3.1144) + (Fuel_LSMGO × 3.2060) [MT]
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-co2" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Statutory Reference:</b> IMO MEPC.308(73) Guidelines for Calculation of CO₂ Emissions &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 6</b></div>
         </div>
       </div>
 
       <!-- PAGE 7: SOx & NOx -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 3pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.3 • SOx SULFUR MASS BALANCE & NOx TECHNICAL CODE</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>STATUTORY COMPLIANCE</div>
+                  <div><b>CHAPTER 2 • PAGE 7</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.3 • SOx SULFUR MASS BALANCE & NOx TECHNICAL CODE</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  2.3 Sulfur Oxides ($SO_x$) & Nitrogen Oxides ($NO_x$) Regulatory Limits
+                </div>
+                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
+                  MARPOL Annex VI Regulation 14 restricts sulfur content in marine fuels to $0.50\%$ m/m globally and $0.10\%$ m/m inside Emission Control Areas (ECA). Regulation 13 enforces Tier II and Tier III NOx emission limits governed by engine rated speed ($n$).
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  SOx = Fuel_MT × (%Sulfur × 0.020) ➔ VLSFO(0.5%): ×0.010 | LSMGO(0.1%): ×0.002<br>
+                  Tier II Limit: 44.0 · n^(-0.23) [g/kWh] &nbsp;|&nbsp; Tier III (NECA): 9.0 · n^(-0.20) [g/kWh]
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-sox-nox" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #64748b;">
-              <div>STATUTORY COMPLIANCE</div>
-              <div><b>CHAPTER 2 • PAGE 7</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Statutory Reference:</b> MARPOL Annex VI Reg 13 & 14, NOx Technical Code 2008 &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 7</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              2.3 Sulfur Oxides ($SO_x$) & Nitrogen Oxides ($NO_x$) Regulatory Limits
-            </div>
-            <div style="font-size: 8.5pt; color: #334155; line-height: 1.5; margin-bottom: 8pt;">
-              MARPOL Annex VI Regulation 14 restricts sulfur content in marine fuels to $0.50\%$ m/m globally and $0.10\%$ m/m inside Emission Control Areas (ECA). Regulation 13 enforces Tier II and Tier III NOx emission limits governed by engine rated speed ($n$).
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              SOx = Fuel_MT × (%Sulfur × 0.020) ➔ VLSFO(0.5%): ×0.010 | LSMGO(0.1%): ×0.002<br>
-              Tier II Limit: 44.0 · n^(-0.23) [g/kWh] &nbsp;|&nbsp; Tier III (NECA): 9.0 · n^(-0.20) [g/kWh]
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-sox-nox" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Statutory Reference:</b> MARPOL Annex VI Reg 13 & 14, NOx Technical Code 2008 &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 7</b></div>
         </div>
       </div>
 
       <!-- PAGE 8: OPERATIONAL CII & RATING SPECTRUM -->
       <div class="textbook-page">
-        <div>
-          <div class="textbook-header">
+        <div class="corporate-print-frame">
+          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
+          <div class="corporate-content-layer">
             <div>
-              <div style="font-size: 14pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                <span style="color:#0f172a; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700;">Distance</span>
-                <span style="font-size: 10.5pt; font-weight: 800; color: #0f172a; margin-left: 3pt;">• ACADEMIC TEXTBOOK MANUAL</span>
+              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
+                <div>
+                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
+                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
+                  </div>
+                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.4 • CARBON INTENSITY INDICATOR (CII) & STATUTORY BASELINES</div>
+                </div>
+                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
+                  <div>IMO MEPC.337(76)</div>
+                  <div><b>CHAPTER 2 • PAGE 8</b></div>
+                </div>
               </div>
-              <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.4 • CARBON INTENSITY INDICATOR (CII) & STATUTORY BASELINES</div>
+
+              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
+                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
+                  2.4 Operational Carbon Intensity Indicator (Attained vs Required CII)
+                </div>
+                <div style="margin-bottom: 6pt;">
+                  <svg width="100%" height="28" viewBox="0 0 400 35" style="border: 0.75pt solid #cbd5e1; border-radius: 3pt; background: #ffffff;">
+                    <rect x="10" y="8" width="70" height="15" fill="#10b981" fill-opacity="0.25" stroke="#059669" stroke-width="0.8" />
+                    <text x="45" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#065f46" text-anchor="middle">A (&lt;0.86)</text>
+                    <rect x="85" y="8" width="70" height="15" fill="#22c55e" fill-opacity="0.25" stroke="#16a34a" stroke-width="0.8" />
+                    <text x="120" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#14532d" text-anchor="middle">B (0.94)</text>
+                    <rect x="160" y="8" width="70" height="15" fill="#eab308" fill-opacity="0.25" stroke="#ca8a04" stroke-width="0.8" />
+                    <text x="195" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#713f12" text-anchor="middle">C (1.00 Ref)</text>
+                    <rect x="235" y="8" width="70" height="15" fill="#f97316" fill-opacity="0.25" stroke="#ea580c" stroke-width="0.8" />
+                    <text x="270" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#7c2d12" text-anchor="middle">D (1.06)</text>
+                    <rect x="310" y="8" width="70" height="15" fill="#ef4444" fill-opacity="0.25" stroke="#dc2626" stroke-width="0.8" />
+                    <text x="345" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#7f1d1d" text-anchor="middle">E (&gt;1.14)</text>
+                    <circle cx="45" cy="8" r="4" fill="#0284c7" />
+                    <text x="45" y="32" font-size="6.5" font-weight="bold" font-family="monospace" fill="#0284c7" text-anchor="middle">▲ Active Passage (Grade A)</text>
+                  </svg>
+                </div>
+                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
+                  <b>Attained CII:</b> Total_CO₂_Grams / [Capacity_DWT × Distance_NM] [gCO₂/dwt·NM]<br>
+                  <b>Required Baseline:</b> CII_ref = a · DWT^(-c) (Tanker: a = 5,247, c = 0.357)
+                </div>
+                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
+                <div id="f-calc-step-cii" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
-            <div style="text-align: right; font-family: monospace; font-size: 7pt; color: #64748b;">
-              <div>IMO MEPC.337(76)</div>
-              <div><b>CHAPTER 2 • PAGE 8</b></div>
+
+            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
+              <div><b>Statutory Reference:</b> IMO Resolution MEPC.337(76) & MEPC.338(76) &bull; <i>miTrack Distance ver M2</i></div>
+              <div><b>PAGE 8 OF 8</b></div>
             </div>
           </div>
-
-          <div class="textbook-card">
-            <div style="font-size: 10pt; font-weight: bold; color: #0f172a; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-              2.4 Operational Carbon Intensity Indicator (Attained vs Required CII)
-            </div>
-            <div style="margin-bottom: 8pt;">
-              <svg width="100%" height="32" viewBox="0 0 400 35" style="border: 0.75pt solid #cbd5e1; border-radius: 3pt; background: #ffffff;">
-                <rect x="10" y="8" width="70" height="15" fill="#10b981" fill-opacity="0.25" stroke="#059669" stroke-width="0.8" />
-                <text x="45" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#065f46" text-anchor="middle">A (&lt;0.86)</text>
-                <rect x="85" y="8" width="70" height="15" fill="#22c55e" fill-opacity="0.25" stroke="#16a34a" stroke-width="0.8" />
-                <text x="120" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#14532d" text-anchor="middle">B (0.94)</text>
-                <rect x="160" y="8" width="70" height="15" fill="#eab308" fill-opacity="0.25" stroke="#ca8a04" stroke-width="0.8" />
-                <text x="195" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#713f12" text-anchor="middle">C (1.00 Ref)</text>
-                <rect x="235" y="8" width="70" height="15" fill="#f97316" fill-opacity="0.25" stroke="#ea580c" stroke-width="0.8" />
-                <text x="270" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#7c2d12" text-anchor="middle">D (1.06)</text>
-                <rect x="310" y="8" width="70" height="15" fill="#ef4444" fill-opacity="0.25" stroke="#dc2626" stroke-width="0.8" />
-                <text x="345" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#7f1d1d" text-anchor="middle">E (&gt;1.14)</text>
-                <circle cx="45" cy="8" r="4" fill="#0284c7" />
-                <text x="45" y="32" font-size="6.5" font-weight="bold" font-family="monospace" fill="#0284c7" text-anchor="middle">▲ Active Passage (Grade A)</text>
-              </svg>
-            </div>
-            <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4;">
-              <b>Attained CII:</b> Total_CO₂_Grams / [Capacity_DWT × Distance_NM] [gCO₂/dwt·NM]<br>
-              <b>Required Baseline:</b> CII_ref = a · DWT^(-c) (Tanker: a = 5,247, c = 0.357)
-            </div>
-            <div style="font-size: 8.5pt; font-weight: bold; color: #0f172a; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-            <div id="f-calc-step-cii" style="font-family: monospace; font-size: 7.8pt; background: #f1f5f9; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textbook-footer">
-          <div><b>Statutory Reference:</b> IMO Resolution MEPC.337(76) & MEPC.338(76) &bull; <i>miTrack Distance ver M2</i></div>
-          <div><b>PAGE 8 OF 8</b></div>
         </div>
       </div>
 
@@ -1808,7 +1901,7 @@
       return [startNode, endNode];
     }
 
-    /* 8. PORT SELECTION & AUTOCOMPLETE WITH LOCAL STORAGE AUTO-SAVE CACHE */
+    /* 8. PORT SELECTION & AUTOCOMPLETE WITH CSV ROUTE LOADER */
     window.renderPortInputs = function() {
       const container = document.getElementById("portSequenceContainer");
       if (!container) return;
@@ -2018,6 +2111,67 @@
       window.renderTelemetryRibbon();
       window.renderWaypointTable();
       window.drawMapLayers();
+    };
+
+    /* CSV Route File Upload Handler */
+    window.handleCSVRouteUpload = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r\n|\n/);
+        const importedPorts = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+          
+          const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if (parts.length >= 3) {
+            let name = parts[1].replace(/^"(.*)"$/, '$1').trim();
+            let lat = parseFloat(parts[2]);
+            let lon = parseFloat(parts[3]);
+
+            if (isNaN(lat) && parts.length >= 4) {
+              lat = parseFloat(parts[2]);
+              lon = parseFloat(parts[3]);
+            }
+            if (isNaN(lat) && parts.length >= 3) {
+              lat = parseFloat(parts[1]);
+              lon = parseFloat(parts[2]);
+              name = `Waypoint ${i}`;
+            }
+
+            if (!isNaN(lat) && !isNaN(lon)) {
+              importedPorts.push({
+                id: `CSV_WPT_${i}`,
+                name: name || `CSV Waypoint ${i}`,
+                unlocode: "CSV",
+                lat,
+                lon,
+                eca: (lat > 48 && lat < 62 && lon > -10 && lon < 25),
+                gateNode: findClosestSeaNode(lat, lon)
+              });
+            }
+          }
+        }
+
+        if (importedPorts.length >= 2) {
+          window.VoyageState.ports = importedPorts;
+          window.renderPortInputs();
+          window.calculateSynchronousRoute();
+          window.renderTelemetryRibbon();
+          window.renderWaypointTable();
+          window.drawMapLayers();
+          alert(`Successfully loaded ${importedPorts.length} waypoints from CSV file!`);
+        } else {
+          alert("Could not parse valid coordinates from CSV. Ensure format includes Latitude and Longitude columns.");
+        }
+        event.target.value = "";
+      };
+      reader.readAsText(file);
     };
 
     /* 9. ROUTE & DENSE GEODESIC NAVMESH PIPELINE */
