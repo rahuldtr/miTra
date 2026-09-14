@@ -36,7 +36,6 @@
 
   <!-- Leaflet.js CDN -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- FontAwesome Icons -->
@@ -1254,8 +1253,8 @@
       }
     };
 
-    /* 3. MASTER PORT CATALOG */
-    const MASTER_PORTS = [
+    /* 3. MASTER PORT CATALOG WITH LOCAL STORAGE AUTO-SAVE CACHE */
+    const DEFAULT_MASTER_PORTS = [
       { id: "OMDQM", name: "Duqm (Port of Duqm), Oman", unlocode: "OM DQM", lat: 19.67, lon: 57.70, eca: false, gateNode: "DUQM_APPR" },
       { id: "OMSLL", name: "Salalah, Oman", unlocode: "OM SLL", lat: 16.94, lon: 54.00, eca: false, gateNode: "GULF_OF_ADEN_IRTC" },
       { id: "OMSOH", name: "Sohar, Oman", unlocode: "OM SOH", lat: 24.50, lon: 56.63, eca: false, gateNode: "GULF_OF_OMAN" },
@@ -1290,6 +1289,28 @@
       { id: "LKCMB", name: "Colombo, Sri Lanka", unlocode: "LK CMB", lat: 6.94, lon: 79.84, eca: false, gateNode: "DONDRA_HEAD_TSS" },
       { id: "AUSYD", name: "Sydney, Australia", unlocode: "AU SYD", lat: -33.86, lon: 151.21, eca: false, gateNode: "AUSTRALIA_SYDNEY" }
     ];
+
+    let MASTER_PORTS = [...DEFAULT_MASTER_PORTS];
+    try {
+      const savedPortsJSON = localStorage.getItem("miTrack_SavedPorts_v2");
+      if (savedPortsJSON) {
+        const parsed = JSON.parse(savedPortsJSON);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          parsed.forEach(sp => {
+            if (!MASTER_PORTS.some(p => p.id === sp.id || p.name === sp.name)) {
+              MASTER_PORTS.push(sp);
+            }
+          });
+        }
+      }
+    } catch (e) {}
+
+    function persistSavedPort(portObj) {
+      try {
+        const customOnly = MASTER_PORTS.filter(p => p.isOnline || p.id.startsWith("CUSTOM_") || p.id.startsWith("PHOTON_"));
+        localStorage.setItem("miTrack_SavedPorts_v2", JSON.stringify(customOnly));
+      } catch (e) {}
+    }
 
     /* 4. MARITIME GRAPH NODES & EDGES */
     const MARITIME_NODES = {
@@ -1787,7 +1808,7 @@
       return [startNode, endNode];
     }
 
-    /* 8. PORT SELECTION & AUTOCOMPLETE */
+    /* 8. PORT SELECTION & AUTOCOMPLETE WITH LOCAL STORAGE AUTO-SAVE CACHE */
     window.renderPortInputs = function() {
       const container = document.getElementById("portSequenceContainer");
       if (!container) return;
@@ -1856,7 +1877,7 @@
                 <b>Manual Waypoint Coordinates</b>
                 <div class="text-[10px] text-slate-500 font-mono">${customLat.toFixed(4)}°, ${customLon.toFixed(4)}°</div>
               </div>
-              <span class="text-[9px] bg-sky-600 text-white px-1.5 py-0.5 rounded font-bold uppercase">Apply</span>
+              <span class="text-[9px] bg-sky-600 text-white px-1.5 py-0.5 rounded font-bold uppercase">Apply & Save</span>
             </div>
           `;
           dropdown.classList.remove("hidden");
@@ -1884,7 +1905,7 @@
               <div class="font-bold">${item.name}</div>
               <div class="text-[10px] text-slate-500 font-mono">${item.unlocode || 'GEOPORT'} | ${item.lat.toFixed(2)}°, ${item.lon.toFixed(2)}°</div>
             </div>
-            ${item.isOnline ? '<span class="text-[9px] bg-sky-100 text-sky-800 px-1 rounded border border-sky-300">ONLINE</span>' : ''}
+            ${item.isOnline ? '<span class="text-[9px] bg-sky-100 text-sky-800 px-1 rounded border border-sky-300">SAVED</span>' : ''}
             ${item.eca ? '<span class="text-[9px] bg-amber-100 text-amber-800 px-1 rounded border border-amber-300">ECA</span>' : ''}
           `;
           opt.onmousedown = () => {
@@ -1942,6 +1963,7 @@
           onlineResults.forEach(op => {
             if (!MASTER_PORTS.some(p => p.name === op.name)) {
               MASTER_PORTS.push(op);
+              persistSavedPort(op);
             }
           });
 
@@ -1958,8 +1980,13 @@
         lat,
         lon,
         eca: false,
-        gateNode: findClosestSeaNode(lat, lon)
+        gateNode: findClosestSeaNode(lat, lon),
+        isOnline: true
       };
+      if (!MASTER_PORTS.some(p => p.name === customPort.name)) {
+        MASTER_PORTS.push(customPort);
+        persistSavedPort(customPort);
+      }
       window.selectPort(portIndex, customPort);
     };
 
@@ -2779,7 +2806,6 @@
         const height = canvas.height;
         const width = canvas.width;
 
-        // Draw multiple smooth sine wave layers for ocean realism
         ctx.fillStyle = "rgba(2, 132, 199, 0.03)";
         ctx.beginPath();
         ctx.moveTo(0, height);
