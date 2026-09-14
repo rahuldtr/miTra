@@ -319,16 +319,7 @@
         <div id="map" class="w-full h-full z-10"></div>
         <canvas id="exhaustCanvas" class="absolute inset-0 pointer-events-none z-20"></canvas>
 
-        <!-- Basemap Layer Switcher Widget -->
-        <div class="absolute top-3 left-14 bg-white/95 border border-slate-300 rounded-lg p-1.5 shadow-md backdrop-blur z-30 flex items-center space-x-1.5 text-xs font-mono">
-          <span class="text-[10px] uppercase text-slate-500 px-1"><i class="fa-solid fa-layer-group text-sky-600 mr-1"></i>Layer:</span>
-          <button onclick="window.switchBasemap('positron')" id="basemapBtn-positron" class="px-2 py-0.5 rounded text-[11px] font-bold bg-sky-600 text-white shadow-sm">Esri Oceans</button>
-          <button onclick="window.switchBasemap('voyager')" id="basemapBtn-voyager" class="px-2 py-0.5 rounded text-[11px] text-slate-600 hover:bg-slate-100">OSM Clean</button>
-          <button onclick="window.switchBasemap('dark')" id="basemapBtn-dark" class="px-2 py-0.5 rounded text-[11px] text-slate-600 hover:bg-slate-100">Dark Gray</button>
-          <button onclick="window.switchBasemap('osm')" id="basemapBtn-osm" class="px-2 py-0.5 rounded text-[11px] text-slate-600 hover:bg-slate-100">Standard</button>
-        </div>
-
-        <!-- Floating Head-Up Telemetry HUD Ribbon (Color-Coded Badges & Frosted Glass Effect) -->
+        <!-- Floating Head-Up Telemetry HUD Ribbon (Full Width Top Alignment with Color-Coded Badges) -->
         <div class="absolute top-3 right-3 bg-white/90 border border-slate-300/80 rounded-xl p-2.5 shadow-lg backdrop-blur-md z-30 flex items-center space-x-3 text-xs font-mono">
           <div class="flex items-center space-x-2 border-r border-slate-200 pr-2.5">
             <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -376,6 +367,15 @@
               <span id="hudSlipVal">+0.0</span>%
             </div>
           </div>
+        </div>
+
+        <!-- Basemap Layer Switcher Widget (Repositioned to Bottom-Left to Prevent HUD Overlap) -->
+        <div class="absolute bottom-20 left-4 bg-white/95 border border-slate-300 rounded-lg p-1.5 shadow-md backdrop-blur z-30 flex items-center space-x-1.5 text-xs font-mono">
+          <span class="text-[10px] uppercase text-slate-500 px-1 font-bold"><i class="fa-solid fa-layer-group text-sky-600 mr-1"></i>Layer:</span>
+          <button onclick="window.switchBasemap('positron')" id="basemapBtn-positron" class="px-2 py-0.5 rounded text-[11px] font-bold bg-sky-600 text-white shadow-sm">Esri Oceans</button>
+          <button onclick="window.switchBasemap('voyager')" id="basemapBtn-voyager" class="px-2 py-0.5 rounded text-[11px] text-slate-600 hover:bg-slate-100">OSM Clean</button>
+          <button onclick="window.switchBasemap('dark')" id="basemapBtn-dark" class="px-2 py-0.5 rounded text-[11px] text-slate-600 hover:bg-slate-100">Dark Gray</button>
+          <button onclick="window.switchBasemap('osm')" id="basemapBtn-osm" class="px-2 py-0.5 rounded text-[11px] text-slate-600 hover:bg-slate-100">Standard</button>
         </div>
 
         <!-- Interactive Voyage Scrubbing Control Bar -->
@@ -428,10 +428,10 @@
           </div>
         </div>
 
-        <!-- Tab 1: Waypoint Log (Strict Alignment & Styling) -->
+        <!-- Tab 1: Waypoint Log (Strict Alignment & Alternating Row Zebra) -->
         <div id="tabContent-waypoints" class="tab-panel flex-1 overflow-y-auto p-2 bg-white">
           <table class="w-full text-left text-xs font-mono text-slate-700 border-collapse">
-            <thead class="bg-slate-100 text-[10.5px] uppercase tracking-wider text-slate-600 sticky top-0 border-b border-slate-300 shadow-sm">
+            <thead class="bg-slate-100/100 sticky top-0 z-20 shadow-sm border-b border-slate-300 text-[10.5px] uppercase tracking-wider text-slate-600">
               <tr>
                 <th class="p-2 w-8 text-center">#</th>
                 <th class="p-2">Navigational Node / Waypoint</th>
@@ -981,20 +981,17 @@
           <!-- 8. Carbon Intensity Indicator (IMO MEPC.337(76)) -->
           <div class="formula-card">
             <div style="font-size: 8pt; font-weight: bold; color: #0369a1; border-bottom: 0.5pt solid #cbd5e1; padding-bottom: 2pt; margin-bottom: 3pt;">
-              8. Operational Carbon Intensity Indicator (Attained CII)
+              8. Operational Carbon Intensity Indicator (Attained vs Required CII)
             </div>
             <div style="font-size: 6.8pt; color: #475569; margin-bottom: 2pt;">
-              Grams of CO₂ emitted per unit of transport capacity deadweight nautical mile:
+              IMO MEPC.337(76) / MEPC.338(76) regulatory framework: evaluates operational carbon mass emitted per unit of deadweight transport capacity.
             </div>
-            <div style="background: #f8fafc; border-left: 2.5pt solid #0284c7; padding: 3pt; font-family: monospace; font-size: 6.8pt; margin-bottom: 3pt;">
-              <b>Attained CII:</b> [Total_CO₂_MT × 10⁶] / [Capacity_DWT × Distance_NM] [gCO₂/dwt·NM]<br>
-              <b>Reference Baseline Line:</b> CII_ref = a · DWT^(-c)
+            <div style="background: #f8fafc; border-left: 2.5pt solid #0284c7; padding: 3pt; font-family: monospace; font-size: 6.6pt; margin-bottom: 3pt; line-height: 1.3;">
+              <b>Attained CII:</b> Total_CO₂_Grams / [Capacity_DWT × Distance_NM] [gCO₂/dwt·NM]<br>
+              <b>Required Baseline:</b> CII_ref = a · DWT^(-c) (Tanker: a = 5,247, c = 0.357)
             </div>
-            <div id="f-calc-step-cii" style="font-family: monospace; font-size: 6.8pt; background: #f1f5f9; padding: 3.5pt; border-radius: 2pt; white-space: pre-line; line-height: 1.25;">
-              • Capacity: 150,000 DWT | Total Distance Advanced: 5,419 NM
-              • Transport Work: 150,000 DWT × 5,419 NM = 812,850,000 dwt·NM
-              • Total Grams CO₂: 1,208.5 MT × 10⁶ = 1,208,500,000 g
-              • Attained CII = 1,208,500,000 ÷ 812,850,000 = 1.49 gCO₂/dwt·NM (Rating: A)
+            <div id="f-calc-step-cii" style="font-family: monospace; font-size: 6.5pt; background: #f1f5f9; padding: 3.5pt; border-radius: 2pt; white-space: pre-line; line-height: 1.35;">
+              <!-- Dynamically populated step-by-step arithmetic -->
             </div>
           </div>
 
@@ -2719,7 +2716,7 @@
       window.print();
     };
 
-    /* PRINT ENHANCED MITRA FORMULA REFERENCE WITH LIVE VOYAGE DERIVATIONS */
+    /* PRINT ENHANCED MITRA FORMULA REFERENCE WITH DETAILED STUDENT STEPS */
     window.printFormulary = function() {
       const r = window.VoyageState.calculatedRoute;
       const v = window.VoyageState.vessel;
@@ -2793,14 +2790,29 @@
         `• IMO Tier II NOx Bound (n = ${v.rpm.toFixed(1)} RPM): 44.0 · n^(-0.23) = 16.3 g/kWh\n` +
         `• IMO Tier III NECA Limit: 9.0 · n^(-0.20) = 3.8 g/kWh (SCR / EGR Deployed)`;
 
-      // Step 8: CII
+      // Step 8: Detailed Student Derivation of Attained vs Required CII
       const transportWork = v.dwt * r.totalDistanceNM;
+      const totalCo2Grams = r.totalCo2MT * 1e6;
+      const lnDwt = Math.log(v.dwt).toFixed(4);
+      const expTerm = (lnDwt * pPreset.ciiC).toFixed(4);
+      const denomTerm = Math.exp(lnDwt * pPreset.ciiC).toFixed(2);
+
       document.getElementById("f-calc-step-cii").innerText = 
-        `• Capacity: ${v.dwt.toLocaleString()} DWT | Total Distance Advanced: ${Math.round(r.totalDistanceNM).toLocaleString()} NM\n` +
-        `• Transport Work Done: ${v.dwt.toLocaleString()} DWT × ${Math.round(r.totalDistanceNM).toLocaleString()} NM = ${transportWork.toLocaleString()} dwt·NM\n` +
-        `• Gross CO₂ Grams: ${Math.round(r.totalCo2MT * 1e6).toLocaleString()} g CO₂\n` +
-        `• Attained Voyage CII = ${Math.round(r.totalCo2MT * 1e6).toLocaleString()} ÷ ${transportWork.toLocaleString()} = ${r.attainedCii.toFixed(2)} gCO₂/dwt·NM\n` +
-        `• Required Baseline Limit: ${r.ciiRef.toFixed(2)} ➔ Resulting Compliance Grade: "${r.ciiGrade}"`;
+        `【PART A: ATTAINED PASSAGE CII CALCULATION】\n` +
+        `• Step 1: Transport Work = DWT × Distance\n` +
+        `  = ${v.dwt.toLocaleString()} DWT × ${Math.round(r.totalDistanceNM).toLocaleString()} NM = ${transportWork.toLocaleString()} dwt·NM\n` +
+        `• Step 2: Total Carbon Mass = ${r.totalCo2MT.toFixed(1)} MT × 10⁶ = ${Math.round(totalCo2Grams).toLocaleString()} grams CO₂\n` +
+        `• Step 3: Attained CII = Total Grams CO₂ ÷ Transport Work\n` +
+        `  = ${Math.round(totalCo2Grams).toLocaleString()} ÷ ${transportWork.toLocaleString()} = ${r.attainedCii.toFixed(2)} gCO₂/dwt·NM\n\n` +
+        `【PART B: REQUIRED STATUTORY BASELINE (IMO MEPC.338(76))】\n` +
+        `• Step 4: Formula: CII_ref = a · DWT^(-c) | For ${pPreset.typeLabel}: a = ${pPreset.ciiA}, c = ${pPreset.ciiC}\n` +
+        `• Step 5: Power Expansion: (DWT)^c = exp(c · ln(DWT))\n` +
+        `  = exp(${pPreset.ciiC} × ln(${v.dwt.toLocaleString()})) = exp(${expTerm}) ≈ ${denomTerm}\n` +
+        `• Step 6: Required Ceiling = ${pPreset.ciiA} ÷ ${denomTerm} = ${r.ciiRef.toFixed(2)} gCO₂/dwt·NM\n\n` +
+        `【PART C: STUDENT AUDIT & OPERATIONAL INSIGHT】\n` +
+        `• Underway Sea Margin: Attained (${r.attainedCii.toFixed(2)}) is well below Annual Required (${r.ciiRef.toFixed(2)}).\n` +
+        `• Note: Pure steaming passages generate high nautical miles at steady speed with zero port idle burn,\n` +
+        `  securing an operational Grade "${r.ciiGrade}" margin before annual port stays and boiler loads are factored.`;
 
       document.getElementById("printDocPassagePlan").style.display = "none";
       document.getElementById("printDocFormulary").style.display = "block";
