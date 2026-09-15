@@ -194,6 +194,17 @@
 </head>
 
 <body class="h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 flex flex-col font-sans select-none">
+  <!-- Minimal Startup Splash Loader -->
+  <div id="appSplashLoader" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center space-y-3 transition-opacity duration-500">
+    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 flex items-center justify-center text-white shadow-2xl animate-pulse">
+      <i class="fa-solid fa-compass text-xl animate-spin" style="animation-duration: 4s;"></i>
+    </div>
+    <div class="text-center font-mono">
+      <div class="text-xs font-bold uppercase tracking-widest text-sky-400">miTrack Distance</div>
+      <div class="text-[10px] text-slate-400 mt-1">Initializing Navmesh & Climatology Matrix...</div>
+    </div>
+  </div>
+
   <!-- TOP APP COMMAND RIBBON (GLASS EFFECT) -->
   <header class="no-print h-14 glass-header flex items-center justify-between px-4 z-40 shrink-0 shadow-md">
     <div class="flex items-center space-x-3">
@@ -1255,18 +1266,18 @@
 
   <!-- JAVASCRIPT APPLICATION CORE -->
   <script>
-    /* 1. GLOBAL STATE OBJECT */
+    /* 1. GLOBAL STATE OBJECT WITH LOCAL STORAGE PERSISTENCE */
     window.VoyageState = {
       ports: [],
       vessel: {
-        name: "M/V VESSEL",
-        type: "tanker",
-        dwt: 150000,
-        pitch: 5.70,
-        rpm: 74.0,
-        baseSog: 13.4,
-        ratedFoc: 24.0,
-        etd: new Date().toISOString().slice(0, 16)
+        name: localStorage.getItem("miTrack_VesselName") || "M/V VESSEL",
+        type: localStorage.getItem("miTrack_VesselType") || "tanker",
+        dwt: parseFloat(localStorage.getItem("miTrack_VesselDwt")) || 150000,
+        pitch: parseFloat(localStorage.getItem("miTrack_VesselPitch")) || 5.70,
+        rpm: parseFloat(localStorage.getItem("miTrack_VesselRpm")) || 74.0,
+        baseSog: parseFloat(localStorage.getItem("miTrack_VesselSog")) || 13.4,
+        ratedFoc: parseFloat(localStorage.getItem("miTrack_VesselFoc")) || 24.0,
+        etd: localStorage.getItem("miTrack_VesselEtd") || new Date().toISOString().slice(0, 16)
       },
       strategy: "best",
       avoidHra: false,
@@ -1286,6 +1297,19 @@
       },
       exhaustParticles: []
     };
+
+    function persistVesselParticulars() {
+      try {
+        localStorage.setItem("miTrack_VesselName", window.VoyageState.vessel.name);
+        localStorage.setItem("miTrack_VesselType", window.VoyageState.vessel.type);
+        localStorage.setItem("miTrack_VesselDwt", window.VoyageState.vessel.dwt);
+        localStorage.setItem("miTrack_VesselPitch", window.VoyageState.vessel.pitch);
+        localStorage.setItem("miTrack_VesselRpm", window.VoyageState.vessel.rpm);
+        localStorage.setItem("miTrack_VesselSog", window.VoyageState.vessel.baseSog);
+        localStorage.setItem("miTrack_VesselFoc", window.VoyageState.vessel.ratedFoc);
+        localStorage.setItem("miTrack_VesselEtd", window.VoyageState.vessel.etd);
+      } catch (e) {}
+    }
 
     /* 2. SIMPLIFIED VESSEL PRESETS */
     const VESSEL_PRESETS = {
@@ -3225,6 +3249,17 @@
 
     /* 14. INITIALIZATION BOOTSTRAPPER */
     window.addEventListener("DOMContentLoaded", () => {
+      // Bind vessel inputs to local storage persistence
+      document.getElementById("vesselNameInput").value = window.VoyageState.vessel.name;
+      document.getElementById("vesselDwtInput").value = window.VoyageState.vessel.dwt;
+      document.getElementById("vesselPitchInput").value = window.VoyageState.vessel.pitch;
+      document.getElementById("vesselRpmInput").value = window.VoyageState.vessel.rpm;
+      document.getElementById("vesselBaseSogInput").value = window.VoyageState.vessel.baseSog;
+      document.getElementById("vesselRatedFocInput").value = window.VoyageState.vessel.ratedFoc;
+      document.getElementById("vesselEtdInput").value = window.VoyageState.vessel.etd;
+      document.getElementById("vesselProfilePreset").value = window.VoyageState.vessel.type;
+      document.getElementById("vesselTypeBadge").innerText = (VESSEL_PRESETS[window.VoyageState.vessel.type] || VESSEL_PRESETS.tanker).typeLabel;
+
       const map = L.map("map", {
         zoomControl: true,
         attributionControl: false,
@@ -3259,30 +3294,17 @@
         { ...MASTER_PORTS.find(p => p.id === "OMDQM") }
       ];
 
-      const initialPreset = VESSEL_PRESETS.tanker;
-      window.VoyageState.vessel = {
-        ...window.VoyageState.vessel,
-        type: initialPreset.type,
-        dwt: initialPreset.dwt,
-        pitch: initialPreset.pitch,
-        rpm: initialPreset.rpm,
-        baseSog: initialPreset.baseSog,
-        ratedFoc: initialPreset.ratedFoc
-      };
-
       // Event Listeners
       document.getElementById("vesselProfilePreset").addEventListener("change", (e) => {
         const p = VESSEL_PRESETS[e.target.value];
         if (!p) return;
-        window.VoyageState.vessel = {
-          ...window.VoyageState.vessel,
-          type: p.type,
-          dwt: p.dwt,
-          pitch: p.pitch,
-          rpm: p.rpm,
-          baseSog: p.baseSog,
-          ratedFoc: p.ratedFoc
-        };
+        window.VoyageState.vessel.type = p.type;
+        window.VoyageState.vessel.dwt = p.dwt;
+        window.VoyageState.vessel.pitch = p.pitch;
+        window.VoyageState.vessel.rpm = p.rpm;
+        window.VoyageState.vessel.baseSog = p.baseSog;
+        window.VoyageState.vessel.ratedFoc = p.ratedFoc;
+
         document.getElementById("vesselDwtInput").value = p.dwt;
         document.getElementById("vesselPitchInput").value = p.pitch;
         document.getElementById("vesselRpmInput").value = p.rpm;
@@ -3290,6 +3312,7 @@
         document.getElementById("vesselRatedFocInput").value = p.ratedFoc;
         document.getElementById("vesselTypeBadge").innerText = p.typeLabel;
 
+        persistVesselParticulars();
         window.calculateSynchronousRoute();
         window.renderTelemetryRibbon();
         window.renderWaypointTable();
@@ -3317,6 +3340,7 @@
           const val = parseFloat(e.target.value);
           if (!isNaN(val)) {
             window.VoyageState.vessel[key] = val;
+            persistVesselParticulars();
             window.calculateSynchronousRoute();
             window.renderTelemetryRibbon();
             window.renderWaypointTable();
@@ -3332,12 +3356,13 @@
 
       document.getElementById("vesselNameInput").addEventListener("input", (e) => {
         window.VoyageState.vessel.name = e.target.value;
+        persistVesselParticulars();
       });
 
       const etdInput = document.getElementById("vesselEtdInput");
-      etdInput.value = window.VoyageState.vessel.etd;
       etdInput.addEventListener("change", (e) => {
         window.VoyageState.vessel.etd = e.target.value;
+        persistVesselParticulars();
         window.calculateSynchronousRoute();
         window.renderTelemetryRibbon();
         window.renderWaypointTable();
@@ -3362,6 +3387,15 @@
 
       initExhaustCanvas();
       initWaveAnimationCanvas();
+
+      // Smoothly hide startup splash loader
+      setTimeout(() => {
+        const splash = document.getElementById("appSplashLoader");
+        if (splash) {
+          splash.style.opacity = "0";
+          setTimeout(() => splash.remove(), 500);
+        }
+      }, 400);
     });
   </script>
 </body>
