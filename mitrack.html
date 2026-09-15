@@ -236,8 +236,8 @@
 
     <!-- Quick Action / Print Tools / Interactive Route Pen -->
     <div class="flex items-center space-x-1.5">
-      <input type="file" id="csvRouteFileInput" accept=".csv" class="hidden" onchange="window.handleCSVRouteUpload(event)">
-      <button onclick="document.getElementById('csvRouteFileInput').click()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Load Route Waypoints from ECDIS CSV Export">
+      <input type="file" id="csvRouteFileInput" accept=".csv,.rtz" class="hidden" onchange="window.handleRouteFileUpload(event)">
+      <button onclick="document.getElementById('csvRouteFileInput').click()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Load Route Waypoints from ECDIS CSV or RTZ Export">
         <i class="fa-solid fa-route text-indigo-600"></i>
         <span>ECDIS Audit</span>
       </button>
@@ -249,8 +249,9 @@
         <i class="fa-solid fa-print text-sky-600"></i>
         <span>Report</span>
       </button>
-      <button onclick="window.exportWaypointsCSV()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-2 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Export CSV">
-        <i class="fa-solid fa-file-csv text-amber-600"></i>
+      <button onclick="window.exportDualFormat()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-2 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Export CSV & RTZ Together">
+        <i class="fa-solid fa-file-export text-amber-600"></i>
+        <span>Export</span>
       </button>
       <button onclick="window.openAboutModal()" class="bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-xl shadow-md transition cursor-pointer" title="Formulary & Specs">
         <i class="fa-solid fa-circle-info"></i>
@@ -505,9 +506,10 @@
               <span>Propulsion & Theoretical Slip Matrix</span>
             </button>
           </div>
-          <div class="text-[11px] text-slate-500 font-mono">
+          <div class="text-[11px] text-slate-500 font-mono flex items-center space-x-2">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
-            <span>A* Navmesh Locked: Zero Land Crossing</span>
+            <span>A* Navmesh Locked</span>
+            <span id="weatherSourceBadge" class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 font-bold uppercase">Climatology Matrix</span>
           </div>
         </div>
 
@@ -1267,7 +1269,7 @@
       }
     ];
 
-    /* 6. MATHEMATICS & HYDRODYNAMICS WITH HISTORICAL CLIMATOLOGY SEASONAL MATRICES */
+    /* 6. MATHEMATICS & HYDRODYNAMICS WITH HISTORICAL CLIMATOLOGY & ASYNCHRONOUS LIVE WEATHER LAZY FETCH */
     function haversineDistance(lat1, lon1, lat2, lon2) {
       const R = 3440.065;
       const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1416,9 +1418,68 @@
         relWindData,
         waveLoss,
         windLoss,
-        currentDrift
+        currentDrift,
+        isLive: false
       };
     }
+
+    /* Asynchronous Background Lazy Fetch for Online Weather (Open-Meteo Integration) */
+    window.tryFetchLiveWeatherForRoute = function() {
+      if (!navigator.onLine) return;
+
+      setTimeout(async () => {
+        const r = window.VoyageState.calculatedRoute;
+        if (!r || !r.waypoints || r.waypoints.length === 0) return;
+
+        try {
+          const sampleWpts = r.waypoints.filter((w, idx) => idx === 0 || idx === r.waypoints.length - 1 || (w.cumulativeDist / (r.totalDistanceNM || 1)) <= 0.6);
+          if (sampleWpts.length === 0) return;
+
+          const lats = sampleWpts.map(w => w.lat).join(',');
+          const lons = sampleWpts.map(w => w.lon).join(',');
+
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,wind_speed_10m,wind_direction_10m&hourly=wave_height,wave_direction`;
+          const resp = await fetch(url);
+          if (!resp.ok) return;
+
+          const data = await resp.json();
+          const results = Array.isArray(data) ? data : [data];
+
+          results.forEach((res, i) => {
+            if (i < r.waypoints.length && res.current) {
+              const w = r.waypoints[i];
+              if ((w.hoursFromStart || 0) <= (14 * 24)) {
+                const windSpd = res.current.wind_speed_10m || w.weather.windSpd;
+                const windDir = res.current.wind_direction_10m || w.weather.windDir;
+                const waveHs = (res.hourly && res.hourly.wave_height && res.hourly.wave_height[0]) ? res.hourly.wave_height[0] : w.weather.waveHs;
+                const waveDir = (res.hourly && res.hourly.wave_direction && res.hourly.wave_direction[0]) ? res.hourly.wave_direction[0] : w.weather.waveDir;
+                
+                const relWave = Math.abs((waveDir - w.course + 180) % 360 - 180);
+                const relWind = Math.abs((windDir - w.course + 180) % 360 - 180);
+
+                w.weather.waveHs = waveHs;
+                w.weather.waveDir = waveDir;
+                w.weather.windSpd = windSpd;
+                w.weather.windDir = windDir;
+                w.weather.waveLoss = 0.24 * Math.pow(waveHs, 1.85) * Math.max(0, Math.cos(relWave * Math.PI / 180));
+                w.weather.windLoss = 0.0032 * Math.pow(windSpd, 1.62) * Math.max(0, Math.cos(relWind * Math.PI / 180));
+                w.weather.relWindData = calculateRelativeWind(windSpd, windDir, w.sog, w.course);
+                w.weather.isLive = true;
+              }
+            }
+          });
+
+          const badge = document.getElementById("weatherSourceBadge");
+          if (badge) {
+            badge.innerText = "Live Forecast (Days 1–14)";
+            badge.className = "text-[9px] bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded border border-sky-300 font-bold uppercase";
+          }
+
+          window.renderTelemetryRibbon();
+          window.renderWaypointTable();
+        } catch (e) {}
+      }, 1200);
+    };
 
     function findClosestSeaNode(lat, lon) {
       let closest = "ROTTERDAM_APPR";
@@ -1513,7 +1574,7 @@
       return [startNode, endNode];
     }
 
-    /* 8. PORT SELECTION & AUTOCOMPLETE WITH CSV ROUTE LOADER */
+    /* 8. PORT SELECTION & AUTOCOMPLETE WITH DUAL FORMAT ROUTE LOADER (CSV & RTZ) */
     window.renderPortInputs = function() {
       const container = document.getElementById("portSequenceContainer");
       if (!container) return;
@@ -1725,47 +1786,79 @@
       window.drawMapLayers();
     };
 
-    /* CSV Route File Upload Handler */
-    window.handleCSVRouteUpload = function(event) {
+    /* Dual Format Route File Upload Handler (Supports CSV and RTZ XML) */
+    window.handleRouteFileUpload = function(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
+      const fileName = file.name.toLowerCase();
+
       reader.onload = function(e) {
         const text = e.target.result;
-        const lines = text.split(/\r\n|\n/);
         const importedPorts = [];
 
-        for (let i = 1; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (!line) continue;
-          
-          const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-          if (parts.length >= 3) {
-            let name = parts[1].replace(/^"(.*)"$/, '$1').trim();
-            let lat = parseFloat(parts[2]);
-            let lon = parseFloat(parts[3]);
+        if (fileName.endsWith('.rtz') || text.includes('<?xml') || text.includes('<route')) {
+          // Parse IEC 61174 RTZ XML format
+          try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, "text/xml");
+            const wptNodes = xmlDoc.querySelectorAll("waypoint, wpt");
+            
+            wptNodes.forEach((node, i) => {
+              let lat = parseFloat(node.getAttribute("lat") || node.getAttribute("latitude") || node.querySelector("lat")?.textContent);
+              let lon = parseFloat(node.getAttribute("lon") || node.getAttribute("longitude") || node.querySelector("lon")?.textContent);
+              let name = node.getAttribute("name") || node.querySelector("name")?.textContent || `RTZ Waypoint ${i + 1}`;
 
-            if (isNaN(lat) && parts.length >= 4) {
-              lat = parseFloat(parts[2]);
-              lon = parseFloat(parts[3]);
-            }
-            if (isNaN(lat) && parts.length >= 3) {
-              lat = parseFloat(parts[1]);
-              lon = parseFloat(parts[2]);
-              name = `Waypoint ${i}`;
-            }
+              if (!isNaN(lat) && !isNaN(lon)) {
+                importedPorts.push({
+                  id: `RTZ_WPT_${i}`,
+                  name,
+                  unlocode: "RTZ",
+                  lat,
+                  lon,
+                  eca: (lat > 48 && lat < 62 && lon > -10 && lon < 25),
+                  gateNode: findClosestSeaNode(lat, lon)
+                });
+              }
+            });
+          } catch (err) {}
+        }
 
-            if (!isNaN(lat) && !isNaN(lon)) {
-              importedPorts.push({
-                id: `CSV_WPT_${i}`,
-                name: name || `CSV Waypoint ${i}`,
-                unlocode: "CSV",
-                lat,
-                lon,
-                eca: (lat > 48 && lat < 62 && lon > -10 && lon < 25),
-                gateNode: findClosestSeaNode(lat, lon)
-              });
+        if (importedPorts.length < 2) {
+          // Fallback / Standard CSV Parser
+          const lines = text.split(/\r\n|\n/);
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            
+            const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (parts.length >= 3) {
+              let name = parts[1].replace(/^"(.*)"$/, '$1').trim();
+              let lat = parseFloat(parts[2]);
+              let lon = parseFloat(parts[3]);
+
+              if (isNaN(lat) && parts.length >= 4) {
+                lat = parseFloat(parts[2]);
+                lon = parseFloat(parts[3]);
+              }
+              if (isNaN(lat) && parts.length >= 3) {
+                lat = parseFloat(parts[1]);
+                lon = parseFloat(parts[2]);
+                name = `Waypoint ${i}`;
+              }
+
+              if (!isNaN(lat) && !isNaN(lon)) {
+                importedPorts.push({
+                  id: `CSV_WPT_${i}`,
+                  name: name || `CSV Waypoint ${i}`,
+                  unlocode: "CSV",
+                  lat,
+                  lon,
+                  eca: (lat > 48 && lat < 62 && lon > -10 && lon < 25),
+                  gateNode: findClosestSeaNode(lat, lon)
+                });
+              }
             }
           }
         }
@@ -1777,9 +1870,9 @@
           window.renderTelemetryRibbon();
           window.renderWaypointTable();
           window.drawMapLayers();
-          alert(`Successfully loaded ${importedPorts.length} waypoints from ECDIS CSV file!`);
+          alert(`Successfully imported ${importedPorts.length} waypoints from route file!`);
         } else {
-          alert("Could not parse valid coordinates from CSV. Ensure format includes Latitude and Longitude columns.");
+          alert("Could not parse valid coordinates from file. Ensure format is a valid ECDIS CSV or RTZ route file.");
         }
         event.target.value = "";
       };
@@ -1986,6 +2079,8 @@
         ciiRef,
         ciiGrade
       };
+
+      window.tryFetchLiveWeatherForRoute();
     };
 
     window.renderTelemetryRibbon = function() {
@@ -2074,7 +2169,10 @@
 
         tr.innerHTML = `
           <td class="p-2 text-center text-slate-400 font-bold">${i + 1}</td>
-          <td class="p-2 font-semibold text-slate-800">${w.name}</td>
+          <td class="p-2 font-semibold text-slate-800 flex items-center space-x-1.5">
+            <span>${w.name}</span>
+            ${w.weather.isLive ? '<span class="text-[8px] bg-sky-100 text-sky-800 px-1 rounded font-bold" title="Live Forecast Data">LIVE</span>' : ''}
+          </td>
           <td class="p-2 text-slate-600">${formatLat(w.lat)}</td>
           <td class="p-2 text-slate-600">${formatLon(w.lon)}</td>
           <td class="p-2 text-right font-medium text-slate-700">${w.legDist.toFixed(1)}</td>
@@ -2748,18 +2846,44 @@
       window.openAboutModal();
     };
 
-    window.exportWaypointsCSV = function() {
+    /* Dual-Format Export: Generates and downloads both CSV and RTZ files simultaneously */
+    window.exportDualFormat = function() {
       const r = window.VoyageState.calculatedRoute;
       if (!r) return;
+
+      // 1. Generate CSV Content
       let csv = "Index,Waypoint,Latitude,Longitude,LegDistance_NM,CumDistance_NM,Course_Deg,EngineSpeed_kn,SOG_kn,ApparentSlip_pct,SeaWaterTemp_C,SigWaveHeight_m,WaveDir_Deg,Current_kn,CurrentDir_Deg,RelWind_kn,RelWind_Dir,LegFuel_MT,ECA_Zone\n";
       r.waypoints.forEach((w, i) => {
         csv += `${i + 1},"${w.name}",${w.lat.toFixed(4)},${w.lon.toFixed(4)},${w.legDist.toFixed(1)},${w.cumulativeDist.toFixed(1)},${Math.round(w.course)},${w.engineSpeed.toFixed(1)},${w.sog.toFixed(1)},${w.slip.toFixed(2)},${w.weather.seaWaterTemp.toFixed(1)},${w.weather.waveHs.toFixed(1)},${w.weather.waveDir},${w.weather.currentSpd.toFixed(1)},${w.weather.currentDir},${w.weather.relWindData.relSpd.toFixed(1)},"${w.weather.relWindData.relAngle} ${w.weather.relWindData.side}",${w.legFuel.toFixed(1)},${w.eca ? 'ECA' : 'SEA'}\n`;
       });
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `miTrack_PassagePlan_${Date.now()}.csv`;
-      link.click();
+
+      // 2. Generate IEC 61174 RTZ XML Content
+      let rtz = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      rtz += `<route xmlns="http://www.cirm.org/RTZ/1/0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">\n`;
+      rtz += `  <routeInfo routeName="miTrack Passage Plan" vesselName="${window.VoyageState.vessel.name}"/>\n`;
+      rtz += `  <waypoints>\n`;
+      r.waypoints.forEach((w, i) => {
+        rtz += `    <waypoint id="${i + 1}" name="${w.name}" lat="${w.lat.toFixed(4)}" lon="${w.lon.toFixed(4)}">\n`;
+        rtz += `      <leg speed="${w.sog.toFixed(1)}"/>\n`;
+        rtz += `    </waypoint>\n`;
+      });
+      rtz += `  </waypoints>\n`;
+      rtz += `</route>`;
+
+      // Helper trigger function for multi-file download
+      const downloadFile = (content, filename, type) => {
+        const blob = new Blob([content], { type });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      const timestamp = Date.now();
+      downloadFile(csv, `miTrack_Route_${timestamp}.csv`, "text/csv;charset=utf-8;");
+      downloadFile(rtz, `miTrack_Route_${timestamp}.rtz`, "application/xml;charset=utf-8;");
     };
 
     /* 14. INITIALIZATION BOOTSTRAPPER (DEFERRABLE & NON-BLOCKING) */
