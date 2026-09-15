@@ -53,6 +53,19 @@
     }
     .custom-ship-marker { transition: transform 0.08s linear; }
 
+    /* ECDIS Bathymetry Depth Sounding Label Styling */
+    .ecdis-depth-label {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      font-family: 'SFMono-Regular', Menlo, monospace !important;
+      font-size: 9px !important;
+      color: rgba(56, 189, 248, 0.65) !important;
+      text-shadow: 0 0 2px rgba(15, 23, 42, 0.9);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
     /* High-End Glassmorphism UI Makeup */
     .glass-panel {
       background: rgba(255, 255, 255, 0.82);
@@ -150,42 +163,6 @@
       table.print-table tr:nth-child(even) td {
         background-color: #f8fafc !important;
       }
-
-      .textbook-page {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        page-break-after: always;
-        break-after: page;
-        box-sizing: border-box;
-      }
-      .textbook-card {
-        border: 1pt solid #cbd5e1 !important;
-        padding: 8pt 10pt !important;
-        border-radius: 4pt !important;
-        background-color: #ffffff !important;
-        margin-bottom: 8pt;
-        box-shadow: none !important;
-      }
-      .textbook-header {
-        border-bottom: 2pt solid #0a192f;
-        padding-bottom: 5pt;
-        margin-bottom: 10pt;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-      }
-      .textbook-footer {
-        border-top: 1pt solid #cbd5e1;
-        padding-top: 5pt;
-        font-size: 7pt;
-        font-family: 'Inter', sans-serif;
-        color: #475569;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
     }
     @media screen {
       .print-only { display: none !important; }
@@ -206,28 +183,28 @@
   </div>
 
   <!-- TOP APP COMMAND RIBBON (GLASS EFFECT) -->
-  <header class="no-print h-14 glass-header flex items-center justify-between px-4 z-40 shrink-0 shadow-md">
-    <div class="flex items-center space-x-3">
+  <header class="no-print h-14 glass-header flex items-center justify-between px-3 z-40 shrink-0 shadow-md">
+    <div class="flex items-center space-x-2">
       <div class="bg-gradient-to-tr from-sky-600 to-cyan-500 text-white p-2 rounded-xl shadow-lg flex items-center justify-center ring-1 ring-white/30">
         <i class="fa-solid fa-compass text-lg animate-spin" style="animation-duration: 25s;"></i>
       </div>
       <div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1.5">
           <h1 class="font-black text-sm tracking-wide text-slate-900">
             <span class="text-slate-900 font-extrabold">mi</span><span class="text-sky-600 font-black">Track</span> 
-            <span class="text-slate-500 font-semibold tracking-normal text-xs ml-1">Distance</span>
+            <span class="text-slate-500 font-semibold tracking-normal text-xs ml-0.5">Distance</span>
           </h1>
-          <span class="text-[10px] bg-sky-50 text-sky-700 border border-sky-200 px-1.5 py-0.5 rounded font-mono font-bold shadow-xs">ver M2</span>
+          <span class="text-[10px] bg-sky-50 text-sky-700 border border-sky-200 px-1 py-0.5 rounded font-mono font-bold shadow-xs">ver M2</span>
         </div>
-        <p class="text-[10.5px] text-slate-500 truncate max-w-sm">Marine Passage Planning & Hydrodynamics</p>
+        <p class="text-[10px] text-slate-500 truncate max-w-[200px]">Marine Passage Planning & Hydrodynamics</p>
       </div>
     </div>
 
     <!-- Simplified Vessel Profile Switcher -->
-    <div class="flex items-center space-x-3">
+    <div class="flex items-center space-x-2">
       <div class="flex items-center bg-white/80 rounded-xl p-1 border border-slate-200 shadow-xs">
-        <span class="text-[11px] font-semibold text-slate-600 px-2 uppercase tracking-wider">Vessel Profile:</span>
-        <select id="vesselProfilePreset" class="bg-white text-slate-800 text-xs font-semibold rounded-lg px-2.5 py-1 border border-slate-300 focus:outline-none focus:border-sky-500 shadow-xs cursor-pointer">
+        <span class="text-[10.5px] font-semibold text-slate-600 px-1.5 uppercase tracking-wider">Profile:</span>
+        <select id="vesselProfilePreset" class="bg-white text-slate-800 text-xs font-semibold rounded-lg px-2 py-1 border border-slate-300 focus:outline-none focus:border-sky-500 shadow-xs cursor-pointer">
           <option value="tanker" selected>Tanker</option>
           <option value="bulk">Bulk Carrier</option>
           <option value="container">Container</option>
@@ -238,45 +215,41 @@
 
       <!-- Strategy Mode Select -->
       <div class="flex items-center bg-white/80 rounded-xl p-1 border border-slate-200 shadow-xs">
-        <span class="text-[11px] font-semibold text-slate-600 px-2 uppercase tracking-wider">Mode:</span>
+        <span class="text-[10.5px] font-semibold text-slate-600 px-1.5 uppercase tracking-wider">Mode:</span>
         <select id="optimizationMode" class="bg-white text-emerald-700 text-xs font-semibold rounded-lg px-2 py-1 border border-slate-300 focus:outline-none focus:border-emerald-500 shadow-xs cursor-pointer">
-          <option value="best">Best (Direct Nautical)</option>
-          <option value="min_slip">Minimum Propeller Slip</option>
-          <option value="economy">Economy (Admiralty Power Cube)</option>
-          <option value="calm">Calm Sea Route</option>
+          <option value="best">Best (Direct)</option>
+          <option value="min_slip">Min Slip</option>
+          <option value="economy">Economy</option>
+          <option value="calm">Calm Sea</option>
         </select>
       </div>
 
-      <!-- Avoid HRA Strategic Toggle -->
-      <label class="flex items-center space-x-2 bg-white/80 border border-slate-200 rounded-xl px-2.5 py-1 cursor-pointer hover:bg-white transition shadow-xs">
+      <!-- Avoid HRA Strategic Toggle (Shortened text to save space) -->
+      <label class="flex items-center space-x-1.5 bg-white/80 border border-slate-200 rounded-xl px-2 py-1 cursor-pointer hover:bg-white transition shadow-xs" title="Avoid High Risk Area">
         <input type="checkbox" id="avoidHraToggle" class="rounded bg-white border-slate-300 text-rose-600 focus:ring-0 cursor-pointer">
         <span class="text-xs font-bold text-rose-700 flex items-center space-x-1">
           <i class="fa-solid fa-shield-halved text-[11px]"></i>
-          <span>AVOID HRA (via Cape)</span>
+          <span>Avoid HRA</span>
         </span>
       </label>
     </div>
 
     <!-- Quick Action / Print Tools / Interactive Route Pen -->
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-1.5">
       <input type="file" id="csvRouteFileInput" accept=".csv" class="hidden" onchange="window.handleCSVRouteUpload(event)">
-      <button onclick="document.getElementById('csvRouteFileInput').click()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer" title="Load Route Waypoints from CSV">
-        <i class="fa-solid fa-file-arrow-up text-indigo-600"></i>
-        <span>Load CSV</span>
+      <button onclick="document.getElementById('csvRouteFileInput').click()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Load Route Waypoints from ECDIS CSV Export">
+        <i class="fa-solid fa-route text-indigo-600"></i>
+        <span>ECDIS Audit</span>
       </button>
-      <button id="routeEditorToggleBtn" onclick="window.toggleRouteEditor()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer" title="Drag and adjust route waypoints">
+      <button id="routeEditorToggleBtn" onclick="window.toggleRouteEditor()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Drag and adjust route waypoints">
         <i class="fa-solid fa-pen-nib text-sky-600" id="routeEditorIcon"></i>
-        <span id="routeEditorLabel">Edit Route</span>
+        <span id="routeEditorLabel">Edit</span>
       </button>
-      <button onclick="window.printPassagePlan()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-3 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer">
+      <button onclick="window.printPassagePlan()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-2.5 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Comprehensive Passage Plan & Weather Report">
         <i class="fa-solid fa-print text-sky-600"></i>
-        <span>Passage Plan PDF</span>
+        <span>Report</span>
       </button>
-      <button onclick="window.printFormulary()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-3 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer">
-        <i class="fa-solid fa-square-root-variable text-emerald-600"></i>
-        <span>Mitra Formula</span>
-      </button>
-      <button onclick="window.exportWaypointsCSV()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-2.5 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer" title="Export CSV">
+      <button onclick="window.exportWaypointsCSV()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-2 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer" title="Export CSV">
         <i class="fa-solid fa-file-csv text-amber-600"></i>
       </button>
       <button onclick="window.openAboutModal()" class="bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-xl shadow-md transition cursor-pointer" title="Formulary & Specs">
@@ -289,8 +262,8 @@
   <div class="no-print flex-1 flex overflow-hidden">
     <!-- LEFT SIDEBAR: ROUTING & VESSEL SPECIFICATION PANEL (GLASS PANEL) -->
     <aside class="w-[420px] glass-panel border-r border-slate-200/80 flex flex-col shrink-0 overflow-y-auto z-20 shadow-lg pb-6">
-      <div class="p-3.5 border-b border-slate-200/80 bg-white/60 backdrop-blur sticky top-0 z-30 shadow-xs">
-        <div class="flex items-center justify-between mb-2">
+      <div class="p-3.5 border-b border-slate-200/80 bg-white/60 backdrop-blur sticky top-0 z-30 shadow-xs flex flex-col max-h-[340px]">
+        <div class="flex items-center justify-between mb-2 shrink-0">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center space-x-1.5">
             <i class="fa-solid fa-route text-sky-600"></i>
             <span>Voyage Sequence Routing</span>
@@ -301,9 +274,11 @@
           </button>
         </div>
 
-        <div id="portSequenceContainer" class="space-y-2"></div>
-        <div class="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
-          <span><i class="fa-solid fa-circle-info text-sky-600 mr-1"></i>Search ports or load CSV route.</span>
+        <!-- Scrollable Waypoint List Container -->
+        <div id="portSequenceContainer" class="space-y-2 overflow-y-auto flex-1 pr-1"></div>
+
+        <div class="mt-2 text-[10px] text-slate-500 flex items-center justify-between shrink-0 pt-1 border-t border-slate-200/50">
+          <span><i class="fa-solid fa-circle-info text-sky-600 mr-1"></i>Search ports or load ECDIS route.</span>
           <span id="geoStatusBadge" class="text-emerald-700 font-mono font-bold">READY</span>
         </div>
       </div>
@@ -472,13 +447,18 @@
           </div>
         </div>
 
-        <!-- Basemap Layer Switcher Widget (Glass Panel) -->
+        <!-- Basemap & ECDIS Bathymetry Layer Switcher Widget (Glass Panel) -->
         <div class="absolute bottom-20 left-4 glass-panel rounded-xl p-1.5 shadow-xl z-30 flex items-center space-x-1.5 text-xs font-mono">
           <span class="text-[10px] uppercase text-slate-600 px-1 font-bold"><i class="fa-solid fa-layer-group text-sky-600 mr-1"></i>Layer:</span>
           <button onclick="window.switchBasemap('positron')" id="basemapBtn-positron" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-600 text-white shadow-xs transition cursor-pointer">Esri Oceans</button>
           <button onclick="window.switchBasemap('voyager')" id="basemapBtn-voyager" class="px-2.5 py-1 rounded-lg text-[11px] text-slate-700 hover:bg-white/80 transition cursor-pointer">OSM Clean</button>
           <button onclick="window.switchBasemap('dark')" id="basemapBtn-dark" class="px-2.5 py-1 rounded-lg text-[11px] text-slate-700 hover:bg-white/80 transition cursor-pointer">Dark Gray</button>
           <button onclick="window.switchBasemap('osm')" id="basemapBtn-osm" class="px-2.5 py-1 rounded-lg text-[11px] text-slate-700 hover:bg-white/80 transition cursor-pointer">Standard</button>
+          <span class="text-slate-300">|</span>
+          <button onclick="window.toggleBathymetry()" id="bathymetryToggleBtn" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-700 hover:bg-white/80 transition cursor-pointer flex items-center space-x-1">
+            <i class="fa-solid fa-water text-cyan-600"></i>
+            <span>ECDIS Depth</span>
+          </button>
         </div>
 
         <!-- Interactive Voyage Scrubbing Control Bar (Glass Panel) -->
@@ -716,19 +696,24 @@
     </main>
   </div>
 
-  <!-- ABOUT MODAL -->
+  <!-- ABOUT MODAL (INCLUDING MITRA FORMULA MANUAL) -->
   <div id="aboutModal" class="no-print fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel border border-slate-200/80 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+    <div class="glass-panel border border-slate-200/80 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white/60">
         <h2 class="text-sm font-black uppercase tracking-wider text-sky-700 flex items-center space-x-2">
           <i class="fa-solid fa-book-bookmark"></i>
-          <span>miTrack Distance: Mitra Formula & Specifications</span>
+          <span>miTrack Distance: Mitra Formula & Specifications Manual</span>
         </h2>
         <button onclick="window.closeAboutModal()" class="text-slate-400 hover:text-slate-700 transition cursor-pointer">
           <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
       <div class="p-5 overflow-y-auto space-y-4 text-xs text-slate-700 font-sans leading-relaxed bg-white/40">
+        <div class="border-b border-slate-200 pb-3 mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-sky-700 font-mono mb-1"><i class="fa-solid fa-square-root-variable text-emerald-600 mr-1"></i> Mitra Formula & Mathematical Derivations</h3>
+          <p class="text-[11px] text-slate-500">Comprehensive governing equations implemented in the voyage optimization core.</p>
+        </div>
+
         <div class="bg-white/90 p-3 rounded-xl border border-slate-200 shadow-xs">
           <h4 class="font-bold text-sky-700 font-mono text-xs uppercase mb-1">1. Theoretical Engine Speed & Apparent Slip</h4>
           <p class="font-mono text-[11px] text-slate-800">V_engine = (RPM × Pitch [m] × 60) / 1852 [knots]</p>
@@ -744,12 +729,26 @@
           <p class="font-mono text-[11px] text-slate-800">V_app = √[(V_wind · cos(θ_rel) + V_sog)² + (V_wind · sin(θ_rel))²]</p>
           <p class="font-mono text-[11px] text-slate-800 mt-1">ΔV_wave = 0.24 · (H_s)^1.85 · max(0, cos(θ_wave))</p>
         </div>
-        <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-200 text-[11px] text-sky-900 font-sans space-y-1 shadow-xs">
+        <div class="bg-white/90 p-3 rounded-xl border border-slate-200 shadow-xs">
+          <h4 class="font-bold text-sky-700 font-mono text-xs uppercase mb-1">4. Admiralty Cubic Power Scaling Law</h4>
+          <p class="font-mono text-[11px] text-slate-800">FOC_eff = FOC_rated × (V_eff / V_rated)³ [MT/day]</p>
+          <p class="text-slate-500 text-[10.5px] mt-1">Governs fuel savings when applying slow-steaming and speed optimization modes.</p>
+        </div>
+        <div class="bg-white/90 p-3 rounded-xl border border-slate-200 shadow-xs">
+          <h4 class="font-bold text-sky-700 font-mono text-xs uppercase mb-1">5. IMO Operational Carbon Intensity Indicator (CII)</h4>
+          <p class="font-mono text-[11px] text-slate-800">CII_attained = (Total_CO₂_Grams) / (Capacity_DWT × Total_Distance_NM)</p>
+          <p class="font-mono text-[11px] text-slate-800 mt-1">CII_ref = a · DWT^(-c) (IMO Resolution MEPC.337(76))</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-200 text-[11px] text-sky-900 font-sans space-y-1 shadow-xs mt-4">
           <div>
             <b>Free Community Courtesy:</b> This application is provided for free educational and passage planning assistance. Developed as a courtesy to the maritime community by rahulDev.
           </div>
           <div class="text-sky-700 font-medium">
-            Special thanks to <b>Prasanth</b> for testing and validating the application.
+            Special thanks to <b>venus3 friends</b> for testing and validating the application.
+          </div>
+          <div class="text-sky-700 font-medium mt-1 border-t border-sky-200/50 pt-1">
+            <b>Feedback & Suggestions:</b> Please reach out to <a href="mailto:rahuldtr@gmail.com" class="text-sky-800 font-bold underline hover:text-sky-600">rahuldtr@gmail.com</a>
           </div>
         </div>
       </div>
@@ -760,11 +759,11 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- STRICT A4 PORTRAIT CORPORATE TEXTBOOK PRINT DOCUMENTS                     -->
+  <!-- COMPREHENSIVE ECDIS VOYAGE & WEATHER AUDIT REPORT PRINT ENGINE                      -->
   <!-- ========================================================================= -->
   <div id="printContainer" class="print-only">
     
-    <!-- PRINT DOCUMENT 1: MASTER PASSAGE PLAN -->
+    <!-- PRINT DOCUMENT 1: COMPREHENSIVE ECDIS VOYAGE & WEATHER AUDIT PACKAGE -->
     <div id="printDocPassagePlan">
       <div class="page-break">
         <div class="corporate-print-frame">
@@ -776,16 +775,16 @@
                 <div>
                   <div style="font-size: 11pt; font-weight: 900; letter-spacing: 0.5pt; text-transform: uppercase;">
                     <span style="color:#ffffff;">mi</span><span style="color:#38bdf8;">Track</span> <span style="color:#cbd5e1; font-style:italic; font-weight:700;">Distance</span>
-                    <span style="font-size: 8.5pt; font-weight: 600; color: #38bdf8; margin-left: 6pt;">• PASSAGE PLAN REPORT</span>
+                    <span style="font-size: 8.5pt; font-weight: 600; color: #38bdf8; margin-left: 6pt;">• COMPREHENSIVE ECDIS VOYAGE & WEATHER AUDIT REPORT</span>
                   </div>
                 </div>
                 <div style="text-align: right; font-family: monospace; font-size: 6.5pt; color: #94a3b8;">
                   <div>GENERATED: <span id="printPlanGenDate"></span></div>
-                  <div>VERSION: VER M2</div>
+                  <div>ECDIS ROUTE FORECASTER</div>
                 </div>
               </div>
 
-              <!-- Vessel Particulars Corporate Grid -->
+              <!-- Vessel Particulars & Comprehensive Emissions Summary Grid -->
               <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4pt; margin-bottom: 8pt; font-family: monospace; font-size: 6.5pt; background-color: #f8fafc; border: 0.75pt solid #cbd5e1; padding: 5pt; border-radius: 3pt;">
                 <div>
                   <div><b>VESSEL:</b> <span id="printPlanVesselName">M/V VESSEL</span></div>
@@ -793,54 +792,55 @@
                   <div><b>DWT:</b> <span id="printPlanDwt">150,000</span> T</div>
                 </div>
                 <div>
-                  <div><b>PITCH:</b> <span id="printPlanPitch">5.70</span> m</div>
-                  <div><b>RPM:</b> <span id="printPlanRpm">74.0</span></div>
-                  <div><b>V_ENG:</b> <span id="printPlanVEng">13.7</span> kn</div>
-                </div>
-                <div>
                   <div><b>TOTAL DIST:</b> <span id="printPlanDist">0</span> NM</div>
-                  <div><b>TIME:</b> <span id="printPlanDays">0.0</span> DAYS</div>
-                  <div><b>WAVE Hs:</b> <span id="printPlanAvgWave">0.0</span> m</div>
+                  <div><b>DURATION:</b> <span id="printPlanDays">0.0</span> DAYS</div>
+                  <div><b>MEAN SLIP:</b> <span id="printPlanMeanSlip">+0.0</span>%</div>
                 </div>
                 <div>
-                  <div><b>SST:</b> <span id="printPlanAvgSeaTemp">0.0</span> °C</div>
-                  <div><b>BUNKER:</b> <span id="printPlanTotalFuel">0.0</span> MT</div>
-                  <div><b>CII:</b> <span id="printPlanCii">A (0.00)</span></div>
+                  <div><b>GROSS BUNKER:</b> <span id="printPlanTotalFuel">0.0</span> MT</div>
+                  <div><b>VLSFO (SEA):</b> <span id="printPlanVlsfo">0.0</span> MT</div>
+                  <div><b>LSMGO (ECA):</b> <span id="printPlanLsmgo">0.0</span> MT</div>
+                </div>
+                <div>
+                  <div><b>GROSS CO₂:</b> <span id="printPlanCo2">0.0</span> MT</div>
+                  <div><b>TOTAL SOx:</b> <span id="printPlanSox">0.0</span> MT</div>
+                  <div><b>IMO CII:</b> <span id="printPlanCii">A (0.00)</span></div>
                 </div>
               </div>
 
-              <!-- Waypoints Table -->
+              <!-- Waypoints & Weather/Emissions Table -->
               <table class="print-table" id="printWaypointTable">
                 <thead>
                   <tr>
                     <th style="width: 3%; text-align: center;">#</th>
-                    <th style="width: 17%;">Waypoint / Fairway Gate</th>
-                    <th style="width: 9%;">Latitude</th>
-                    <th style="width: 9%;">Longitude</th>
-                    <th style="width: 5%; text-align: right;">Leg</th>
-                    <th style="width: 5%; text-align: right;">Total</th>
+                    <th style="width: 16%;">ECDIS Waypoint Node</th>
+                    <th style="width: 8%;">Latitude</th>
+                    <th style="width: 8%;">Longitude</th>
+                    <th style="width: 5%; text-align: right;">Leg Dist</th>
+                    <th style="width: 5%; text-align: right;">Cum Dist</th>
                     <th style="width: 5%; text-align: right;">Course</th>
                     <th style="width: 5%; text-align: right;">SOG</th>
                     <th style="width: 5%; text-align: right;">Slip %</th>
-                    <th style="width: 7%; text-align: center;">Sea Temp</th>
+                    <th style="width: 6%; text-align: center;">SST</th>
                     <th style="width: 8%; text-align: center;">Sig Wave (Hs)</th>
                     <th style="width: 8%; text-align: center;">Current</th>
-                    <th style="width: 8%; text-align: center;">Rel Wind</th>
-                    <th style="width: 6%; text-align: right;">Fuel</th>
+                    <th style="width: 9%; text-align: center;">Relative Wind</th>
+                    <th style="width: 6%; text-align: right;">Leg FOC</th>
+                    <th style="width: 5%; text-align: center;">Zone</th>
                   </tr>
                 </thead>
                 <tbody id="printWaypointTableBody"></tbody>
               </table>
             </div>
 
-            <!-- Corporate Footer without Signature Matrix -->
+            <!-- Corporate Footer -->
             <div>
               <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f; padding-top: 6pt;">
                 <div>
-                  <b style="color: #0a192f;">SAFETY FIRST • SAFETY ALWAYS</b> &nbsp;|&nbsp; 
+                  <b style="color: #0a192f;">SAFETY FIRST • VERIFIED ECDIS AUDIT</b> &nbsp;|&nbsp; 
                   <i>miTrack Distance ver M2 &bull; Developed by rahulDev.</i>
                 </div>
-                <div style="font-family: monospace; font-weight: bold; color: #0a192f;">PAGE 1 OF 2</div>
+                <div style="font-family: monospace; font-weight: bold; color: #0a192f;">PAGE 1 OF 1</div>
               </div>
             </div>
           </div>
@@ -848,420 +848,6 @@
       </div>
     </div>
 
-    <!-- PRINT DOCUMENT 2: MITRA FORMULA (INTERNATIONAL TEXTBOOK MANUAL - ONE TOPIC PER PAGE) -->
-    <div id="printDocFormulary">
-      
-      <!-- PAGE 1: PROPELLER KINEMATICS & SLIP -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.1 • KINEMATIC PROPELLER DYNAMICS & APPARENT SLIP</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>VESSEL: <b id="f-vessel-name-p1" class="text-slate-900">M/V VESSEL</b></div>
-                  <div><b>CHAPTER 1 • PAGE 1</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  1.1 Theoretical Principles & Governing Equations
-                </div>
-                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
-                  In marine engineering and naval architecture, a screw propeller operating in a fluid medium advances a theoretical distance equal to its face pitch per revolution. Because water is a dynamic fluid subject to boundary layer displacement and wake streams, the observed speed over ground ($V_{\text{obs}}$) deviates from the pitch advance speed ($V_{\text{eng}}$). This discrepancy is quantified as apparent slip.
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  <b>Advance Speed:</b> V_eng = (N [RPM] × P [m] × 60) / 1852 [knots]<br>
-                  <b>Apparent Slip:</b> S_apparent = [(V_eng - V_obs) / V_eng] × 100 [%]<br>
-                  <b>True Slip (Taylor Wake):</b> S_true = [(V_eng - V_a) / V_eng] × 100 [%] &nbsp;|&nbsp; V_a = V_obs / (1 - w)
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-slip" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Textbook Reference:</b> SNAME Principles of Naval Architecture (PNA Vol. II) &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 1</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE 2: WAVE ADDED RESISTANCE & CURRENT -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.2 • HYDRODYNAMIC ADDED RESISTANCE & SPECTRAL ENERGY</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>STATUTORY REFERENCE</div>
-                  <div><b>CHAPTER 1 • PAGE 2</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  1.2 Significant Wave Height ($H_s$) & Current Drift Formulations (Climatological Atlas Matrix)
-                </div>
-                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
-                  Seaway resistance increments result from wave reflection and ship motion damping. Following the semi-empirical Holtrop & Mennen formulation combined with monthly historical climatology datasets, added resistance and seasonal monsoon current vectors scale dynamically with the selected ETD month.
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  <b>Wave Added Resistance Speed Loss:</b> ΔV_wave = 0.24 · (H_s,month)^1.85 · max(0, cos(θ_wave)) [knots]<br>
-                  <b>Seasonal Climatology Vector:</b> V_drift = V_current(month) · cos(Dir_current - Course_ship) [knots]
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-wave" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Textbook Reference:</b> NOAA NCEI Climatological Atlas & IOC UNESCO Wave Statistics &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 2</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE 3: APPARENT WIND TRIANGLE -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.3 • APPARENT WIND VECTOR TRIANGLE & CARTESIAN RESOLUTION</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>NAVIGATIONAL METEOROLOGY</div>
-                  <div><b>CHAPTER 1 • PAGE 3</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  1.3 Bridge Wind Vector Triangle & Aerodynamic Drag
-                </div>
-                <div style="display: flex; gap: 10pt; align-items: center; margin-bottom: 8pt;">
-                  <div style="flex: 1; font-size: 8.5pt; color: #334155; line-height: 1.45;">
-                    <b>Vector Proof:</b> The apparent wind experienced over the bridge deck ($\vec{V}_{\text{app}}$) is the vector difference between true wind velocity ($\vec{V}_{\text{true}}$) and ship velocity over ground ($\vec{V}_{\text{ship}}$). Resolving into Cartesian components ($u, v$) allows precise aerodynamic superstructure drag calculations.
-                  </div>
-                  <!-- Inline SVG: Large Detailed Wind Triangle -->
-                  <svg width="140" height="75" viewBox="0 0 160 90" style="background:#f8fafc; border:0.75pt solid #cbd5e1; border-radius:3pt; shrink: 0;">
-                    <defs>
-                      <marker id="th" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" />
-                      </marker>
-                      <marker id="thr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#e11d48" />
-                      </marker>
-                      <marker id="the" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
-                      </marker>
-                    </defs>
-                    <line x1="20" y1="75" x2="80" y2="75" stroke="#059669" stroke-width="2" marker-end="url(#the)" />
-                    <text x="40" y="85" font-size="7.5" font-family="monospace" fill="#059669">V_ship</text>
-                    <line x1="80" y1="75" x2="135" y2="20" stroke="#e11d48" stroke-width="2" marker-end="url(#thr)" />
-                    <text x="112" y="52" font-size="7.5" font-family="monospace" fill="#e11d48">V_true</text>
-                    <line x1="20" y1="75" x2="132" y2="23" stroke="#0284c7" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#th)" />
-                    <text x="60" y="42" font-size="7.5" font-family="monospace" fill="#0284c7">V_app</text>
-                  </svg>
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  u_rel = (-V_true · sin(TWD)) - (V_sog · sin(HDG))<br>
-                  v_rel = (-V_true · cos(TWD)) - (V_sog · cos(HDG))<br>
-                  <b>Apparent Speed:</b> V_app = √(u_rel² + v_rel²) | <b>Aerodynamic Drag:</b> ΔV_wind = 0.0032 · (V_app)^1.62
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-wind" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Textbook Reference:</b> Admiralty Manual of Navigation (BR 45) &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 3</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE 4: SFOC & BRAKE POWER -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE I, SECTION 1.4 • THERMODYNAMIC SFOC & DIESEL BRAKE POWER BALANCE</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>MARINE ENGINEERING</div>
-                  <div><b>CHAPTER 1 • PAGE 4</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  1.4 Specific Fuel Oil Consumption (SFOC) & Thermal Efficiency
-                </div>
-                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
-                  Marine slow-speed two-stroke diesel engines convert chemical fuel energy into mechanical shaft power. Specific Fuel Oil Consumption (SFOC) measures mass flow rate per unit of brake power output, directly reflecting thermal brake efficiency ($\eta_{\text{th}} = \frac{3600}{\text{SFOC} \times \text{LCV}}$).
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  <b>Engine Brake Power:</b> P_B = P_MCR × (RPM / RPM_MCR)³ [kW]<br>
-                  <b>Specific Fuel Consumption:</b> SFOC = (FOC_daily [MT] × 10⁶ [g]) / (P_B [kW] × 24 [h]) [g/kWh]
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-sfoc" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Textbook Reference:</b> Pounder’s Marine Diesel Engines and Gas Turbines &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 4</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE 5: ADMIRALTY CUBIC LAW -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.1 • ADMIRALTY COEFFICIENT & CUBIC POWER LAW SCALING</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>NAVAL ARCHITECTURE</div>
-                  <div><b>CHAPTER 2 • PAGE 5</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  2.1 Admiralty Coefficient & Cubic Speed Scaling
-                </div>
-                <div style="display: flex; gap: 10pt; align-items: center; margin-bottom: 8pt;">
-                  <div style="flex: 1; font-size: 8.5pt; color: #334155; line-height: 1.45;">
-                    <b>Proof:</b> For displacement hulls operating below hull speed limits, wave-making and frictional resistance scale with $V^2$, yielding effective power $P_E \propto V^3$. Consequently, daily bunker consumption scales directly with the cube of the speed ratio.
-                  </div>
-                  <!-- Inline SVG: Power/FOC Cubic Law Curve -->
-                  <svg width="140" height="70" viewBox="0 0 140 70" style="background:#f8fafc; border:0.75pt solid #cbd5e1; border-radius:3pt; shrink: 0;">
-                    <line x1="20" y1="10" x2="20" y2="58" stroke="#cbd5e1" stroke-width="1" />
-                    <line x1="20" y1="58" x2="130" y2="58" stroke="#cbd5e1" stroke-width="1" />
-                    <path d="M 20 58 Q 75 56 125 14" fill="none" stroke="#0284c7" stroke-width="2.5" />
-                    <circle cx="82" cy="45" r="3.5" fill="#059669" />
-                    <text x="88" y="47" font-size="6.5" font-family="monospace" fill="#059669">Econ V³</text>
-                    <circle cx="112" cy="24" r="3.5" fill="#e11d48" />
-                    <text x="92" y="20" font-size="6.5" font-family="monospace" fill="#e11d48">100% MCR</text>
-                  </svg>
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  Admiralty Coeff: A_c = (Δ^(2/3) · V³) / P_B<br>
-                  Daily FOC Scaling: FOC_eff = FOC_rated × (V_eff / V_rated)³ [MT/day]
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-admiralty" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Textbook Reference:</b> SNAME Principles of Naval Architecture &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 5</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE 6: MARPOL ANNEX VI CO2 -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.2 • STOICHIOMETRIC CARBON COMBUSTION & CO₂ EMISSIONS</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>STATUTORY COMPLIANCE</div>
-                  <div><b>CHAPTER 2 • PAGE 6</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  2.2 Stoichiometric Carbon Dioxide ($CO_2$) Emissions (MEPC.308(73))
-                </div>
-                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
-                  Under MARPOL Annex VI, carbon dioxide emissions are directly proportional to fuel consumption through a standardized carbon conversion factor ($C_F$). Complete combustion of hydrocarbon fuels yields stoichiometric carbon ratios based on carbon mass percentages.
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  VLSFO (84.93% Carbon): C_F = 3.1144 MT-CO₂ / MT-Fuel<br>
-                  LSMGO (87.44% Carbon): C_F = 3.2060 MT-CO₂ / MT-Fuel<br>
-                  Total Gross CO₂ = (Fuel_VLSFO × 3.1144) + (Fuel_LSMGO × 3.2060) [MT]
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-co2" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Statutory Reference:</b> IMO MEPC.308(73) Guidelines for Calculation of CO₂ Emissions &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 6</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE 7: SOx & NOx -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.3 • SOx SULFUR MASS BALANCE & NOx TECHNICAL CODE</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>STATUTORY COMPLIANCE</div>
-                  <div><b>CHAPTER 2 • PAGE 7</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  2.3 Sulfur Oxides ($SO_x$) & Nitrogen Oxides ($NO_x$) Regulatory Limits
-                </div>
-                <div style="font-size: 8.5pt; color: #334155; line-height: 1.45; margin-bottom: 8pt;">
-                  MARPOL Annex VI Regulation 14 restricts sulfur content in marine fuels to $0.50\%$ m/m globally and $0.10\%$ m/m inside Emission Control Areas (ECA). Regulation 13 enforces Tier II and Tier III NOx emission limits governed by engine rated speed ($n$).
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  SOx = Fuel_MT × (%Sulfur × 0.020) ➔ VLSFO(0.5%): ×0.010 | LSMGO(0.1%): ×0.002<br>
-                  Tier II Limit: 44.0 · n^(-0.23) [g/kWh] &nbsp;|&nbsp; Tier III (NECA): 9.0 · n^(-0.20) [g/kWh]
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-sox-nox" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Statutory Reference:</b> MARPOL Annex VI Reg 13 & 14, NOx Technical Code 2008 &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 7</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE 8: OPERATIONAL CII & RATING SPECTRUM -->
-      <div class="textbook-page">
-        <div class="corporate-print-frame">
-          <div class="corporate-watermark">mi<span style="color:#0284c7;">T</span>minds AI</div>
-          <div class="corporate-content-layer">
-            <div>
-              <div class="textbook-header" style="border-bottom: 2pt solid #0a192f;">
-                <div>
-                  <div style="font-size: 13pt; letter-spacing: 0.5pt; text-transform: uppercase;">
-                    <span style="color:#0a192f; font-weight:900;">mi</span><span style="color:#0284c7; font-weight:900;">Track</span> <span style="color:#64748b; font-weight:700; font-style:italic;">Distance</span>
-                  </div>
-                  <div style="font-size: 7.5pt; color: #0284c7; font-family: monospace; font-weight: bold; margin-top: 2pt;">MODULE II, SECTION 2.4 • CARBON INTENSITY INDICATOR (CII) & STATUTORY BASELINES</div>
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.0pt; color: #475569;">
-                  <div>IMO MEPC.337(76)</div>
-                  <div><b>CHAPTER 2 • PAGE 8</b></div>
-                </div>
-              </div>
-
-              <div class="textbook-card" style="border: 0.75pt solid #cbd5e1;">
-                <div style="font-size: 9.5pt; font-weight: bold; color: #0a192f; border-bottom: 0.75pt solid #cbd5e1; padding-bottom: 4pt; margin-bottom: 6pt;">
-                  2.4 Operational Carbon Intensity Indicator (Attained vs Required CII)
-                </div>
-                <div style="margin-bottom: 6pt;">
-                  <svg width="100%" height="28" viewBox="0 0 400 35" style="border: 0.75pt solid #cbd5e1; border-radius: 3pt; background: #ffffff;">
-                    <rect x="10" y="8" width="70" height="15" fill="#10b981" fill-opacity="0.25" stroke="#059669" stroke-width="0.8" />
-                    <text x="45" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#065f46" text-anchor="middle">A (&lt;0.86)</text>
-                    <rect x="85" y="8" width="70" height="15" fill="#22c55e" fill-opacity="0.25" stroke="#16a34a" stroke-width="0.8" />
-                    <text x="120" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#14532d" text-anchor="middle">B (0.94)</text>
-                    <rect x="160" y="8" width="70" height="15" fill="#eab308" fill-opacity="0.25" stroke="#ca8a04" stroke-width="0.8" />
-                    <text x="195" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#713f12" text-anchor="middle">C (1.00 Ref)</text>
-                    <rect x="235" y="8" width="70" height="15" fill="#f97316" fill-opacity="0.25" stroke="#ea580c" stroke-width="0.8" />
-                    <text x="270" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#7c2d12" text-anchor="middle">D (1.06)</text>
-                    <rect x="310" y="8" width="70" height="15" fill="#ef4444" fill-opacity="0.25" stroke="#dc2626" stroke-width="0.8" />
-                    <text x="345" y="19" font-size="8" font-weight="bold" font-family="monospace" fill="#7f1d1d" text-anchor="middle">E (&gt;1.14)</text>
-                    <circle cx="45" cy="8" r="4" fill="#0284c7" />
-                    <text x="45" y="32" font-size="6.5" font-weight="bold" font-family="monospace" fill="#0284c7" text-anchor="middle">▲ Active Passage (Grade A)</text>
-                  </svg>
-                </div>
-                <div style="background: #f8fafc; border-left: 3pt solid #0284c7; padding: 6pt 8pt; font-family: monospace; font-size: 8pt; margin-bottom: 8pt; line-height: 1.4; border-top: 0.5pt solid #e2e8f0; border-right: 0.5pt solid #e2e8f0; border-bottom: 0.5pt solid #e2e8f0;">
-                  <b>Attained CII:</b> Total_CO₂_Grams / [Capacity_DWT × Distance_NM] [gCO₂/dwt·NM]<br>
-                  <b>Required Baseline:</b> CII_ref = a · DWT^(-c) (Tanker: a = 5,247, c = 0.357)
-                </div>
-                <div style="font-size: 8.5pt; font-weight: bold; color: #0a192f; margin-bottom: 4pt;">Live Passage Audit & Step-by-Step Derivation:</div>
-                <div id="f-calc-step-cii" style="font-family: monospace; font-size: 7.8pt; background: #f8fafc; padding: 8pt; border-radius: 3pt; white-space: pre-line; line-height: 1.4; border: 0.5pt solid #cbd5e1;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-
-            <div class="textbook-footer" style="border-top: 0.75pt solid #0a192f;">
-              <div><b>Statutory Reference:</b> IMO Resolution MEPC.337(76) & MEPC.338(76) &bull; <i>miTrack Distance ver M2</i></div>
-              <div><b>PAGE 8 OF 8</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 
   <!-- JAVASCRIPT APPLICATION CORE -->
@@ -1288,6 +874,8 @@
       playbackTimer: null,
       activeBasemapKey: 'positron',
       currentTileLayer: null,
+      isBathymetryActive: false,
+      bathymetryLayer: null,
       mapInstance: null,
       mapLayers: {
         trackPolylines: [],
@@ -1936,7 +1524,7 @@
         const isLast = idx === window.VoyageState.ports.length - 1;
 
         const row = document.createElement("div");
-        row.className = "flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-200 shadow-xs relative";
+        row.className = "flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-200 shadow-xs relative shrink-0";
 
         let labelIcon = '<i class="fa-solid fa-circle-dot text-emerald-600 text-xs"></i>';
         let labelText = "Origin";
@@ -2189,7 +1777,7 @@
           window.renderTelemetryRibbon();
           window.renderWaypointTable();
           window.drawMapLayers();
-          alert(`Successfully loaded ${importedPorts.length} waypoints from CSV file!`);
+          alert(`Successfully loaded ${importedPorts.length} waypoints from ECDIS CSV file!`);
         } else {
           alert("Could not parse valid coordinates from CSV. Ensure format includes Latitude and Longitude columns.");
         }
@@ -2517,7 +2105,7 @@
       return `${Math.abs(lon).toFixed(2)}° ${dir}`;
     }
 
-    /* 10. MAP LAYERS & BASEMAP SWITCHER */
+    /* 10. MAP LAYERS & BASEMAP SWITCHER WITH ECDIS BATHYMETRY TOGGLE */
     const BASEMAP_TILES = {
       positron: {
         url: "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
@@ -2574,6 +2162,33 @@
       });
     };
 
+    window.toggleBathymetry = function() {
+      const map = window.VoyageState.mapInstance;
+      if (!map) return;
+
+      window.VoyageState.isBathymetryActive = !window.VoyageState.isBathymetryActive;
+      const isActive = window.VoyageState.isBathymetryActive;
+      const btn = document.getElementById("bathymetryToggleBtn");
+
+      if (isActive) {
+        btn.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-600 text-white shadow-xs transition cursor-pointer flex items-center space-x-1";
+        
+        // Add OpenSeaMap bathymetry / seamark overlay layer
+        window.VoyageState.bathymetryLayer = L.tileLayer('https://t1.openseamap.org/seamark/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenSeaMap contributors'
+        }).addTo(map);
+
+      } else {
+        btn.className = "px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-700 hover:bg-white/80 transition cursor-pointer flex items-center space-x-1";
+        
+        if (window.VoyageState.bathymetryLayer) {
+          map.removeLayer(window.VoyageState.bathymetryLayer);
+          window.VoyageState.bathymetryLayer = null;
+        }
+      }
+    };
+
     /* Interactive Route Editor Pen Toggle */
     window.toggleRouteEditor = function() {
       window.VoyageState.isRouteEditorActive = !window.VoyageState.isRouteEditorActive;
@@ -2584,12 +2199,12 @@
       const icon = document.getElementById("routeEditorIcon");
 
       if (isActive) {
-        btn.className = "bg-rose-600 hover:bg-rose-500 text-white border border-rose-600 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-md flex items-center space-x-1.5 transition cursor-pointer";
-        label.innerText = "Done Editing";
+        btn.className = "bg-rose-600 hover:bg-rose-500 text-white border border-rose-600 text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-md flex items-center space-x-1 transition cursor-pointer";
+        label.innerText = "Done";
         icon.className = "fa-solid fa-check text-white";
       } else {
-        btn.className = "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center space-x-1.5 transition cursor-pointer";
-        label.innerText = "Edit Route";
+        btn.className = "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-2.5 py-1.5 rounded-xl shadow-xs flex items-center space-x-1 transition cursor-pointer";
+        label.innerText = "Edit";
         icon.className = "fa-solid fa-pen-nib text-sky-600";
       }
 
@@ -3066,7 +2681,7 @@
       document.getElementById("aboutModal").classList.add("hidden");
     };
 
-    /* 13. PRINT ENGINE */
+    /* 13. COMPREHENSIVE ECDIS VOYAGE & WEATHER AUDIT REPORT PRINT ENGINE */
     window.printPassagePlan = function() {
       const r = window.VoyageState.calculatedRoute;
       const v = window.VoyageState.vessel;
@@ -3078,20 +2693,24 @@
       document.getElementById("printPlanVesselName").innerText = v.name || "M/V VESSEL";
       document.getElementById("printPlanVesselType").innerText = pPreset.typeLabel;
       document.getElementById("printPlanDwt").innerText = v.dwt.toLocaleString();
-      document.getElementById("printPlanPitch").innerText = v.pitch.toFixed(2);
-      document.getElementById("printPlanRpm").innerText = v.rpm.toFixed(1);
-      document.getElementById("printPlanVEng").innerText = calculateEngineSpeed(v.rpm, v.pitch).toFixed(1);
       document.getElementById("printPlanDist").innerText = Math.round(r.totalDistanceNM).toLocaleString();
       document.getElementById("printPlanDays").innerText = r.totalSteamingDays.toFixed(1);
-      document.getElementById("printPlanAvgWave").innerText = r.avgWaveHs.toFixed(2);
-      document.getElementById("printPlanAvgSeaTemp").innerText = r.avgSeaTemp.toFixed(1);
-      document.getElementById("printPlanTotalFuel").innerText = Math.round(r.totalFuelBurnMT).toLocaleString();
+      document.getElementById("printPlanMeanSlip").innerText = (r.meanSlip >= 0 ? "+" : "") + r.meanSlip.toFixed(2);
+      document.getElementById("printPlanTotalFuel").innerText = r.totalFuelBurnMT.toFixed(1);
+      
+      const ecaPct = r.totalDistanceNM > 0 ? (r.totalEcaDistanceNM / r.totalDistanceNM) : 0;
+      const lsmgoEst = r.totalFuelBurnMT * ecaPct;
+      const vlsfoEst = r.totalFuelBurnMT - lsmgoEst;
+      document.getElementById("printPlanVlsfo").innerText = vlsfoEst.toFixed(1);
+      document.getElementById("printPlanLsmgo").innerText = lsmgoEst.toFixed(1);
+      document.getElementById("printPlanCo2").innerText = r.totalCo2MT.toFixed(1);
+      document.getElementById("printPlanSox").innerText = r.totalSoxMT.toFixed(2);
       document.getElementById("printPlanCii").innerText = `${r.ciiGrade} (${r.attainedCii.toFixed(2)})`;
 
       const tbody = document.getElementById("printWaypointTableBody");
       tbody.innerHTML = "";
 
-      const step = Math.max(1, Math.ceil(r.waypoints.length / 15));
+      const step = Math.max(1, Math.ceil(r.waypoints.length / 25));
       const printRows = [];
       for (let i = 0; i < r.waypoints.length; i += step) {
         printRows.push({ idx: i + 1, ...r.waypoints[i] });
@@ -3117,120 +2736,16 @@
           <td style="text-align: center;">${w.weather.currentDisplay}</td>
           <td style="text-align: center;">${w.weather.relWindData.displayStr}</td>
           <td style="text-align: right;">${w.legFuel.toFixed(1)} MT</td>
+          <td style="text-align: center;">${w.eca ? 'ECA' : 'SEA'}</td>
         `;
         tbody.appendChild(tr);
       });
 
-      document.getElementById("printDocPassagePlan").style.display = "block";
-      document.getElementById("printDocFormulary").style.display = "none";
       window.print();
     };
 
-    /* PRINT ENHANCED MITRA FORMULA REFERENCE WITH 1-TOPIC-PER-PAGE TEXTBOOK LAYOUT */
     window.printFormulary = function() {
-      const r = window.VoyageState.calculatedRoute;
-      const v = window.VoyageState.vessel;
-      if (!r) return;
-
-      const pPreset = VESSEL_PRESETS[v.type] || VESSEL_PRESETS.tanker;
-      const vEng = calculateEngineSpeed(v.rpm, v.pitch);
-      const meanObs = r.totalDistanceNM / ((r.totalSteamingDays * 24) || 1);
-      const ecaPct = r.totalDistanceNM > 0 ? (r.totalEcaDistanceNM / r.totalDistanceNM) : 0;
-      const lsmgoBurn = r.totalFuelBurnMT * ecaPct;
-      const vlsfoBurn = r.totalFuelBurnMT - lsmgoBurn;
-
-      document.getElementById("f-vessel-name-p1").innerText = `${v.name || 'M/V VESSEL'} (${pPreset.typeLabel} • ${v.dwt.toLocaleString()} DWT)`;
-
-      // Step 1: Slip Derivation (Page 1)
-      const pitchAdvanceMhr = v.rpm * v.pitch * 60;
-      const taylorWake = (0.5 * 0.80 - 0.05).toFixed(2);
-      const vApparentWater = (meanObs / (1 - taylorWake)).toFixed(2);
-      document.getElementById("f-calc-step-slip").innerText = 
-        `• Active Particulars: Shaft RPM N = ${v.rpm.toFixed(1)} | Propeller Pitch P = ${v.pitch.toFixed(2)} m | Design Base SOG = ${v.baseSog.toFixed(1)} kn\n` +
-        `• Step 1: Theoretical Advance per Hour = N × P × 60 = ${v.rpm.toFixed(1)} × ${v.pitch.toFixed(2)} × 60 = ${pitchAdvanceMhr.toFixed(0)} m/h\n` +
-        `• Step 2: Theoretical Engine Speed V_eng = ${pitchAdvanceMhr.toFixed(0)} ÷ 1852 [m/NM] = ${vEng.toFixed(2)} knots\n` +
-        `• Step 3: Observed Speed Over Ground V_obs = Total Distance (${r.totalDistanceNM.toFixed(0)} NM) ÷ Steaming Hours (${(r.totalSteamingDays * 24).toFixed(1)} h) = ${meanObs.toFixed(2)} knots\n` +
-        `• Step 4: Apparent Propeller Slip (Sa) = [(${vEng.toFixed(2)} - ${meanObs.toFixed(2)}) ÷ ${vEng.toFixed(2)}] × 100 = ${(r.meanSlip >= 0 ? "+" : "") + r.meanSlip.toFixed(2)}%\n` +
-        `• Step 5: True Slip (St) Estimation: Assuming Taylor Wake Fraction w ≈ ${taylorWake}, Wake Speed V_a = ${vApparentWater} kn ➔ St ≈ +24.8%`;
-
-      // Step 2: Wave & Current (Page 2)
-      const waveEnergyExp = Math.pow(r.avgWaveHs, 1.85).toFixed(3);
-      const waveDragKn = (0.24 * Math.pow(r.avgWaveHs, 1.85)).toFixed(2);
-      const etdMonthName = new Date(v.etd).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
-      document.getElementById("f-calc-step-wave").innerText = 
-        `• Active ETD Climatology Month: ${etdMonthName} (Historical NOAA NCEI & IOC UNESCO Matrix Lookup)\n` +
-        `• Step 1: Climatological Significant Wave Height Hs = ${r.avgWaveHs.toFixed(2)} m (Seasonal Monsoonal Seaway)\n` +
-        `• Step 2: Spectral Energy Exponent term: (Hs)^1.85 = (${r.avgWaveHs.toFixed(2)})^1.85 = ${waveEnergyExp}\n` +
-        `• Step 3: Wave Added Resistance Penalty: ΔV_wave = 0.24 × ${waveEnergyExp} = -${waveDragKn} knots\n` +
-        `• Step 4: Seasonal Climatology Current Drift Component: Evaluated for ${etdMonthName} yields net ground drift\n` +
-        `• Step 5: Net Ground Speed Equilibrium: V_obs = [${vEng.toFixed(2)} × 0.95] - ${waveDragKn} = ${meanObs.toFixed(2)} knots`;
-
-      // Step 3: Wind Vector Triangle (Page 3)
-      const uRelSample = (14.77 - v.baseSog).toFixed(2);
-      const vAppSample = Math.hypot(14.77 - v.baseSog, -2.60).toFixed(1);
-      document.getElementById("f-calc-step-wind").innerText = 
-        `• Step 1: True Wind Vector = 15.0 kn @ 280°T | Ship Heading = 090°T @ ${v.baseSog.toFixed(1)} kn SOG\n` +
-        `• Step 2: Cartesian X coordinate (u_rel) = (-15.0·sin 280°) - (${v.baseSog.toFixed(1)}·sin 90°) = +14.77 - ${v.baseSog.toFixed(1)} = ${uRelSample} kn\n` +
-        `• Step 3: Cartesian Y coordinate (v_rel) = (-15.0·cos 280°) - (${v.baseSog.toFixed(1)}·cos 90°) = -2.60 - 0.00 = -2.60 kn\n` +
-        `• Step 4: Apparent Bridge Wind Magnitude V_app = √[(${uRelSample})² + (-2.60)²] = ${vAppSample} knots\n` +
-        `• Step 5: Superstructure Aerodynamic Drag Penalty: ΔV_wind = 0.0032 · (15.0)^1.62 = -0.26 knots`;
-
-      // Step 4: SFOC & Power (Page 4)
-      const estPowerKW = v.type === "ulcv" ? 55000 : (v.type === "vlcc" ? 22000 : 9820);
-      const sfocCalc = ((v.ratedFoc * 1e6) / (estPowerKW * 24)).toFixed(1);
-      const brakeThermEff = (3600 / (parseFloat(sfocCalc) * 42.7)).toFixed(1);
-      document.getElementById("f-calc-step-sfoc").innerText = 
-        `• Step 1: 2-Stroke Slow-Speed Engine MCR = ${(estPowerKW * 1.15).toFixed(0)} kW @ 78.0 RPM\n` +
-        `• Step 2: Normal Continuous Rating (NCR): P_B ≈ ${estPowerKW.toLocaleString()} kW @ ${v.rpm.toFixed(1)} RPM\n` +
-        `• Step 3: Specific Fuel Oil Consumption (SFOC) = (${v.ratedFoc.toFixed(1)} × 10⁶ g) ÷ (${estPowerKW.toLocaleString()} kW × 24 h) = ${sfocCalc} g/kWh\n` +
-        `• Step 4: Brake Thermal Efficiency: η_th = 3600 ÷ (SFOC × 42.7 MJ/kg LCV) ≈ ${brakeThermEff}%\n` +
-        `• Step 5: Allowance: Includes 15% propulsion margin for heavy weather & hull fouling`;
-
-      // Step 5: Admiralty Scaling (Page 5)
-      const speedRatio = (vEng / v.baseSog).toFixed(3);
-      const ratioCubed = Math.pow(vEng / v.baseSog, 3).toFixed(3);
-      const dailyFocEff = (v.ratedFoc * Math.pow(vEng / v.baseSog, 3)).toFixed(1);
-      document.getElementById("f-calc-step-admiralty").innerText = 
-        `• Step 1: Design Baseline: ${v.ratedFoc.toFixed(1)} MT/day @ ${v.baseSog.toFixed(1)} kn (Admiralty Constant A_c ≈ 615)\n` +
-        `• Step 2: Dimensionless Speed Ratio: (V_effective ÷ V_rated) = (${vEng.toFixed(2)} ÷ ${v.baseSog.toFixed(1)}) = ${speedRatio}\n` +
-        `• Step 3: Cubic Power Scale Factor: (${speedRatio})³ = ${ratioCubed}\n` +
-        `• Step 4: Actual Operational Bunker Burn: FOC_eff = ${v.ratedFoc.toFixed(1)} MT/d × ${ratioCubed} = ${dailyFocEff} MT/day\n` +
-        `• Step 5: Excess Slip Fuel Penalty = ${r.totalSlipWasteMT.toFixed(1)} MT consumed over 5.0% smooth hull design baseline`;
-
-      // Step 6: CO2 (Page 6)
-      document.getElementById("f-calc-step-co2").innerText = 
-        `• Step 1: Open Ocean VLSFO Burn (Carbon Content = 84.93%): ${vlsfoBurn.toFixed(1)} MT × 3.1144 = ${(vlsfoBurn * 3.114).toFixed(1)} MT CO₂\n` +
-        `• Step 2: ECA Coastal LSMGO Burn (Carbon Content = 87.44%): ${lsmgoBurn.toFixed(1)} MT × 3.2060 = ${(lsmgoBurn * 3.206).toFixed(1)} MT CO₂\n` +
-        `• Step 3: Total Gross Voyage Carbon Mass Generated = ${(vlsfoBurn * 3.114 + lsmgoBurn * 3.206).toFixed(1)} MT CO₂\n` +
-        `• Step 4: Total Carbon Mass in Grams = ${Math.round((vlsfoBurn * 3.114 + lsmgoBurn * 3.206) * 1e6).toLocaleString()} grams CO₂`;
-
-      // Step 7: SOx and NOx (Page 7)
-      document.getElementById("f-calc-step-sox-nox").innerText = 
-        `• Step 1: VLSFO SOx Emission (0.50% Sulfur): ${vlsfoBurn.toFixed(1)} MT × (0.005 × 2.0) = ${(vlsfoBurn * 0.01).toFixed(2)} MT SOx\n` +
-        `• Step 2: LSMGO SOx Emission (0.10% Sulfur): ${lsmgoBurn.toFixed(1)} MT × (0.001 × 2.0) = ${(lsmgoBurn * 0.002).toFixed(2)} MT SOx\n` +
-        `• Step 3: Total Gross Sulfur Oxides Emitted = ${r.totalSoxMT.toFixed(2)} MT\n` +
-        `• Step 4: IMO Tier II NOx Bound (n = ${v.rpm.toFixed(1)} RPM): 44.0 · n^(-0.23) = 16.3 g/kWh\n` +
-        `• Step 5: IMO Tier III NECA Limit: 9.0 · n^(-0.20) = 3.8 g/kWh (SCR / EGR Deployed)`;
-
-      // Step 8: CII (Page 8)
-      const transportWork = v.dwt * r.totalDistanceNM;
-      const totalCo2Grams = r.totalCo2MT * 1e6;
-      const lnDwt = Math.log(v.dwt).toFixed(4);
-      const denomTerm = Math.exp(lnDwt * pPreset.ciiC).toFixed(2);
-
-      document.getElementById("f-calc-step-cii").innerText = 
-        `• Step 1: Transport Work Done = Capacity DWT × Total Distance NM\n` +
-        `  = ${v.dwt.toLocaleString()} DWT × ${Math.round(r.totalDistanceNM).toLocaleString()} NM = ${transportWork.toLocaleString()} dwt·NM\n` +
-        `• Step 2: Gross Carbon Mass in Grams = ${r.totalCo2MT.toFixed(1)} MT × 10⁶ = ${Math.round(totalCo2Grams).toLocaleString()} grams\n` +
-        `• Step 3: Attained Passage CII = Total Grams CO₂ ÷ Transport Work\n` +
-        `  = ${Math.round(totalCo2Grams).toLocaleString()} ÷ ${transportWork.toLocaleString()} = ${r.attainedCii.toFixed(2)} gCO₂/dwt·NM\n` +
-        `• Step 4: Required Baseline Formula: CII_ref = a · DWT^(-c) | For ${pPreset.typeLabel}: a = ${pPreset.ciiA}, c = ${pPreset.ciiC}\n` +
-        `• Step 5: Power Expansion Term: (DWT)^c = exp(c · ln(DWT)) = exp(${pPreset.ciiC} × ln(${v.dwt.toLocaleString()})) ≈ ${denomTerm}\n` +
-        `• Step 6: Required Statutory Ceiling = ${pPreset.ciiA} ÷ ${denomTerm} = ${r.ciiRef.toFixed(2)} gCO₂/dwt·NM ➔ Grade "${r.ciiGrade}" (${((r.attainedCii/r.ciiRef)*100).toFixed(0)}% of baseline)`;
-
-      document.getElementById("printDocPassagePlan").style.display = "none";
-      document.getElementById("printDocFormulary").style.display = "block";
-      window.print();
+      window.openAboutModal();
     };
 
     window.exportWaypointsCSV = function() {
@@ -3247,7 +2762,7 @@
       link.click();
     };
 
-    /* 14. INITIALIZATION BOOTSTRAPPER */
+    /* 14. INITIALIZATION BOOTSTRAPPER (DEFERRABLE & NON-BLOCKING) */
     window.addEventListener("DOMContentLoaded", () => {
       // Bind vessel inputs to local storage persistence
       document.getElementById("vesselNameInput").value = window.VoyageState.vessel.name;
@@ -3260,142 +2775,145 @@
       document.getElementById("vesselProfilePreset").value = window.VoyageState.vessel.type;
       document.getElementById("vesselTypeBadge").innerText = (VESSEL_PRESETS[window.VoyageState.vessel.type] || VESSEL_PRESETS.tanker).typeLabel;
 
-      const map = L.map("map", {
-        zoomControl: true,
-        attributionControl: false,
-        minZoom: 2,
-        maxZoom: 18,
-        worldCopyJump: true
-      }).setView([20.0, 60.0], 3);
+      // Defer heavy rendering to next animation frame so splash loader paints instantly
+      requestAnimationFrame(() => {
+        const map = L.map("map", {
+          zoomControl: true,
+          attributionControl: false,
+          minZoom: 2,
+          maxZoom: 18,
+          worldCopyJump: true
+        }).setView([20.0, 60.0], 3);
 
-      window.VoyageState.mapInstance = map;
-      window.switchBasemap('positron');
+        window.VoyageState.mapInstance = map;
+        window.switchBasemap('positron');
 
-      // Draw all Maritime Regulatory, Warlike, SECA & Restricted Zones
-      MARITIME_REGIONS.forEach(reg => {
-        const poly = L.polygon(reg.coords, {
-          color: reg.color,
-          weight: 1.5,
-          dashArray: "4, 4",
-          fillColor: reg.fillColor,
-          fillOpacity: reg.fillOpacity
-        }).addTo(map);
+        // Draw all Maritime Regulatory, Warlike, SECA & Restricted Zones
+        MARITIME_REGIONS.forEach(reg => {
+          const poly = L.polygon(reg.coords, {
+            color: reg.color,
+            weight: 1.5,
+            dashArray: "4, 4",
+            fillColor: reg.fillColor,
+            fillOpacity: reg.fillOpacity
+          }).addTo(map);
 
-        poly.bindTooltip(`<b>${reg.name}</b><br><span style="font-size:10px; color:#475569;">${reg.desc}</span>`, {
-          className: "bg-white border border-slate-300 text-slate-800 text-[10px] shadow p-1.5"
+          poly.bindTooltip(`<b>${reg.name}</b><br><span style="font-size:10px; color:#475569;">${reg.desc}</span>`, {
+            className: "bg-white border border-slate-300 text-slate-800 text-[10px] shadow p-1.5"
+          });
+
+          window.VoyageState.mapLayers.zones.push(poly);
         });
 
-        window.VoyageState.mapLayers.zones.push(poly);
-      });
+        // Default Passage: Rotterdam to Duqm (Port of Duqm, Oman)
+        window.VoyageState.ports = [
+          { ...MASTER_PORTS.find(p => p.id === "NLRTM") },
+          { ...MASTER_PORTS.find(p => p.id === "OMDQM") }
+        ];
 
-      // Default Passage: Rotterdam to Duqm (Port of Duqm, Oman)
-      window.VoyageState.ports = [
-        { ...MASTER_PORTS.find(p => p.id === "NLRTM") },
-        { ...MASTER_PORTS.find(p => p.id === "OMDQM") }
-      ];
+        // Event Listeners
+        document.getElementById("vesselProfilePreset").addEventListener("change", (e) => {
+          const p = VESSEL_PRESETS[e.target.value];
+          if (!p) return;
+          window.VoyageState.vessel.type = p.type;
+          window.VoyageState.vessel.dwt = p.dwt;
+          window.VoyageState.vessel.pitch = p.pitch;
+          window.VoyageState.vessel.rpm = p.rpm;
+          window.VoyageState.vessel.baseSog = p.baseSog;
+          window.VoyageState.vessel.ratedFoc = p.ratedFoc;
 
-      // Event Listeners
-      document.getElementById("vesselProfilePreset").addEventListener("change", (e) => {
-        const p = VESSEL_PRESETS[e.target.value];
-        if (!p) return;
-        window.VoyageState.vessel.type = p.type;
-        window.VoyageState.vessel.dwt = p.dwt;
-        window.VoyageState.vessel.pitch = p.pitch;
-        window.VoyageState.vessel.rpm = p.rpm;
-        window.VoyageState.vessel.baseSog = p.baseSog;
-        window.VoyageState.vessel.ratedFoc = p.ratedFoc;
+          document.getElementById("vesselDwtInput").value = p.dwt;
+          document.getElementById("vesselPitchInput").value = p.pitch;
+          document.getElementById("vesselRpmInput").value = p.rpm;
+          document.getElementById("vesselBaseSogInput").value = p.baseSog;
+          document.getElementById("vesselRatedFocInput").value = p.ratedFoc;
+          document.getElementById("vesselTypeBadge").innerText = p.typeLabel;
 
-        document.getElementById("vesselDwtInput").value = p.dwt;
-        document.getElementById("vesselPitchInput").value = p.pitch;
-        document.getElementById("vesselRpmInput").value = p.rpm;
-        document.getElementById("vesselBaseSogInput").value = p.baseSog;
-        document.getElementById("vesselRatedFocInput").value = p.ratedFoc;
-        document.getElementById("vesselTypeBadge").innerText = p.typeLabel;
+          persistVesselParticulars();
+          window.calculateSynchronousRoute();
+          window.renderTelemetryRibbon();
+          window.renderWaypointTable();
+          window.drawMapLayers();
+        });
 
-        persistVesselParticulars();
+        document.getElementById("optimizationMode").addEventListener("change", (e) => {
+          window.VoyageState.strategy = e.target.value;
+          window.calculateSynchronousRoute();
+          window.renderTelemetryRibbon();
+          window.renderWaypointTable();
+          window.drawMapLayers();
+        });
+
+        document.getElementById("avoidHraToggle").addEventListener("change", (e) => {
+          window.VoyageState.avoidHra = e.target.checked;
+          window.calculateSynchronousRoute();
+          window.renderTelemetryRibbon();
+          window.renderWaypointTable();
+          window.drawMapLayers();
+        });
+
+        const bindNumInput = (id, key) => {
+          document.getElementById(id).addEventListener("input", (e) => {
+            const val = parseFloat(e.target.value);
+            if (!isNaN(val)) {
+              window.VoyageState.vessel[key] = val;
+              persistVesselParticulars();
+              window.calculateSynchronousRoute();
+              window.renderTelemetryRibbon();
+              window.renderWaypointTable();
+              window.drawMapLayers();
+            }
+          });
+        };
+        bindNumInput("vesselDwtInput", "dwt");
+        bindNumInput("vesselPitchInput", "pitch");
+        bindNumInput("vesselRpmInput", "rpm");
+        bindNumInput("vesselBaseSogInput", "baseSog");
+        bindNumInput("vesselRatedFocInput", "ratedFoc");
+
+        document.getElementById("vesselNameInput").addEventListener("input", (e) => {
+          window.VoyageState.vessel.name = e.target.value;
+          persistVesselParticulars();
+        });
+
+        const etdInput = document.getElementById("vesselEtdInput");
+        etdInput.addEventListener("change", (e) => {
+          window.VoyageState.vessel.etd = e.target.value;
+          persistVesselParticulars();
+          window.calculateSynchronousRoute();
+          window.renderTelemetryRibbon();
+          window.renderWaypointTable();
+          window.drawMapLayers();
+        });
+
+        document.getElementById("voyageScrubber").addEventListener("input", (e) => {
+          window.VoyageState.scrubberIndex = parseInt(e.target.value, 10);
+          window.updateShipPositionOnScrub(window.VoyageState.scrubberIndex);
+        });
+
+        // Initial Pipeline Boot
+        window.renderPortInputs();
         window.calculateSynchronousRoute();
         window.renderTelemetryRibbon();
         window.renderWaypointTable();
         window.drawMapLayers();
-      });
 
-      document.getElementById("optimizationMode").addEventListener("change", (e) => {
-        window.VoyageState.strategy = e.target.value;
-        window.calculateSynchronousRoute();
-        window.renderTelemetryRibbon();
-        window.renderWaypointTable();
-        window.drawMapLayers();
-      });
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 250);
 
-      document.getElementById("avoidHraToggle").addEventListener("change", (e) => {
-        window.VoyageState.avoidHra = e.target.checked;
-        window.calculateSynchronousRoute();
-        window.renderTelemetryRibbon();
-        window.renderWaypointTable();
-        window.drawMapLayers();
-      });
+        initExhaustCanvas();
+        initWaveAnimationCanvas();
 
-      const bindNumInput = (id, key) => {
-        document.getElementById(id).addEventListener("input", (e) => {
-          const val = parseFloat(e.target.value);
-          if (!isNaN(val)) {
-            window.VoyageState.vessel[key] = val;
-            persistVesselParticulars();
-            window.calculateSynchronousRoute();
-            window.renderTelemetryRibbon();
-            window.renderWaypointTable();
-            window.drawMapLayers();
+        // Smoothly hide startup splash loader
+        setTimeout(() => {
+          const splash = document.getElementById("appSplashLoader");
+          if (splash) {
+            splash.style.opacity = "0";
+            setTimeout(() => splash.remove(), 500);
           }
-        });
-      };
-      bindNumInput("vesselDwtInput", "dwt");
-      bindNumInput("vesselPitchInput", "pitch");
-      bindNumInput("vesselRpmInput", "rpm");
-      bindNumInput("vesselBaseSogInput", "baseSog");
-      bindNumInput("vesselRatedFocInput", "ratedFoc");
-
-      document.getElementById("vesselNameInput").addEventListener("input", (e) => {
-        window.VoyageState.vessel.name = e.target.value;
-        persistVesselParticulars();
+        }, 300);
       });
-
-      const etdInput = document.getElementById("vesselEtdInput");
-      etdInput.addEventListener("change", (e) => {
-        window.VoyageState.vessel.etd = e.target.value;
-        persistVesselParticulars();
-        window.calculateSynchronousRoute();
-        window.renderTelemetryRibbon();
-        window.renderWaypointTable();
-        window.drawMapLayers();
-      });
-
-      document.getElementById("voyageScrubber").addEventListener("input", (e) => {
-        window.VoyageState.scrubberIndex = parseInt(e.target.value, 10);
-        window.updateShipPositionOnScrub(window.VoyageState.scrubberIndex);
-      });
-
-      // Initial Pipeline Boot
-      window.renderPortInputs();
-      window.calculateSynchronousRoute();
-      window.renderTelemetryRibbon();
-      window.renderWaypointTable();
-      window.drawMapLayers();
-
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 250);
-
-      initExhaustCanvas();
-      initWaveAnimationCanvas();
-
-      // Smoothly hide startup splash loader
-      setTimeout(() => {
-        const splash = document.getElementById("appSplashLoader");
-        if (splash) {
-          splash.style.opacity = "0";
-          setTimeout(() => splash.remove(), 500);
-        }
-      }, 400);
     });
   </script>
 </body>
