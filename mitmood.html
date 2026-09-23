@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>miTmood — Spring Garden Mood Tracker</title>
+
+  <!-- Typography matching the reference artwork -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-happy: rgba(230, 48, 75, 0.82);
+      --color-happy-stroke: #d90429;
+      --color-neutral: rgba(255, 195, 0, 0.85);
+      --color-neutral-stroke: #f39c12;
+      --color-sadtired: rgba(181, 71, 230, 0.82);
+      --color-sadtired-stroke: #7209b7;
+      
+      --glass-bg: rgba(255, 255, 255, 0.32);
+      --glass-border: rgba(255, 255, 255, 0.72);
+      --glass-shadow: 0 8px 32px 0 rgba(40, 20, 30, 0.18);
+      --glass-bevel: inset 0 1.5px 2px rgba(255, 255, 255, 0.85), inset 0 -1.5px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #231612;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #app-viewport {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      max-height: 980px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.55);
+    }
+
+    .scenery-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      background: 
+        radial-gradient(circle at 18% 18%, rgba(255, 255, 235, 0.98) 0%, rgba(255, 232, 162, 0.6) 24%, rgba(255, 195, 170, 0.32) 50%, transparent 72%),
+        linear-gradient(180deg, #97c8ed 0%, #ffcfc4 30%, #fde49e 56%, #89be57 82%, #3c6523 100%);
+      background-size: cover;
+      background-position: center;
+    }
+
+    #meadowCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .ui-overlay {
+      position: relative;
+      z-index: 40;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 16px 14px;
+      pointer-events: none;
+    }
+
+    .ui-overlay * {
+      pointer-events: auto;
+    }
+
+    .glass-btn {
+      background: var(--glass-bg);
+      border: 1.2px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-bevel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #3b2234;
+      touch-action: manipulation;
+      transition: transform 0.12s ease, background 0.2s;
+    }
+
+    .glass-btn:active {
+      transform: scale(0.92);
+    }
+
+    .glass-icon-box {
+      width: 44px;
+      height: 44px;
+    }
+
+    .glass-icon-box svg {
+      width: 22px;
+      height: 22px;
+      stroke: #3c2436;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .header-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.7rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(180deg, #ffffff 15%, #ffd4e5 65%, #ffd1b3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 14px rgba(135, 45, 80, 0.45));
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .mood-pills-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .mood-pill {
+      flex: 1;
+      height: 44px;
+      border-radius: 22px;
+      background: var(--glass-bg);
+      border: 1.2px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-bevel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #3b2234;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .mood-pill svg {
+      width: 20px;
+      height: 20px;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+    }
+
+    .mood-pill.active {
+      background: rgba(255, 255, 255, 0.94);
+      border-color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 255, 255, 0.6), var(--glass-bevel);
+    }
+
+    .mood-pill[data-mood="happy"].active { color: #b7094c; }
+    .mood-pill[data-mood="neutral"].active { color: #d47b00; }
+    .mood-pill[data-mood="sadtired"].active { color: #6a0dad; }
+
+    .flower-stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .flower-scaler-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease-out;
+      transform-origin: center center;
+    }
+
+    .flower-svg {
+      width: 100%;
+      height: 100%;
+      max-width: 440px;
+      max-height: 720px;
+      overflow: visible;
+      pointer-events: auto;
+    }
+
+    #stemSwayGroup {
+      transform-origin: 220px 680px;
+      animation: stemWindBreeze 8s ease-in-out infinite alternate;
+    }
+
+    #leftFoliageGroup {
+      transform-origin: 216px 540px;
+      animation: leftLeafBreeze 4.6s ease-in-out infinite alternate;
+    }
+
+    #leftFoliageTip {
+      transform-origin: 130px 505px;
+      animation: leafFlutterLeft 2.2s ease-in-out infinite alternate;
+    }
+
+    #rightFoliageGroup {
+      transform-origin: 224px 540px;
+      animation: rightLeafBreeze 5.2s ease-in-out infinite alternate -1s;
+    }
+
+    #rightFoliageTip {
+      transform-origin: 310px 505px;
+      animation: leafFlutterRight 2.5s ease-in-out infinite alternate -0.6s;
+    }
+
+    @keyframes stemWindBreeze {
+      0% { transform: rotate(0deg); }
+      35% { transform: rotate(0.8deg) translateX(1px); }
+      70% { transform: rotate(-0.6deg) translateX(-1px); }
+      100% { transform: rotate(0.5deg); }
+    }
+
+    @keyframes leftLeafBreeze {
+      0% { transform: rotate(0deg) skewX(0deg); }
+      50% { transform: rotate(-3.8deg) translateY(1px) skewX(-1.5deg); }
+      100% { transform: rotate(1.4deg) translateY(-0.8px) skewX(1deg); }
+    }
+
+    @keyframes leafFlutterLeft {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(2.4deg) scale(0.99, 1.01); }
+      100% { transform: rotate(-2.8deg) scale(1.01, 0.99); }
+    }
+
+    @keyframes rightLeafBreeze {
+      0% { transform: rotate(0deg) skewX(0deg); }
+      50% { transform: rotate(3.6deg) translateY(1.2px) skewX(1.6deg); }
+      100% { transform: rotate(-1.4deg) translateY(-1px) skewX(-1deg); }
+    }
+
+    @keyframes leafFlutterRight {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(-2.4deg) scale(0.99, 1.01); }
+      100% { transform: rotate(2.8deg) scale(1.01, 0.99); }
+    }
+
+    .creatures-flight-stage {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 25;
+      overflow: visible;
+    }
+
+    .flying-creature {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      pointer-events: auto;
+      cursor: pointer;
+      touch-action: manipulation;
+      transform-style: preserve-3d;
+      perspective: 800px;
+      transition: transform 0.12s linear;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
+    }
+
+    .creature-body-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .wing-3d-left {
+      transform-origin: 50% 50%;
+      animation: wingFlapLeft 0.16s ease-in-out infinite alternate;
+    }
+
+    .wing-3d-right {
+      transform-origin: 50% 50%;
+      animation: wingFlapRight 0.16s ease-in-out infinite alternate;
+    }
+
+    @keyframes wingFlapLeft {
+      0% { transform: rotateY(0deg) rotateZ(0deg); }
+      100% { transform: rotateY(68deg) rotateZ(-12deg); }
+    }
+
+    @keyframes wingFlapRight {
+      0% { transform: rotateY(0deg) rotateZ(0deg); }
+      100% { transform: rotateY(-68deg) rotateZ(12deg); }
+    }
+
+    .perched .wing-3d-left {
+      animation: wingPerchLeft 2.8s ease-in-out infinite alternate;
+    }
+    .perched .wing-3d-right {
+      animation: wingPerchRight 2.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes wingPerchLeft {
+      0%, 75% { transform: rotateY(15deg); }
+      85% { transform: rotateY(55deg); }
+      92% { transform: rotateY(18deg); }
+      100% { transform: rotateY(50deg); }
+    }
+
+    @keyframes wingPerchRight {
+      0%, 75% { transform: rotateY(-15deg); }
+      85% { transform: rotateY(-55deg); }
+      92% { transform: rotateY(-18deg); }
+      100% { transform: rotateY(-50deg); }
+    }
+
+    .sparkling-bee {
+      position: absolute;
+      width: 38px;
+      height: 32px;
+      pointer-events: auto;
+      cursor: pointer;
+      touch-action: manipulation;
+      z-index: 35;
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.9));
+      transition: transform 0.1s linear;
+    }
+
+    .bee-glow-halo {
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 235, 120, 0.8) 0%, rgba(255, 185, 0, 0.3) 45%, transparent 72%);
+      animation: beeTwinkle 1.1s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes beeTwinkle {
+      0% { transform: scale(0.85); opacity: 0.55; }
+      100% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* Zero-lag vector hit areas */
+    .petal-vector {
+      cursor: pointer;
+      touch-action: manipulation;
+      fill: rgba(255, 255, 255, 0.01);
+      stroke: rgba(255, 255, 255, 0.45);
+      stroke-width: 1.2;
+      transition: stroke 0.15s, stroke-width 0.15s;
+    }
+
+    .petal-vector:hover {
+      stroke: #ffffff;
+      stroke-width: 2.2;
+    }
+
+    .petal-vector.colored-happy {
+      fill: var(--color-happy) !important;
+      stroke: var(--color-happy-stroke) !important;
+      stroke-width: 1.8;
+    }
+
+    .petal-vector.colored-neutral {
+      fill: var(--color-neutral) !important;
+      stroke: var(--color-neutral-stroke) !important;
+      stroke-width: 1.8;
+    }
+
+    .petal-vector.colored-sadtired {
+      fill: var(--color-sadtired) !important;
+      stroke: var(--color-sadtired-stroke) !important;
+      stroke-width: 1.8;
+    }
+
+    .petal-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+      fill: #3b2234;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
+    }
+
+    .petal-number.on-colored {
+      fill: #ffffff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+    }
+
+    .left-zoom-slider {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 42px;
+      height: 220px;
+      border-radius: 22px;
+      background: var(--glass-bg);
+      border: 1.2px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-bevel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 4px;
+      z-index: 45;
+      pointer-events: auto;
+    }
+
+    .zoom-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: #ffffff;
+      font-size: 1.35rem;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 1px 3px rgba(50, 20, 30, 0.5);
+    }
+
+    .zoom-rail {
+      position: relative;
+      width: 4px;
+      flex-grow: 1;
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 4px;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+
+    .zoom-thumb {
+      position: absolute;
+      width: 14px;
+      height: 28px;
+      border-radius: 9px;
+      background: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      transition: top 0.06s linear;
+    }
+
+    .dew-drop {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.2) 60%, rgba(0, 0, 0, 0.1) 100%);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      pointer-events: none;
+    }
+
+    .bottom-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 2px;
+    }
+
+    .month-pill {
+      flex: 1;
+      height: 52px;
+      border-radius: 26px;
+      background: var(--glass-bg);
+      border: 1.2px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-bevel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+    }
+
+    .month-name {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.4rem;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(55, 20, 40, 0.6);
+      margin-top: -6px;
+    }
+
+    .month-nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      color: #3b2234;
+      font-size: 1.1rem;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .month-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.85);
+      transform: scale(1.12);
+    }
+
+    .creator-credit {
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: rgba(255, 245, 250, 0.94);
+      text-align: center;
+      margin-top: 5px;
+      text-shadow: 0 1px 4px rgba(40, 15, 25, 0.8);
+    }
+
+    .glass-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 12, 18, 0.52);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .glass-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+      border-radius: 28px;
+      padding: 24px 22px;
+      color: #2b1424;
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .glass-modal.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .modal-head h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #2b1424;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: #ffffff;
+      font-weight: 700;
+      color: #3b2234;
+      cursor: pointer;
+      touch-action: manipulation;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #f7f3f6;
+    }
+
+    .action-btn.danger {
+      background: #ffe3e8;
+      color: #c9184a;
+      border-color: #ffb3c1;
+    }
+
+    .toast-pill {
+      position: absolute;
+      top: 84px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1.2px solid #ffffff;
+      box-shadow: 0 8px 24px rgba(40, 15, 30, 0.2);
+      padding: 7px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #3b2234;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: all 0.2s ease;
+      z-index: 120;
+    }
+
+    .toast-pill.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-viewport">
+    
+    <div class="scenery-background"></div>
+    <canvas id="meadowCanvas"></canvas>
+
+    <!-- Flying Butterflies, Moths & Bee Stage Overlay -->
+    <div class="creatures-flight-stage" id="creaturesStage">
+      
+      <!-- 1. Monarch Butterfly -->
+      <div class="flying-creature perched" id="creatureMonarch" title="Tap to startle!">
+        <svg class="creature-body-svg" viewBox="0 0 80 80">
+          <g class="wing-3d-left" style="transform-origin: 38px 40px;">
+            <path d="M 38,40 C 14,8 -10,22 -4,46 C 2,60 22,62 38,40 Z" fill="#f36900" stroke="#111" stroke-width="2" />
+            <path d="M 38,42 C 12,46 6,66 20,78 C 32,82 38,58 38,42 Z" fill="#d95400" stroke="#111" stroke-width="2" />
+            <circle cx="6" cy="30" r="2.2" fill="#fff" />
+            <circle cx="16" cy="22" r="1.8" fill="#fff" />
+            <circle cx="18" cy="68" r="1.8" fill="#fff" />
+          </g>
+          <g class="wing-3d-right" style="transform-origin: 42px 40px;">
+            <path d="M 42,40 C 66,8 90,22 84,46 C 78,60 58,62 42,40 Z" fill="#f36900" stroke="#111" stroke-width="2" />
+            <path d="M 42,42 C 68,46 74,66 60,78 C 48,82 42,58 42,42 Z" fill="#d95400" stroke="#111" stroke-width="2" />
+            <circle cx="74" cy="30" r="2.2" fill="#fff" />
+            <circle cx="64" cy="22" r="1.8" fill="#fff" />
+            <circle cx="62" cy="68" r="1.8" fill="#fff" />
+          </g>
+          <ellipse cx="40" cy="42" rx="3" ry="16" fill="#111" />
+          <circle cx="40" cy="25" r="2.8" fill="#111" />
+          <path d="M 39,24 Q 31,10 22,8 M 41,24 Q 49,10 58,8" stroke="#111" stroke-width="1.8" fill="none" />
+        </svg>
+      </div>
+
+      <!-- 2. Luna Moth -->
+      <div class="flying-creature perched" id="creatureLuna" title="Tap to startle!">
+        <svg class="creature-body-svg" viewBox="0 0 80 80">
+          <g class="wing-3d-left" style="transform-origin: 38px 40px;">
+            <path d="M 38,38 C 16,10 -2,22 4,50 C 12,70 30,62 38,38 Z" fill="#90e0a6" stroke="#256e3b" stroke-width="2" />
+            <path d="M 38,40 C 16,48 10,70 24,84 C 34,90 38,62 38,40 Z" fill="#75cb8f" stroke="#256e3b" stroke-width="2" />
+            <circle cx="20" cy="36" r="3.2" fill="#ffd166" stroke="#256e3b" stroke-width="1.2" />
+          </g>
+          <g class="wing-3d-right" style="transform-origin: 42px 40px;">
+            <path d="M 42,38 C 64,10 82,22 76,50 C 68,70 50,62 42,38 Z" fill="#90e0a6" stroke="#256e3b" stroke-width="2" />
+            <path d="M 42,40 C 64,48 70,70 56,84 C 46,90 42,62 42,40 Z" fill="#75cb8f" stroke="#256e3b" stroke-width="2" />
+            <circle cx="60" cy="36" r="3.2" fill="#ffd166" stroke="#256e3b" stroke-width="1.2" />
+          </g>
+          <ellipse cx="40" cy="40" rx="3.5" ry="14" fill="#1b4332" />
+          <path d="M 39,26 Q 30,12 24,10 M 41,26 Q 50,12 56,10" stroke="#1b4332" stroke-width="1.6" fill="none" />
+        </svg>
+      </div>
+
+      <!-- 3. Polyphemus Silk Moth -->
+      <div class="flying-creature perched" id="creatureSilk" title="Tap to startle!">
+        <svg class="creature-body-svg" viewBox="0 0 80 80">
+          <g class="wing-3d-left" style="transform-origin: 38px 40px;">
+            <path d="M 38,38 C 10,12 -6,22 0,52 C 6,70 26,66 38,38 Z" fill="#c68b59" stroke="#4a2810" stroke-width="2" />
+            <path d="M 38,40 C 14,46 8,68 20,80 C 30,86 36,62 38,40 Z" fill="#a4683a" stroke="#4a2810" stroke-width="2" />
+            <circle cx="18" cy="44" r="4.2" fill="#3a5a40" stroke="#111" stroke-width="1.4" />
+            <circle cx="18" cy="44" r="1.8" fill="#fff" />
+          </g>
+          <g class="wing-3d-right" style="transform-origin: 42px 40px;">
+            <path d="M 42,38 C 70,12 86,22 80,52 C 74,70 54,66 42,38 Z" fill="#c68b59" stroke="#4a2810" stroke-width="2" />
+            <path d="M 42,40 C 66,46 72,68 60,80 C 50,86 44,62 42,40 Z" fill="#a4683a" stroke="#4a2810" stroke-width="2" />
+            <circle cx="62" cy="44" r="4.2" fill="#3a5a40" stroke="#111" stroke-width="1.4" />
+            <circle cx="62" cy="44" r="1.8" fill="#fff" />
+          </g>
+          <ellipse cx="40" cy="40" rx="4" ry="14" fill="#3a2010" />
+          <path d="M 38,26 Q 28,14 20,12 M 42,26 Q 52,14 60,12" stroke="#3a2010" stroke-width="2" fill="none" />
+        </svg>
+      </div>
+
+      <!-- 4. Sparkling Honey Bee -->
+      <div class="sparkling-bee" id="sparklingBee">
+        <div class="bee-glow-halo"></div>
+        <svg viewBox="0 0 38 32" width="100%" height="100%">
+          <ellipse cx="15" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.8)" transform="rotate(-28 15 8)"/>
+          <ellipse cx="23" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.8)" transform="rotate(28 23 8)"/>
+          <ellipse cx="19" cy="18" rx="12" ry="8" fill="#ffb703"/>
+          <path d="M 13,11 L 13,25 M 19,10 L 19,26 M 25,11 L 25,25" stroke="#221e1b" stroke-width="2.2"/>
+          <circle cx="9" cy="18" r="3" fill="#221e1b"/>
+          <circle cx="8" cy="17" r="0.9" fill="#ffffff"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- Flower & Vector Overlay Stage -->
+    <div class="flower-stage">
+      <div class="flower-scaler-wrapper" id="flowerScaler">
+        
+        <svg class="flower-svg" viewBox="0 0 440 700" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="petalShadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.25" />
+            </filter>
+
+            <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff59d" />
+              <stop offset="35%" stop-color="#ffb74d" />
+              <stop offset="70%" stop-color="#d81b60" />
+              <stop offset="100%" stop-color="#4a148c" />
+            </radialGradient>
+
+            <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#33691e" />
+              <stop offset="45%" stop-color="#689f38" />
+              <stop offset="75%" stop-color="#8bc34a" />
+              <stop offset="100%" stop-color="#2e7d32" />
+            </linearGradient>
+
+            <linearGradient id="leafGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7cb342" />
+              <stop offset="60%" stop-color="#558b2f" />
+              <stop offset="100%" stop-color="#2e7d32" />
+            </linearGradient>
+
+            <linearGradient id="leafGradRight" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#7cb342" />
+              <stop offset="60%" stop-color="#558b2f" />
+              <stop offset="100%" stop-color="#2e7d32" />
+            </linearGradient>
+
+            <linearGradient id="bgOuterPetal" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#f3d1f4" />
+              <stop offset="60%" stop-color="#d19cdb" />
+              <stop offset="100%" stop-color="#af7ac5" />
+            </linearGradient>
+
+            <linearGradient id="bgMidPetal" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffe0ec" />
+              <stop offset="60%" stop-color="#f8a5c2" />
+              <stop offset="100%" stop-color="#ea779a" />
+            </linearGradient>
+
+            <linearGradient id="bgInnerPetal" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fff8db" />
+              <stop offset="55%" stop-color="#f6d365" />
+              <stop offset="100%" stop-color="#fda085" />
+            </linearGradient>
+          </defs>
+
+          <!-- Botanical Stem & Leaves Physically Rooted at Stem Wall -->
+          <g id="stemSwayGroup">
+            <path d="M 214,420 Q 218,540 220,680 L 228,680 Q 226,540 226,420 Z" fill="url(#stemGrad)" />
+
+            <g id="leftFoliageGroup">
+              <g id="leftFoliageTip">
+                <path d="M 216,540 C 160,545 60,535 40,490 C 80,450 160,490 216,520 Z" fill="url(#leafGradLeft)" stroke="#1b5e20" stroke-width="1.8" />
+                <path d="M 216,536 Q 130,505 44,490" stroke="#aed581" stroke-width="2.4" fill="none" />
+                <path d="M 170,524 Q 140,500 150,486 M 120,508 Q 96,488 108,476" stroke="#aed581" stroke-width="1.4" fill="none" />
+                <circle cx="155" cy="508" r="3.5" fill="#ffffff" opacity="0.85" />
+              </g>
+            </g>
+
+            <g id="rightFoliageGroup">
+              <g id="rightFoliageTip">
+                <path d="M 224,540 C 280,545 380,535 400,490 C 360,450 280,490 224,520 Z" fill="url(#leafGradRight)" stroke="#1b5e20" stroke-width="1.8" />
+                <path d="M 224,536 Q 310,505 396,490" stroke="#aed581" stroke-width="2.4" fill="none" />
+                <path d="M 270,524 Q 300,500 290,486 M 320,508 Q 344,488 332,476" stroke="#aed581" stroke-width="1.4" fill="none" />
+                <circle cx="310" cy="520" r="3" fill="#ffffff" opacity="0.85" />
+              </g>
+            </g>
+          </g>
+
+          <g id="flowerBaseArt" filter="url(#petalShadow)">
+            <g id="outerPetalsBase"></g>
+            <g id="midPetalsBase"></g>
+            <g id="innerPetalsBase"></g>
+            <circle cx="220" cy="310" r="34" fill="url(#centerGlow)" stroke="#3e103f" stroke-width="1.5" />
+          </g>
+
+          <g id="artCenterMoth" transform="translate(178, 305) scale(0.68) rotate(24)">
+            <path d="M 24,20 C 6,4 -2,12 2,30 C 6,42 16,40 24,20 Z" fill="#b08968" stroke="#4a2810" stroke-width="1.5" />
+            <path d="M 24,20 C 42,4 50,12 46,30 C 42,42 32,40 24,20 Z" fill="#b08968" stroke="#4a2810" stroke-width="1.5" />
+            <ellipse cx="24" cy="22" rx="2" ry="8" fill="#3a2010" />
+          </g>
+
+          <!-- Interactive Vector Layer -->
+          <g id="interactiveVectorOverlay"></g>
+        </svg>
+
+      </div>
+    </div>
+
+    <!-- UI Overlay Controls -->
+    <main class="ui-overlay">
+      <div>
+        <header class="header-bar">
+          <button class="glass-btn glass-icon-box" id="btnMenu" aria-label="Menu">
+            <svg viewBox="0 0 24 24">
+              <line x1="4" y1="7" x2="20" y2="7"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="17" x2="20" y2="17"></line>
+            </svg>
+          </button>
+
+          <h1 class="brand-title">miTmood</h1>
+
+          <div class="header-actions">
+            <button class="glass-btn glass-icon-box" id="btnBell" aria-label="Notifications & Affirmations">
+              <svg viewBox="0 0 24 24">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </button>
+            <button class="glass-btn glass-icon-box" id="btnHelp" aria-label="Help">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="mood-pills-row" role="radiogroup">
+          <button class="mood-pill active" data-mood="happy">
+            <svg viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="4.2" fill="#ffea79" />
+              <circle cx="16" cy="6" r="4.5" fill="#ff4d6d" />
+              <circle cx="23" cy="9" r="4.5" fill="#ff4d6d" />
+              <circle cx="26" cy="16" r="4.5" fill="#ff4d6d" />
+              <circle cx="23" cy="23" r="4.5" fill="#ff4d6d" />
+              <circle cx="16" cy="26" r="4.5" fill="#ff4d6d" />
+              <circle cx="9" cy="23" r="4.5" fill="#ff4d6d" />
+              <circle cx="6" cy="16" r="4.5" fill="#ff4d6d" />
+              <circle cx="9" cy="9" r="4.5" fill="#ff4d6d" />
+            </svg>
+            <span>Happy</span>
+          </button>
+
+          <button class="mood-pill" data-mood="neutral">
+            <svg viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="4.2" fill="#d47b00" />
+              <circle cx="16" cy="6" r="4.5" fill="#ffe066" />
+              <circle cx="23" cy="9" r="4.5" fill="#ffe066" />
+              <circle cx="26" cy="16" r="4.5" fill="#ffe066" />
+              <circle cx="23" cy="23" r="4.5" fill="#ffe066" />
+              <circle cx="16" cy="26" r="4.5" fill="#ffe066" />
+              <circle cx="9" cy="23" r="4.5" fill="#ffe066" />
+              <circle cx="6" cy="16" r="4.5" fill="#ffe066" />
+              <circle cx="9" cy="9" r="4.5" fill="#ffe066" />
+            </svg>
+            <span>Neutral</span>
+          </button>
+
+          <button class="mood-pill" data-mood="sadtired">
+            <svg viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="4.2" fill="#ffd166" />
+              <circle cx="16" cy="6" r="4.5" fill="#d070fb" />
+              <circle cx="23" cy="9" r="4.5" fill="#d070fb" />
+              <circle cx="26" cy="16" r="4.5" fill="#d070fb" />
+              <circle cx="23" cy="23" r="4.5" fill="#d070fb" />
+              <circle cx="16" cy="26" r="4.5" fill="#d070fb" />
+              <circle cx="9" cy="23" r="4.5" fill="#d070fb" />
+              <circle cx="6" cy="16" r="4.5" fill="#d070fb" />
+              <circle cx="9" cy="9" r="4.5" fill="#d070fb" />
+            </svg>
+            <span>Sad/Tired</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="left-zoom-slider" id="zoomWidget">
+        <button class="zoom-btn" id="btnZoomIn">+</button>
+        <div class="zoom-rail" id="zoomRail">
+          <div class="zoom-thumb" id="zoomThumb"></div>
+        </div>
+        <button class="zoom-btn" id="btnZoomOut">−</button>
+
+        <div class="dew-drop" style="width: 7px; height: 7px; bottom: -20px; left: 16px;"></div>
+        <div class="dew-drop" style="width: 5px; height: 5px; bottom: -32px; left: 18px;"></div>
+      </div>
+
+      <footer style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <div class="bottom-row">
+          <button class="glass-btn glass-icon-box" id="btnBottomMenu" aria-label="Settings and erase options">
+            <svg viewBox="0 0 24 24">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="month-pill">
+            <button class="month-nav-btn" id="btnPrevMonth" aria-label="Previous Month">❮</button>
+            <span class="month-name" id="monthDisplayLabel">October</span>
+            <button class="month-nav-btn" id="btnNextMonth" aria-label="Next Month">❯</button>
+          </div>
+
+          <button class="glass-btn glass-icon-box" id="btnNextAction" aria-label="Jump to today">
+            <svg viewBox="0 0 24 24">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+        <div class="creator-credit">Developed by miTra for friends</div>
+      </footer>
+    </main>
+
+    <div class="toast-pill" id="toastNotice">Day recorded</div>
+
+    <!-- Modals -->
+    <div class="glass-modal" id="modalAffirmations">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>Gentle Reminders 🔔</h2>
+          <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseAffirmations">✕</button>
+        </div>
+        <div style="background: linear-gradient(135deg, #fff0f5, #fffde7); border-radius: 18px; padding: 16px; margin: 12px 0; border: 1px dashed #f4978e; text-align: center;">
+          <p id="affirmationQuote" style="font-family:'Cormorant Garamond', serif; font-size:1.25rem; font-style:italic; color:#3b2234; line-height:1.45;">
+            "You are allowed to bloom gently, at your very own pace."
+          </p>
+        </div>
+        <div style="font-size:0.88rem; color:#4a2b3d; margin-bottom:14px; line-height:1.5;">
+          <strong>Tip:</strong> Take a quiet moment each morning or evening to color today's petal and check in with yourself.
+        </div>
+        <button class="action-btn" id="btnNewAffirmation">✨ Draw Another Thought</button>
+        <button class="action-btn" id="btnDismissAffirmation">Done</button>
+      </div>
+    </div>
+
+    <div class="glass-modal" id="modalMenu">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>Manage Moods 📋</h2>
+          <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseMenu">✕</button>
+        </div>
+        <p style="font-size: 0.86rem; color: #422938; margin-bottom: 12px;">
+          Manage petal entries. Data is automatically preserved in your device.
+        </p>
+
+        <button class="action-btn" id="btnToggleEraser">
+          <span id="eraserIcon">✏️</span>
+          <span id="eraserLabel">Activate Eraser (Tap petals to clear)</span>
+        </button>
+
+        <button class="action-btn danger" id="btnClearMonth">
+          ⚠️ Clear All Entries for <span id="clearMonthName">October</span>
+        </button>
+
+        <button class="action-btn" id="btnExportJSON">
+          📥 Backup Moods (JSON Export)
+        </button>
+
+        <button class="action-btn" id="btnStatsView">
+          📊 View Monthly Flower Summary
+        </button>
+      </div>
+    </div>
+
+    <div class="glass-modal" id="modalHelp">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>How to Use miTmood 🌸</h2>
+          <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseHelp">✕</button>
+        </div>
+        <div style="font-size: 0.88rem; color: #3b2234; line-height: 1.55;">
+          <p>• <strong>1. Select Your Mood:</strong> Choose Happy (red), Neutral (yellow), or Sad/Tired (purple) from the top bar.</p><br/>
+          <p>• <strong>2. Color the Flower:</strong> Tap the numbered petal matching today's date to fill it with your mood color.</p><br/>
+          <p>• <strong>3. Erase / Edit:</strong> Tap an already colored petal again to clear it, or use the menu's eraser mode.</p><br/>
+          <p>• <strong>4. Zoom:</strong> Use the left slider (+ / -) to zoom in on petals.</p><br/>
+          <p>• <strong>5. Interactive Garden:</strong> Tap the butterflies, moths, or the golden bee to startle them into flight!</p>
+        </div>
+        <button class="action-btn" id="btnHelpDone">Got it!</button>
+      </div>
+    </div>
+
+    <div class="glass-modal" id="modalInsights">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2>Monthly Flower Stats 🌺</h2>
+          <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseInsights">✕</button>
+        </div>
+        <div id="statsSummaryContent" style="margin: 14px 0; font-size: 0.92rem; color: #3b2234;"></div>
+        <button class="action-btn" id="btnInsightsDone">Close</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const MONTHS = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const AFFIRMATIONS = [
+      "You are allowed to bloom gently, at your very own pace.",
+      "Just like flowers need rain to grow, every emotion has its own beauty.",
+      "Your heart is a secret garden; tend to it with kindness today.",
+      "There is sunshine inside you waiting to blossom.",
+      "Every new day is a fresh petal unfolding in your story.",
+      "Small steps each day create a full garden of joy."
+    ];
+
+    let currentYear = 2026;
+    let currentMonthIdx = 9; // October default
+    let activeMood = 'happy';
+    let isEraserMode = false;
+    let currentZoom = 1.0;
+
+    const toastEl = document.getElementById('toastNotice');
+    let toastTimer = null;
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('visible'), 2000);
+    }
+
+    function getStorageKey(y, m) {
+      return `miTmood_save_${y}_${m}`;
+    }
+
+    function loadMonthData(y, m) {
+      try {
+        const raw = localStorage.getItem(getStorageKey(y, m));
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveDayMood(y, m, day, mood) {
+      const data = loadMonthData(y, m);
+      if (mood === null) {
+        delete data[day];
+      } else {
+        data[day] = mood;
+      }
+      try {
+        localStorage.setItem(getStorageKey(y, m), JSON.stringify(data));
+      } catch (e) {
+        console.error("Failed to save to localStorage", e);
+      }
+    }
+
+    function getDaysCount(y, m) {
+      return new Date(y, m + 1, 0).getDate();
+    }
+
+    /* -----------------------------------------------------------
+       OPTIMIZED BACKGROUND CANVAS (No GPU-blocking shadow passes)
+       ----------------------------------------------------------- */
+    const mCanvas = document.getElementById('meadowCanvas');
+    const mCtx = mCanvas.getContext('2d');
+    let bgWidth, bgHeight;
+
+    const floatingPetals = [];
+    const petalPalette = [
+      'rgba(255, 182, 193, 0.72)',
+      'rgba(255, 223, 105, 0.75)',
+      'rgba(224, 170, 255, 0.70)',
+      'rgba(255, 255, 255, 0.78)',
+      'rgba(255, 154, 162, 0.72)'
+    ];
+
+    function initFloatingPetals() {
+      floatingPetals.length = 0;
+      for (let i = 0; i < 30; i++) {
+        floatingPetals.push({
+          x: Math.random() * bgWidth,
+          y: Math.random() * bgHeight,
+          size: Math.random() * 5 + 3,
+          color: petalPalette[Math.floor(Math.random() * petalPalette.length)],
+          speedX: Math.random() * 0.75 + 0.35,
+          speedY: Math.sin(Math.random() * Math.PI) * 0.45 + 0.2,
+          rot: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.035,
+          oscillation: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function resizeBackground() {
+      const rect = mCanvas.getBoundingClientRect();
+      bgWidth = mCanvas.width = rect.width;
+      bgHeight = mCanvas.height = rect.height;
+      initFloatingPetals();
+    }
+    window.addEventListener('resize', resizeBackground);
+    resizeBackground();
+
+    const beeSparkles = [];
+    function emitBeeSparkle(x, y) {
+      beeSparkles.push({
+        x: x + (Math.random() - 0.5) * 12,
+        y: y + (Math.random() - 0.5) * 12,
+        vx: (Math.random() - 0.5) * 1.0,
+        vy: (Math.random() - 0.5) * 1.0 - 0.4,
+        size: Math.random() * 2.5 + 1.2,
+        life: 1.0,
+        decay: Math.random() * 0.025 + 0.015
+      });
+    }
+
+    function renderMeadowScene() {
+      mCtx.clearRect(0, 0, bgWidth, bgHeight);
+
+      // Light gradient shaft
+      const sunGradient = mCtx.createRadialGradient(bgWidth * 0.15, bgHeight * 0.15, 20, bgWidth * 0.15, bgHeight * 0.15, bgWidth * 0.85);
+      sunGradient.addColorStop(0, 'rgba(255, 255, 245, 0.85)');
+      sunGradient.addColorStop(0.25, 'rgba(255, 235, 170, 0.40)');
+      sunGradient.addColorStop(0.55, 'rgba(255, 200, 180, 0.12)');
+      sunGradient.addColorStop(1, 'transparent');
+      mCtx.fillStyle = sunGradient;
+      mCtx.fillRect(0, 0, bgWidth, bgHeight);
+
+      // Floating Petals
+      for (let i = 0; i < floatingPetals.length; i++) {
+        const p = floatingPetals[i];
+        p.x += p.speedX;
+        p.y += p.speedY + Math.sin(p.oscillation) * 0.25;
+        p.rot += p.rotSpeed;
+        p.oscillation += 0.02;
+
+        if (p.x > bgWidth + 20) p.x = -20;
+        if (p.y > bgHeight + 20) p.y = -20;
+
+        mCtx.save();
+        mCtx.translate(p.x, p.y);
+        mCtx.rotate(p.rot);
+        mCtx.fillStyle = p.color;
+        mCtx.beginPath();
+        mCtx.ellipse(0, 0, p.size * 1.4, p.size * 0.75, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.restore();
+      }
+
+      // Fast sparkle trail
+      for (let i = beeSparkles.length - 1; i >= 0; i--) {
+        const s = beeSparkles[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life -= s.decay;
+
+        if (s.life <= 0) {
+          beeSparkles.splice(i, 1);
+          continue;
+        }
+
+        mCtx.beginPath();
+        mCtx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
+        mCtx.fillStyle = `rgba(255, 223, 77, ${s.life})`;
+        mCtx.fill();
+      }
+
+      requestAnimationFrame(renderMeadowScene);
+    }
+    requestAnimationFrame(renderMeadowScene);
+
+    /* -----------------------------------------------------------
+       FLOWER RENDERER & INSTANT POINTERDOWN EVENT MAPPING
+       ----------------------------------------------------------- */
+    const outerPetalsBase = document.getElementById('outerPetalsBase');
+    const midPetalsBase = document.getElementById('midPetalsBase');
+    const innerPetalsBase = document.getElementById('innerPetalsBase');
+    const interactiveVectorOverlay = document.getElementById('interactiveVectorOverlay');
+
+    const CX = 220;
+    const CY = 310;
+
+    const RING_CONFIG = [
+      { name: 'outer', container: outerPetalsBase, radius: 120, count: 12, w: 52, h: 96, baseFill: 'url(#bgOuterPetal)' },
+      { name: 'middle', container: midPetalsBase, radius: 80, count: 11, w: 46, h: 84, baseFill: 'url(#bgMidPetal)' },
+      { name: 'inner', container: innerPetalsBase, radius: 44, count: 8, w: 36, h: 66, baseFill: 'url(#bgInnerPetal)' }
+    ];
+
+    function createPetalPath(w, h) {
+      const hw = w / 2;
+      return `M 0,${-h} C ${hw * 1.3},${-h * 0.65} ${hw * 1.1},${-h * 0.1} 0,0 C ${-hw * 1.1},${-h * 0.1} ${-hw * 1.3},${-h * 0.65} 0,${-h} Z`;
+    }
+
+    function buildFlowerPetals(year, monthIdx) {
+      outerPetalsBase.innerHTML = '';
+      midPetalsBase.innerHTML = '';
+      innerPetalsBase.innerHTML = '';
+      interactiveVectorOverlay.innerHTML = '';
+
+      const totalDays = getDaysCount(year, monthIdx);
+      const savedData = loadMonthData(year, monthIdx);
+
+      let dayCounter = 1;
+
+      RING_CONFIG.forEach((ring, ringIdx) => {
+        const step = (Math.PI * 2) / ring.count;
+        const offset = ringIdx * 0.28;
+
+        for (let i = 0; i < ring.count; i++) {
+          if (dayCounter > totalDays) break;
+          const day = dayCounter;
+          const angle = offset + i * step;
+          const deg = (angle * 180 / Math.PI) + 90;
+
+          const px = CX + Math.cos(angle) * ring.radius;
+          const py = CY + Math.sin(angle) * ring.radius;
+
+          const basePetal = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          basePetal.setAttribute('d', createPetalPath(ring.w, ring.h));
+          basePetal.setAttribute('fill', ring.baseFill);
+          basePetal.setAttribute('stroke', '#a25997');
+          basePetal.setAttribute('stroke-width', '0.9');
+          basePetal.setAttribute('transform', `translate(${px}, ${py}) rotate(${deg})`);
+          ring.container.appendChild(basePetal);
+
+          const vectorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          vectorGroup.setAttribute('id', `petal-group-${day}`);
+
+          const vectorPetal = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          vectorPetal.setAttribute('id', `petal-vector-${day}`);
+          vectorPetal.setAttribute('class', 'petal-vector');
+          vectorPetal.setAttribute('d', createPetalPath(ring.w, ring.h));
+          vectorPetal.setAttribute('transform', `translate(${px}, ${py}) rotate(${deg})`);
+
+          const savedMood = savedData[day];
+          if (savedMood) {
+            vectorPetal.classList.add(`colored-${savedMood}`);
+          }
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('id', `petal-num-${day}`);
+          text.setAttribute('class', `petal-number ${savedMood ? 'on-colored' : ''}`);
+          text.setAttribute('x', px);
+          text.setAttribute('y', py - (ring.h * 0.45));
+          text.setAttribute('transform', `rotate(${deg} ${px} ${py}) rotate(${-deg} ${px} ${py - (ring.h * 0.45)})`);
+          text.textContent = day;
+
+          // Zero-latency instant registration across mouse & mobile touches
+          vectorPetal.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handlePetalTap(day, vectorPetal, text);
+          }, { passive: false });
+
+          vectorGroup.appendChild(vectorPetal);
+          vectorGroup.appendChild(text);
+          interactiveVectorOverlay.appendChild(vectorGroup);
+
+          dayCounter++;
+        }
+      });
+    }
+
+    function handlePetalTap(day, vectorPetal, textEl) {
+      const data = loadMonthData(currentYear, currentMonthIdx);
+      const currentMood = data[day];
+      const isClear = isEraserMode || (currentMood === activeMood);
+
+      // Instant UI response
+      vectorPetal.classList.remove('colored-happy', 'colored-neutral', 'colored-sadtired');
+
+      if (isClear) {
+        saveDayMood(currentYear, currentMonthIdx, day, null);
+        textEl.classList.remove('on-colored');
+        showToast(`Day ${day} ${isEraserMode ? 'cleared' : 'reset'}`);
+      } else {
+        saveDayMood(currentYear, currentMonthIdx, day, activeMood);
+        vectorPetal.classList.add(`colored-${activeMood}`);
+        textEl.classList.add('on-colored');
+        showToast(`Day ${day} logged as ${activeMood.toUpperCase()}`);
+      }
+    }
+
+    /* -----------------------------------------------------------
+       AUTONOMOUS FLIGHT SIMULATION
+       ----------------------------------------------------------- */
+    const creatures = [
+      {
+        id: 'creatureMonarch',
+        el: document.getElementById('creatureMonarch'),
+        perchX: 0.20,
+        perchY: 0.31,
+        perchAngle: -18,
+        scale: 0.88,
+        isFlying: false,
+        flightDuration: 6000,
+        startTime: 0,
+        path: null,
+        nextTakeoffTime: Date.now() + 4000 + Math.random() * 5000
+      },
+      {
+        id: 'creatureLuna',
+        el: document.getElementById('creatureLuna'),
+        perchX: 0.76,
+        perchY: 0.32,
+        perchAngle: 22,
+        scale: 0.92,
+        isFlying: false,
+        flightDuration: 7200,
+        startTime: 0,
+        path: null,
+        nextTakeoffTime: Date.now() + 8000 + Math.random() * 6000
+      },
+      {
+        id: 'creatureSilk',
+        el: document.getElementById('creatureSilk'),
+        perchX: 0.22,
+        perchY: 0.58,
+        perchAngle: -24,
+        scale: 0.95,
+        isFlying: false,
+        flightDuration: 6500,
+        startTime: 0,
+        path: null,
+        nextTakeoffTime: Date.now() + 12000 + Math.random() * 7000
+      }
+    ];
+
+    function generateFlightPath(c, vw, vh) {
+      const startX = c.perchX * vw;
+      const startY = c.perchY * vh;
+
+      return {
+        start: { x: startX, y: startY },
+        p1: {
+          x: Math.max(30, Math.min(vw - 60, startX + (Math.random() - 0.5) * vw * 0.7)),
+          y: Math.max(50, startY - (120 + Math.random() * 160))
+        },
+        p2: {
+          x: Math.max(30, Math.min(vw - 60, vw * 0.5 + (Math.random() - 0.5) * vw * 0.6)),
+          y: Math.max(60, Math.min(vh * 0.65, startY + (Math.random() - 0.5) * 140))
+        },
+        p3: {
+          x: Math.max(30, Math.min(vw - 60, startX + (Math.random() - 0.5) * 100)),
+          y: Math.max(70, startY - 60)
+        },
+        end: { x: startX, y: startY }
+      };
+    }
+
+    function getCubicBezier(p0, p1, p2, p3, t) {
+      const mt = 1 - t;
+      return (mt * mt * mt * p0) + (3 * mt * mt * t * p1) + (3 * mt * t * t * p2) + (t * t * t * p3);
+    }
+
+    function triggerCreatureTakeoff(c, isStartled = false) {
+      if (c.isFlying) return;
+      const vp = document.getElementById('app-viewport');
+      const vw = vp.clientWidth;
+      const vh = vp.clientHeight;
+
+      c.isFlying = true;
+      c.startTime = performance.now();
+      c.flightDuration = isStartled ? 4500 : (5500 + Math.random() * 2500);
+      c.path = generateFlightPath(c, vw, vh);
+
+      c.el.classList.remove('perched');
+      if (isStartled) {
+        showToast("Butterfly startled! 🦋");
+      }
+    }
+
+    creatures.forEach(c => {
+      c.el.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        triggerCreatureTakeoff(c, true);
+      });
+    });
+
+    const beeEl = document.getElementById('sparklingBee');
+    let beePos = { x: 260, y: 220, targetX: 290, targetY: 260, angle: 0 };
+
+    beeEl.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      beePos.targetX = 60 + Math.random() * 320;
+      beePos.targetY = 120 + Math.random() * 200;
+      showToast("Sparkling Bee buzzes! 🐝✨");
+      for (let i = 0; i < 14; i++) emitBeeSparkle(beePos.x + 18, beePos.y + 16);
+    });
+
+    function updateBeeMotion() {
+      if (Math.hypot(beePos.targetX - beePos.x, beePos.targetY - beePos.y) < 16 || Math.random() < 0.02) {
+        beePos.targetX = 120 + Math.random() * 240;
+        beePos.targetY = 160 + Math.random() * 280;
+      }
+      const dx = beePos.targetX - beePos.x;
+      const dy = beePos.targetY - beePos.y;
+      beePos.x += dx * 0.032;
+      beePos.y += dy * 0.032;
+      beePos.angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      beeEl.style.transform = `translate3d(${beePos.x}px, ${beePos.y}px, 20px) rotate(${beePos.angle * 0.2}deg)`;
+
+      if (Math.random() < 0.35) {
+        emitBeeSparkle(beePos.x + 19, beePos.y + 16);
+      }
+    }
+
+    function updateCreaturesFlight(now) {
+      const vp = document.getElementById('app-viewport');
+      const vw = vp.clientWidth;
+      const vh = vp.clientHeight;
+
+      creatures.forEach(c => {
+        if (!c.isFlying) {
+          const px = c.perchX * vw;
+          const py = c.perchY * vh;
+          c.el.style.transform = `translate3d(${px}px, ${py}px, 0px) rotate(${c.perchAngle}deg) scale(${c.scale})`;
+
+          if (Date.now() > c.nextTakeoffTime) {
+            triggerCreatureTakeoff(c, false);
+          }
+        } else {
+          const elapsed = now - c.startTime;
+          const t = Math.min(1, elapsed / c.flightDuration);
+
+          const curX = getCubicBezier(c.path.start.x, c.path.p1.x, c.path.p2.x, c.path.end.x, t);
+          const curY = getCubicBezier(c.path.start.y, c.path.p1.y, c.path.p2.y, c.path.end.y, t);
+
+          const nextT = Math.min(1, t + 0.02);
+          const nextX = getCubicBezier(c.path.start.x, c.path.p1.x, c.path.p2.x, c.path.end.x, nextT);
+          const nextY = getCubicBezier(c.path.start.y, c.path.p1.y, c.path.p2.y, c.path.end.y, nextT);
+
+          const angleDeg = Math.atan2(nextY - curY, nextX - curX) * 180 / Math.PI + 90;
+          const bankRoll = Math.sin(t * Math.PI * 4) * 16;
+
+          c.el.style.transform = `translate3d(${curX}px, ${curY}px, 40px) rotate(${angleDeg}deg) rotateZ(${bankRoll}deg) scale(${c.scale * 1.08})`;
+
+          if (t >= 1) {
+            c.isFlying = false;
+            c.el.classList.add('perched');
+            c.nextTakeoffTime = Date.now() + 6000 + Math.random() * 8000;
+          }
+        }
+      });
+
+      updateBeeMotion();
+      requestAnimationFrame(updateCreaturesFlight);
+    }
+    requestAnimationFrame(updateCreaturesFlight);
+
+    /* -----------------------------------------------------------
+       CONTROLS, MODALS & MONTH NAVIGATION
+       ----------------------------------------------------------- */
+    const monthDisplayLabel = document.getElementById('monthDisplayLabel');
+    const clearMonthName = document.getElementById('clearMonthName');
+
+    function updateMonthView() {
+      monthDisplayLabel.textContent = MONTHS[currentMonthIdx];
+      clearMonthName.textContent = MONTHS[currentMonthIdx];
+      buildFlowerPetals(currentYear, currentMonthIdx);
+    }
+
+    document.getElementById('btnPrevMonth').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      currentMonthIdx--;
+      if (currentMonthIdx < 0) {
+        currentMonthIdx = 11;
+        currentYear--;
+      }
+      updateMonthView();
+    });
+
+    document.getElementById('btnNextMonth').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      currentMonthIdx++;
+      if (currentMonthIdx > 11) {
+        currentMonthIdx = 0;
+        currentYear++;
+      }
+      updateMonthView();
+    });
+
+    document.getElementById('btnNextAction').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      const now = new Date();
+      currentYear = now.getFullYear();
+      currentMonthIdx = now.getMonth();
+      updateMonthView();
+      showToast(`Jumped to ${MONTHS[currentMonthIdx]}`);
+    });
+
+    document.querySelectorAll('.mood-pill').forEach(pill => {
+      pill.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeMood = pill.dataset.mood;
+        isEraserMode = false;
+        showToast(`Selected: ${pill.textContent.trim()}`);
+      });
+    });
+
+    // Zoom Slider Controls
+    const flowerScaler = document.getElementById('flowerScaler');
+    const zoomThumb = document.getElementById('zoomThumb');
+    const zoomRail = document.getElementById('zoomRail');
+
+    function applyZoom(z) {
+      currentZoom = Math.max(0.85, Math.min(1.4, z));
+      flowerScaler.style.transform = `scale(${currentZoom})`;
+      const pct = (currentZoom - 0.85) / (1.4 - 0.85);
+      zoomThumb.style.top = `${(1 - pct) * 100}%`;
+    }
+
+    document.getElementById('btnZoomIn').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      applyZoom(currentZoom + 0.1);
+    });
+    document.getElementById('btnZoomOut').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      applyZoom(currentZoom - 0.1);
+    });
+
+    let isDraggingZoom = false;
+    function handleZoomDrag(e) {
+      if (!isDraggingZoom) return;
+      const rect = zoomRail.getBoundingClientRect();
+      const clientY = e.clientY ?? (e.touches && e.touches[0].clientY);
+      if (clientY === undefined) return;
+      const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+      const factor = 1 - (relY / rect.height);
+      applyZoom(0.85 + factor * (1.4 - 0.85));
+    }
+
+    zoomRail.addEventListener('pointerdown', (e) => {
+      isDraggingZoom = true;
+      zoomRail.setPointerCapture(e.pointerId);
+      handleZoomDrag(e);
+    });
+    zoomRail.addEventListener('pointermove', handleZoomDrag);
+    zoomRail.addEventListener('pointerup', () => { isDraggingZoom = false; });
+    zoomRail.addEventListener('pointercancel', () => { isDraggingZoom = false; });
+
+    // Modal Helpers
+    function openModal(el) { el.classList.add('active'); }
+    function closeModal(el) { el.classList.remove('active'); }
+
+    const modalAffirmations = document.getElementById('modalAffirmations');
+    const affirmationQuote = document.getElementById('affirmationQuote');
+    document.getElementById('btnBell').addEventListener('pointerdown', () => openModal(modalAffirmations));
+    document.getElementById('btnCloseAffirmations').addEventListener('pointerdown', () => closeModal(modalAffirmations));
+    document.getElementById('btnDismissAffirmation').addEventListener('pointerdown', () => closeModal(modalAffirmations));
+    document.getElementById('btnNewAffirmation').addEventListener('pointerdown', () => {
+      const pick = AFFIRMATIONS[Math.floor(Math.random() * AFFIRMATIONS.length)];
+      affirmationQuote.textContent = `"${pick}"`;
+    });
+
+    const modalMenu = document.getElementById('modalMenu');
+    document.getElementById('btnMenu').addEventListener('pointerdown', () => openModal(modalMenu));
+    document.getElementById('btnBottomMenu').addEventListener('pointerdown', () => openModal(modalMenu));
+    document.getElementById('btnCloseMenu').addEventListener('pointerdown', () => closeModal(modalMenu));
+
+    document.getElementById('btnToggleEraser').addEventListener('pointerdown', () => {
+      isEraserMode = !isEraserMode;
+      document.getElementById('eraserIcon').textContent = isEraserMode ? '🧹' : '✏️';
+      document.getElementById('eraserLabel').textContent = isEraserMode ? 'Eraser Active (Tap petals to erase)' : 'Activate Eraser (Tap petals to clear)';
+      closeModal(modalMenu);
+      showToast(isEraserMode ? "Eraser mode active: tap petals to clear" : "Coloring mode resumed");
+    });
+
+    document.getElementById('btnClearMonth').addEventListener('pointerdown', () => {
+      if (confirm(`Clear all mood entries for ${MONTHS[currentMonthIdx]} ${currentYear}?`)) {
+        localStorage.removeItem(getStorageKey(currentYear, currentMonthIdx));
+        updateMonthView();
+        closeModal(modalMenu);
+        showToast(`${MONTHS[currentMonthIdx]} entries cleared`);
+      }
+    });
+
+    document.getElementById('btnExportJSON').addEventListener('pointerdown', () => {
+      const dump = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('miTmood_save_')) {
+          dump[k] = JSON.parse(localStorage.getItem(k));
+        }
+      }
+      const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `miTmood_backup_${MONTHS[currentMonthIdx]}_${currentYear}.json`;
+      a.click();
+      closeModal(modalMenu);
+      showToast("Backup exported!");
+    });
+
+    const modalInsights = document.getElementById('modalInsights');
+    const statsSummaryContent = document.getElementById('statsSummaryContent');
+    document.getElementById('btnStatsView').addEventListener('pointerdown', () => {
+      closeModal(modalMenu);
+      const data = loadMonthData(currentYear, currentMonthIdx);
+      const total = getDaysCount(currentYear, currentMonthIdx);
+      let h = 0, n = 0, s = 0;
+      Object.values(data).forEach(m => {
+        if (m === 'happy') h++;
+        if (m === 'neutral') n++;
+        if (m === 'sadtired') s++;
+      });
+      statsSummaryContent.innerHTML = `
+        <div style="line-height:1.8;">
+          <p><strong>Month:</strong> ${MONTHS[currentMonthIdx]} ${currentYear}</p>
+          <p>🌺 Happy Days: <strong>${h}</strong></p>
+          <p>🌼 Neutral Days: <strong>${n}</strong></p>
+          <p>🌸 Sad/Tired Days: <strong>${s}</strong></p>
+          <p>🗓️ Days Logged: <strong>${h + n + s} / ${total}</strong></p>
+        </div>
+      `;
+      openModal(modalInsights);
+    });
+    document.getElementById('btnCloseInsights').addEventListener('pointerdown', () => closeModal(modalInsights));
+    document.getElementById('btnInsightsDone').addEventListener('pointerdown', () => closeModal(modalInsights));
+
+    const modalHelp = document.getElementById('modalHelp');
+    document.getElementById('btnHelp').addEventListener('pointerdown', () => openModal(modalHelp));
+    document.getElementById('btnCloseHelp').addEventListener('pointerdown', () => closeModal(modalHelp));
+    document.getElementById('btnHelpDone').addEventListener('pointerdown', () => closeModal(modalHelp));
+
+    document.querySelectorAll('.glass-modal').forEach(m => {
+      m.addEventListener('pointerdown', (e) => {
+        if (e.target === m) closeModal(m);
+      });
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateMonthView();
+    });
+  </script>
+</body>
+</html>
