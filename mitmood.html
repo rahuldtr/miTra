@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>miTPetal — Joyful Spring Garden</title>
+  <title>miTPetal — Joyful Spring Flower Garden</title>
 
   <style>
     :root {
-      /* Joyful, vibrant happiness palette */
-      --color-happy: rgba(255, 75, 110, 0.88);
-      --color-happy-stroke: #ff124f;
-      --color-neutral: rgba(255, 209, 50, 0.90);
-      --color-neutral-stroke: #ff9e00;
-      --color-sadtired: rgba(199, 125, 255, 0.88);
-      --color-sadtired-stroke: #9d4edd;
+      /* Ultra-Vibrant Floral Happiness Palette */
+      --color-happy: rgba(255, 0, 84, 0.88);
+      --color-happy-stroke: #d90429;
+      --color-neutral: rgba(255, 183, 3, 0.92);
+      --color-neutral-stroke: #fb8500;
+      --color-sadtired: rgba(181, 23, 158, 0.88);
+      --color-sadtired-stroke: #7209b7;
 
-      /* Sunny, crystal glassmorphism */
-      --glass-bg: rgba(255, 255, 255, 0.28);
-      --glass-border: rgba(255, 255, 255, 0.85);
-      --glass-shadow: 0 10px 32px 0 rgba(220, 80, 140, 0.16);
-      --glass-bevel: inset 0 2px 3px rgba(255, 255, 255, 0.9), inset 0 -1.5px 2px rgba(255, 200, 220, 0.35);
+      /* Luminous Flower-Season Prism Glass */
+      --glass-bg: rgba(255, 255, 255, 0.35);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      --glass-shadow: 0 12px 36px 0 rgba(230, 50, 120, 0.22);
+      --glass-bevel: inset 0 2px 3.5px rgba(255, 255, 255, 0.95), inset 0 -1.5px 2px rgba(255, 180, 210, 0.4);
 
-      /* Universal native offline font stacks */
+      /* Offline native system font stacks */
       --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --font-serif: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Baskerville", "Times New Roman", serif;
       --font-script: "Snell Roundhand", "Brush Script MT", "Caveat", "Segoe Script", "Dancing Script", cursive, serif;
@@ -43,7 +43,7 @@
       min-height: -webkit-fill-available;
       overflow: hidden;
       font-family: var(--font-body);
-      background: #1d0f19;
+      background: #1a0815;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -60,23 +60,23 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 0 80px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 90px rgba(255, 75, 140, 0.25), 0 0 60px rgba(0, 0, 0, 0.6);
     }
 
     @media (min-width: 900px) {
       body {
         padding: 24px;
-        background: radial-gradient(circle at center, #2e1627 0%, #11080f 100%);
+        background: radial-gradient(circle at center, #3d122b 0%, #12040d 100%);
       }
       #app-viewport {
         height: 94vh;
         max-height: 950px;
         border-radius: 38px;
-        border: 2px solid rgba(255, 255, 255, 0.25);
+        border: 2.2px solid rgba(255, 255, 255, 0.35);
       }
     }
 
-    /* Radiant Sunny Daylight Meadow Backdrop */
+    /* Radiant Flower Season Sunlight & Azure Sky Backdrop */
     .scenery-background {
       position: absolute;
       inset: 0;
@@ -85,8 +85,8 @@
       z-index: 1;
       pointer-events: none;
       background: 
-        radial-gradient(circle at 22% 16%, rgba(255, 255, 240, 1) 0%, rgba(255, 242, 175, 0.75) 28%, rgba(255, 200, 220, 0.4) 52%, transparent 75%),
-        linear-gradient(180deg, #a0d8ef 0%, #ffe3dc 32%, #fff0b8 58%, #9fd868 84%, #4c8a2b 100%);
+        radial-gradient(circle at 20% 14%, rgba(255, 255, 245, 1) 0%, rgba(255, 240, 160, 0.85) 26%, rgba(255, 180, 210, 0.45) 50%, transparent 74%),
+        linear-gradient(180deg, #70c8f8 0%, #ffd6ea 28%, #ffea9f 54%, #8cd846 80%, #357a1e 100%);
       background-size: cover;
     }
 
@@ -99,7 +99,7 @@
       pointer-events: none;
     }
 
-    /* Transparent, Floating Overlay */
+    /* Floating UI Overlay */
     .ui-overlay {
       position: relative;
       z-index: 40;
@@ -116,10 +116,10 @@
       pointer-events: auto;
     }
 
-    /* Glass Controls */
+    /* Crystal Glass Buttons */
     .glass-btn {
       background: var(--glass-bg);
-      border: 1.4px solid var(--glass-border);
+      border: 1.5px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-bevel);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -128,9 +128,9 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: #3f1d35;
+      color: #3b0d2a;
       touch-action: manipulation;
-      transition: transform 0.12s ease, background 0.2s;
+      transition: transform 0.12s ease, background 0.2s, box-shadow 0.2s;
     }
 
     .glass-btn:active {
@@ -145,8 +145,8 @@
     .glass-icon-box svg {
       width: 22px;
       height: 22px;
-      stroke: #3f1d35;
-      stroke-width: 2.3;
+      stroke: #3b0d2a;
+      stroke-width: 2.4;
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;
@@ -159,37 +159,37 @@
       justify-content: space-between;
     }
 
-    /* Happiness Flower Redesigned Brand Header */
+    /* Colorful Spring Flower Brand Header */
     .brand-wrap {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .brand-title {
       font-family: var(--font-script);
-      font-size: clamp(2.4rem, 5.5vw, 3.6rem);
+      font-size: clamp(2.6rem, 5.8vw, 3.8rem);
       font-weight: 700;
       letter-spacing: 0.5px;
       color: #ffffff;
-      background: linear-gradient(180deg, #ffffff 0%, #fff2f6 40%, #ffd0e3 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #fff0f6 35%, #ffb3d9 75%, #ff70a6 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 2px 14px rgba(255, 75, 110, 0.5))
-              drop-shadow(0 0 25px rgba(255, 255, 255, 0.8));
+      filter: drop-shadow(0 3px 16px rgba(255, 0, 110, 0.55))
+              drop-shadow(0 0 28px rgba(255, 255, 255, 0.9));
       line-height: 1;
       padding: 0 4px;
     }
 
     .brand-sparkle {
-      font-size: 1.25rem;
-      animation: floralShimmer 2.4s ease-in-out infinite alternate;
+      font-size: 1.35rem;
+      animation: floralShimmer 2.2s ease-in-out infinite alternate;
     }
 
     @keyframes floralShimmer {
-      0% { transform: scale(0.85) rotate(-10deg); filter: drop-shadow(0 0 2px #fff); }
-      100% { transform: scale(1.15) rotate(10deg); filter: drop-shadow(0 0 8px #ff70a6); }
+      0% { transform: scale(0.85) rotate(-12deg); filter: drop-shadow(0 0 3px #fff); }
+      100% { transform: scale(1.22) rotate(12deg); filter: drop-shadow(0 0 10px #ff007f); }
     }
 
     .header-actions {
@@ -197,13 +197,13 @@
       gap: clamp(8px, 1.5vw, 14px);
     }
 
-    /* Joyful Mood Pills */
+    /* Vibrant Mood Pills */
     .mood-pills-row {
       display: flex;
       justify-content: center;
       gap: clamp(8px, 2vw, 16px);
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       margin: 8px auto 0;
     }
 
@@ -212,7 +212,7 @@
       height: clamp(38px, 4.4vh, 46px);
       border-radius: 24px;
       background: var(--glass-bg);
-      border: 1.4px solid var(--glass-border);
+      border: 1.5px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-bevel);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -226,25 +226,25 @@
       font-style: italic;
       font-weight: 700;
       font-size: clamp(1.05rem, 2vw, 1.25rem);
-      color: #3b1d31;
+      color: #3b0d2a;
       transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .mood-pill svg {
       width: clamp(18px, 2.2vw, 22px);
       height: clamp(18px, 2.2vw, 22px);
-      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.18));
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.22));
     }
 
     .mood-pill.active {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       border-color: #ffffff;
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 10px 24px rgba(255, 107, 138, 0.45), var(--glass-bevel);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 12px 28px rgba(255, 0, 110, 0.4), var(--glass-bevel);
     }
 
     .mood-pill[data-mood="happy"].active { color: #d90429; }
-    .mood-pill[data-mood="neutral"].active { color: #e85d04; }
+    .mood-pill[data-mood="neutral"].active { color: #d97706; }
     .mood-pill[data-mood="sadtired"].active { color: #7209b7; }
 
     /* Centered, Zoomed Bloom Stage */
@@ -276,7 +276,7 @@
       max-height: min(80vh, 800px);
       overflow: visible;
       pointer-events: auto;
-      filter: drop-shadow(0 14px 28px rgba(80, 20, 50, 0.22));
+      filter: drop-shadow(0 16px 32px rgba(120, 20, 70, 0.26));
     }
 
     #stemSwayGroup {
@@ -412,7 +412,7 @@
       touch-action: manipulation;
       z-index: 35;
       transform-style: preserve-3d;
-      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.95));
+      filter: drop-shadow(0 0 12px rgba(255, 215, 0, 1));
       transition: transform 0.1s linear;
     }
 
@@ -420,7 +420,7 @@
       position: absolute;
       inset: -14px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 235, 120, 0.8) 0%, rgba(255, 185, 0, 0.3) 45%, transparent 72%);
+      background: radial-gradient(circle, rgba(255, 235, 120, 0.85) 0%, rgba(255, 185, 0, 0.4) 45%, transparent 72%);
       animation: beeTwinkle 1.1s ease-in-out infinite alternate;
       pointer-events: none;
     }
@@ -434,33 +434,33 @@
       cursor: pointer;
       touch-action: manipulation;
       fill: rgba(255, 255, 255, 0.01);
-      stroke: rgba(255, 255, 255, 0.48);
-      stroke-width: 1.2;
+      stroke: rgba(255, 255, 255, 0.55);
+      stroke-width: 1.25;
       transition: stroke 0.15s, stroke-width 0.15s;
     }
 
     .petal-vector:hover {
       stroke: #ffffff;
       stroke-width: 2.2;
-      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.85));
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.95));
     }
 
     .petal-vector.colored-happy {
       fill: var(--color-happy) !important;
       stroke: var(--color-happy-stroke) !important;
-      stroke-width: 1.8;
+      stroke-width: 1.9;
     }
 
     .petal-vector.colored-neutral {
       fill: var(--color-neutral) !important;
       stroke: var(--color-neutral-stroke) !important;
-      stroke-width: 1.8;
+      stroke-width: 1.9;
     }
 
     .petal-vector.colored-sadtired {
       fill: var(--color-sadtired) !important;
       stroke: var(--color-sadtired-stroke) !important;
-      stroke-width: 1.8;
+      stroke-width: 1.9;
     }
 
     .petal-number {
@@ -470,7 +470,7 @@
       text-anchor: middle;
       dominant-baseline: central;
       pointer-events: none;
-      fill: #3e1b34;
+      fill: #3b0d2a;
       text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95);
     }
 
@@ -522,7 +522,7 @@
       position: relative;
       width: 4px;
       flex-grow: 1;
-      background: rgba(255, 255, 255, 0.45);
+      background: rgba(255, 255, 255, 0.55);
       border-radius: 4px;
       margin: 8px 0;
       cursor: pointer;
@@ -565,7 +565,7 @@
       height: clamp(44px, 5vh, 52px);
       border-radius: 26px;
       background: var(--glass-bg);
-      border: 1.4px solid var(--glass-border);
+      border: 1.5px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-bevel);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -580,7 +580,7 @@
       font-size: clamp(2rem, 3.8vw, 2.6rem);
       font-weight: 700;
       color: #ffffff;
-      text-shadow: 0 2px 10px rgba(70, 20, 45, 0.6);
+      text-shadow: 0 2px 10px rgba(90, 15, 55, 0.7);
       margin-top: -4px;
     }
 
@@ -588,20 +588,20 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.48);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       touch-action: manipulation;
-      color: #3b2234;
+      color: #3b0d2a;
       font-size: 1.05rem;
       transition: transform 0.2s, background 0.2s;
     }
 
     .month-nav-btn:hover {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       transform: scale(1.12);
     }
 
@@ -612,13 +612,13 @@
       color: rgba(255, 245, 250, 0.95);
       text-align: center;
       margin-top: 5px;
-      text-shadow: 0 1px 4px rgba(60, 20, 40, 0.7);
+      text-shadow: 0 1px 4px rgba(70, 10, 45, 0.8);
     }
 
     .glass-modal {
       position: fixed;
       inset: 0;
-      background: rgba(20, 10, 18, 0.52);
+      background: rgba(30, 8, 24, 0.58);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       display: flex;
@@ -639,12 +639,12 @@
     .modal-card {
       width: 100%;
       max-width: 400px;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       border: 1.5px solid #ffffff;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
       border-radius: 28px;
       padding: 24px 22px;
-      color: #2b1424;
+      color: #2b0d22;
       transform: scale(0.95);
       transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -664,7 +664,7 @@
       font-family: var(--font-serif);
       font-size: 1.6rem;
       font-weight: 700;
-      color: #2b1424;
+      color: #2b0d22;
     }
 
     .action-btn {
@@ -674,7 +674,7 @@
       border: 1px solid rgba(0, 0, 0, 0.1);
       background: #ffffff;
       font-weight: 700;
-      color: #3b2234;
+      color: #3b0d2a;
       cursor: pointer;
       touch-action: manipulation;
       margin-top: 10px;
@@ -686,13 +686,13 @@
     }
 
     .action-btn:hover {
-      background: #f7f3f6;
+      background: #fdf5f9;
     }
 
     .action-btn.danger {
-      background: #ffe3e8;
+      background: #ffe3eb;
       color: #c9184a;
-      border-color: #ffb3c1;
+      border-color: #ffb3c6;
     }
 
     .toast-pill {
@@ -700,14 +700,14 @@
       top: clamp(75px, 9vh, 90px);
       left: 50%;
       transform: translate(-50%, -8px);
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.95);
       border: 1.2px solid #ffffff;
-      box-shadow: 0 8px 24px rgba(40, 15, 30, 0.2);
+      box-shadow: 0 8px 24px rgba(50, 10, 35, 0.22);
       padding: 7px 20px;
       border-radius: 20px;
       font-size: 0.85rem;
       font-weight: 700;
-      color: #3b2234;
+      color: #3b0d2a;
       pointer-events: none;
       opacity: 0;
       white-space: nowrap;
@@ -735,14 +735,14 @@
       <div class="flying-creature perched" id="creatureMonarch">
         <svg class="creature-body-svg" viewBox="0 0 80 80">
           <g class="wing-3d-left" style="transform-origin: 38px 40px;">
-            <path d="M 38,40 C 14,8 -10,22 -4,46 C 2,60 22,62 38,40 Z" fill="#ff7014" stroke="#111" stroke-width="2" />
+            <path d="M 38,40 C 14,8 -10,22 -4,46 C 2,60 22,62 38,40 Z" fill="#ff6d00" stroke="#111" stroke-width="2" />
             <path d="M 38,42 C 12,46 6,66 20,78 C 32,82 38,58 38,42 Z" fill="#e65100" stroke="#111" stroke-width="2" />
             <circle cx="6" cy="30" r="2.2" fill="#fff" />
             <circle cx="16" cy="22" r="1.8" fill="#fff" />
             <circle cx="18" cy="68" r="1.8" fill="#fff" />
           </g>
           <g class="wing-3d-right" style="transform-origin: 42px 40px;">
-            <path d="M 42,40 C 66,8 90,22 84,46 C 78,60 58,62 42,40 Z" fill="#ff7014" stroke="#111" stroke-width="2" />
+            <path d="M 42,40 C 66,8 90,22 84,46 C 78,60 58,62 42,40 Z" fill="#ff6d00" stroke="#111" stroke-width="2" />
             <path d="M 42,42 C 68,46 74,66 60,78 C 48,82 42,58 42,42 Z" fill="#e65100" stroke="#111" stroke-width="2" />
             <circle cx="74" cy="30" r="2.2" fill="#fff" />
             <circle cx="64" cy="22" r="1.8" fill="#fff" />
@@ -758,17 +758,17 @@
       <div class="flying-creature perched" id="creatureLuna">
         <svg class="creature-body-svg" viewBox="0 0 80 80">
           <g class="wing-3d-left" style="transform-origin: 38px 40px;">
-            <path d="M 38,38 C 16,10 -2,22 4,50 C 12,70 30,62 38,38 Z" fill="#a0e8b4" stroke="#256e3b" stroke-width="2" />
-            <path d="M 38,40 C 16,48 10,70 24,84 C 34,90 38,62 38,40 Z" fill="#80d898" stroke="#256e3b" stroke-width="2" />
-            <circle cx="20" cy="36" r="3.2" fill="#ffd166" stroke="#256e3b" stroke-width="1.2" />
+            <path d="M 38,38 C 16,10 -2,22 4,50 C 12,70 30,62 38,38 Z" fill="#70e000" stroke="#1b4332" stroke-width="2" />
+            <path d="M 38,40 C 16,48 10,70 24,84 C 34,90 38,62 38,40 Z" fill="#38b000" stroke="#1b4332" stroke-width="2" />
+            <circle cx="20" cy="36" r="3.2" fill="#ffea00" stroke="#1b4332" stroke-width="1.2" />
           </g>
           <g class="wing-3d-right" style="transform-origin: 42px 40px;">
-            <path d="M 42,38 C 64,10 82,22 76,50 C 68,70 50,62 42,38 Z" fill="#a0e8b4" stroke="#256e3b" stroke-width="2" />
-            <path d="M 42,40 C 64,48 70,70 56,84 C 46,90 42,62 42,40 Z" fill="#80d898" stroke="#256e3b" stroke-width="2" />
-            <circle cx="60" cy="36" r="3.2" fill="#ffd166" stroke="#256e3b" stroke-width="1.2" />
+            <path d="M 42,38 C 64,10 82,22 76,50 C 68,70 50,62 42,38 Z" fill="#70e000" stroke="#1b4332" stroke-width="2" />
+            <path d="M 42,40 C 64,48 70,70 56,84 C 46,90 42,62 42,40 Z" fill="#38b000" stroke="#1b4332" stroke-width="2" />
+            <circle cx="60" cy="36" r="3.2" fill="#ffea00" stroke="#1b4332" stroke-width="1.2" />
           </g>
-          <ellipse cx="40" cy="40" rx="3.5" ry="14" fill="#1b4332" />
-          <path d="M 39,26 Q 30,12 24,10 M 41,26 Q 50,12 56,10" stroke="#1b4332" stroke-width="1.6" fill="none" />
+          <ellipse cx="40" cy="40" rx="3.5" ry="14" fill="#0d2818" />
+          <path d="M 39,26 Q 30,12 24,10 M 41,26 Q 50,12 56,10" stroke="#0d2818" stroke-width="1.6" fill="none" />
         </svg>
       </div>
 
@@ -776,19 +776,19 @@
       <div class="flying-creature perched" id="creatureSilk">
         <svg class="creature-body-svg" viewBox="0 0 80 80">
           <g class="wing-3d-left" style="transform-origin: 38px 40px;">
-            <path d="M 38,38 C 10,12 -6,22 0,52 C 6,70 26,66 38,38 Z" fill="#d29662" stroke="#4a2810" stroke-width="2" />
-            <path d="M 38,40 C 14,46 8,68 20,80 C 30,86 36,62 38,40 Z" fill="#b47442" stroke="#4a2810" stroke-width="2" />
-            <circle cx="18" cy="44" r="4.2" fill="#3a5a40" stroke="#111" stroke-width="1.4" />
+            <path d="M 38,38 C 10,12 -6,22 0,52 C 6,70 26,66 38,38 Z" fill="#e07a5f" stroke="#4a1506" stroke-width="2" />
+            <path d="M 38,40 C 14,46 8,68 20,80 C 30,86 36,62 38,40 Z" fill="#bc4749" stroke="#4a1506" stroke-width="2" />
+            <circle cx="18" cy="44" r="4.2" fill="#2b9348" stroke="#111" stroke-width="1.4" />
             <circle cx="18" cy="44" r="1.8" fill="#fff" />
           </g>
           <g class="wing-3d-right" style="transform-origin: 42px 40px;">
-            <path d="M 42,38 C 70,12 86,22 80,52 C 74,70 54,66 42,38 Z" fill="#d29662" stroke="#4a2810" stroke-width="2" />
-            <path d="M 42,40 C 66,46 72,68 60,80 C 50,86 44,62 42,40 Z" fill="#b47442" stroke="#4a2810" stroke-width="2" />
-            <circle cx="62" cy="44" r="4.2" fill="#3a5a40" stroke="#111" stroke-width="1.4" />
+            <path d="M 42,38 C 70,12 86,22 80,52 C 74,70 54,66 42,38 Z" fill="#e07a5f" stroke="#4a1506" stroke-width="2" />
+            <path d="M 42,40 C 66,46 72,68 60,80 C 50,86 44,62 42,40 Z" fill="#bc4749" stroke="#4a1506" stroke-width="2" />
+            <circle cx="62" cy="44" r="4.2" fill="#2b9348" stroke="#111" stroke-width="1.4" />
             <circle cx="62" cy="44" r="1.8" fill="#fff" />
           </g>
-          <ellipse cx="40" cy="40" rx="4" ry="14" fill="#3a2010" />
-          <path d="M 38,26 Q 28,14 20,12 M 42,26 Q 52,14 60,12" stroke="#3a2010" stroke-width="2" fill="none" />
+          <ellipse cx="40" cy="40" rx="4" ry="14" fill="#38040e" />
+          <path d="M 38,26 Q 28,14 20,12 M 42,26 Q 52,14 60,12" stroke="#38040e" stroke-width="2" fill="none" />
         </svg>
       </div>
 
@@ -796,8 +796,8 @@
       <div class="sparkling-bee" id="sparklingBee">
         <div class="bee-glow-halo"></div>
         <svg viewBox="0 0 38 32" width="100%" height="100%">
-          <ellipse cx="15" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.85)" transform="rotate(-28 15 8)"/>
-          <ellipse cx="23" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.85)" transform="rotate(28 23 8)"/>
+          <ellipse cx="15" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.9)" transform="rotate(-28 15 8)"/>
+          <ellipse cx="23" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.9)" transform="rotate(28 23 8)"/>
           <ellipse cx="19" cy="18" rx="12" ry="8" fill="#ffb703"/>
           <path d="M 13,11 L 13,25 M 19,10 L 19,26 M 25,11 L 25,25" stroke="#221e1b" stroke-width="2.2"/>
           <circle cx="9" cy="18" r="3" fill="#221e1b"/>
@@ -807,58 +807,60 @@
 
     </div>
 
-    <!-- Centered & Pre-Zoomed Dahlia Flower Stage -->
+    <!-- Centered & Pre-Zoomed Dahlia Flower Stage with Rich Floral Gradients -->
     <div class="flower-stage">
       <div class="flower-scaler-wrapper" id="flowerScaler">
         
         <svg class="flower-svg" viewBox="0 0 440 700" preserveAspectRatio="xMidYMid meet">
           <defs>
             <filter id="petalShadow" x="-10%" y="-10%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-opacity="0.22" />
+              <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#550033" flood-opacity="0.28" />
             </filter>
 
+            <!-- Ultra-Vivid Flower Center Glow -->
             <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#fff8b5" />
-              <stop offset="35%" stop-color="#ffb74d" />
-              <stop offset="70%" stop-color="#e91e63" />
-              <stop offset="100%" stop-color="#4a148c" />
+              <stop offset="0%" stop-color="#fffb00" />
+              <stop offset="30%" stop-color="#ff7b00" />
+              <stop offset="68%" stop-color="#ff0054" />
+              <stop offset="100%" stop-color="#480ca8" />
             </radialGradient>
 
             <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#33691e" />
-              <stop offset="45%" stop-color="#689f38" />
-              <stop offset="75%" stop-color="#8bc34a" />
-              <stop offset="100%" stop-color="#2e7d32" />
+              <stop offset="0%" stop-color="#2d6a4f" />
+              <stop offset="45%" stop-color="#70e000" />
+              <stop offset="75%" stop-color="#9ef01a" />
+              <stop offset="100%" stop-color="#1b4332" />
             </linearGradient>
 
             <linearGradient id="leafGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#84cc3b" />
-              <stop offset="60%" stop-color="#558b2f" />
-              <stop offset="100%" stop-color="#2e7d32" />
+              <stop offset="0%" stop-color="#9ef01a" />
+              <stop offset="55%" stop-color="#38b000" />
+              <stop offset="100%" stop-color="#1b4332" />
             </linearGradient>
 
             <linearGradient id="leafGradRight" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#84cc3b" />
-              <stop offset="60%" stop-color="#558b2f" />
-              <stop offset="100%" stop-color="#2e7d32" />
+              <stop offset="0%" stop-color="#9ef01a" />
+              <stop offset="55%" stop-color="#38b000" />
+              <stop offset="100%" stop-color="#1b4332" />
             </linearGradient>
 
+            <!-- Rich Floral Petal Gradients -->
             <linearGradient id="bgOuterPetal" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#fce2f9" />
-              <stop offset="60%" stop-color="#d6a9df" />
-              <stop offset="100%" stop-color="#b683cb" />
+              <stop offset="0%" stop-color="#fed5ff" />
+              <stop offset="50%" stop-color="#d684ff" />
+              <stop offset="100%" stop-color="#9b5de5" />
             </linearGradient>
 
             <linearGradient id="bgMidPetal" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#ffe5f0" />
-              <stop offset="60%" stop-color="#fcaec5" />
-              <stop offset="100%" stop-color="#f282a5" />
+              <stop offset="0%" stop-color="#fff0f5" />
+              <stop offset="45%" stop-color="#ff758f" />
+              <stop offset="100%" stop-color="#ff0054" />
             </linearGradient>
 
             <linearGradient id="bgInnerPetal" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#fffce8" />
-              <stop offset="55%" stop-color="#fde076" />
-              <stop offset="100%" stop-color="#fca88d" />
+              <stop offset="0%" stop-color="#ffffd0" />
+              <stop offset="50%" stop-color="#ffbe0b" />
+              <stop offset="100%" stop-color="#fb5607" />
             </linearGradient>
           </defs>
 
@@ -868,19 +870,19 @@
 
             <g id="leftFoliageGroup">
               <g id="leftFoliageTip">
-                <path d="M 216,540 C 160,545 60,535 40,490 C 80,450 160,490 216,520 Z" fill="url(#leafGradLeft)" stroke="#1b5e20" stroke-width="1.8" />
-                <path d="M 216,536 Q 130,505 44,490" stroke="#bdf182" stroke-width="2.4" fill="none" />
-                <path d="M 170,524 Q 140,500 150,486 M 120,508 Q 96,488 108,476" stroke="#bdf182" stroke-width="1.4" fill="none" />
-                <circle cx="155" cy="508" r="3.5" fill="#ffffff" opacity="0.85" />
+                <path d="M 216,540 C 160,545 60,535 40,490 C 80,450 160,490 216,520 Z" fill="url(#leafGradLeft)" stroke="#1b4332" stroke-width="2" />
+                <path d="M 216,536 Q 130,505 44,490" stroke="#d8f3dc" stroke-width="2.6" fill="none" />
+                <path d="M 170,524 Q 140,500 150,486 M 120,508 Q 96,488 108,476" stroke="#d8f3dc" stroke-width="1.6" fill="none" />
+                <circle cx="155" cy="508" r="3.8" fill="#ffffff" opacity="0.9" />
               </g>
             </g>
 
             <g id="rightFoliageGroup">
               <g id="rightFoliageTip">
-                <path d="M 224,540 C 280,545 380,535 400,490 C 360,450 280,490 224,520 Z" fill="url(#leafGradRight)" stroke="#1b5e20" stroke-width="1.8" />
-                <path d="M 224,536 Q 310,505 396,490" stroke="#bdf182" stroke-width="2.4" fill="none" />
-                <path d="M 270,524 Q 300,500 290,486 M 320,508 Q 344,488 332,476" stroke="#bdf182" stroke-width="1.4" fill="none" />
-                <circle cx="310" cy="520" r="3" fill="#ffffff" opacity="0.85" />
+                <path d="M 224,540 C 280,545 380,535 400,490 C 360,450 280,490 224,520 Z" fill="url(#leafGradRight)" stroke="#1b4332" stroke-width="2" />
+                <path d="M 224,536 Q 310,505 396,490" stroke="#d8f3dc" stroke-width="2.6" fill="none" />
+                <path d="M 270,524 Q 300,500 290,486 M 320,508 Q 344,488 332,476" stroke="#d8f3dc" stroke-width="1.6" fill="none" />
+                <circle cx="310" cy="520" r="3.2" fill="#ffffff" opacity="0.9" />
               </g>
             </g>
           </g>
@@ -889,13 +891,13 @@
             <g id="outerPetalsBase"></g>
             <g id="midPetalsBase"></g>
             <g id="innerPetalsBase"></g>
-            <circle cx="220" cy="310" r="34" fill="url(#centerGlow)" stroke="#3e103f" stroke-width="1.5" />
+            <circle cx="220" cy="310" r="34" fill="url(#centerGlow)" stroke="#3e0026" stroke-width="1.6" />
           </g>
 
           <g id="artCenterMoth" transform="translate(178, 305) scale(0.68) rotate(24)">
-            <path d="M 24,20 C 6,4 -2,12 2,30 C 6,42 16,40 24,20 Z" fill="#b08968" stroke="#4a2810" stroke-width="1.5" />
-            <path d="M 24,20 C 42,4 50,12 46,30 C 42,42 32,40 24,20 Z" fill="#b08968" stroke="#4a2810" stroke-width="1.5" />
-            <ellipse cx="24" cy="22" rx="2" ry="8" fill="#3a2010" />
+            <path d="M 24,20 C 6,4 -2,12 2,30 C 6,42 16,40 24,20 Z" fill="#d4a373" stroke="#4a1506" stroke-width="1.5" />
+            <path d="M 24,20 C 42,4 50,12 46,30 C 42,42 32,40 24,20 Z" fill="#d4a373" stroke="#4a1506" stroke-width="1.5" />
+            <ellipse cx="24" cy="22" rx="2" ry="8" fill="#38040e" />
           </g>
 
           <g id="interactiveVectorOverlay"></g>
@@ -918,7 +920,7 @@
 
           <!-- Redesigned Floral Title with Fallback Fonts -->
           <div class="brand-wrap">
-            <span class="brand-sparkle">🌸</span>
+            <span class="brand-sparkle">🌺</span>
             <h1 class="brand-title">miTPetal</h1>
             <span class="brand-sparkle">🌸</span>
           </div>
@@ -943,30 +945,30 @@
         <div class="mood-pills-row" role="radiogroup">
           <button class="mood-pill active" data-mood="happy">
             <svg viewBox="0 0 32 32">
-              <circle cx="16" cy="16" r="4.2" fill="#ffea79" />
-              <circle cx="16" cy="6" r="4.5" fill="#ff3366" />
-              <circle cx="23" cy="9" r="4.5" fill="#ff3366" />
-              <circle cx="26" cy="16" r="4.5" fill="#ff3366" />
-              <circle cx="23" cy="23" r="4.5" fill="#ff3366" />
-              <circle cx="16" cy="26" r="4.5" fill="#ff3366" />
-              <circle cx="9" cy="23" r="4.5" fill="#ff3366" />
-              <circle cx="6" cy="16" r="4.5" fill="#ff3366" />
-              <circle cx="9" cy="9" r="4.5" fill="#ff3366" />
+              <circle cx="16" cy="16" r="4.2" fill="#ffea00" />
+              <circle cx="16" cy="6" r="4.5" fill="#ff0054" />
+              <circle cx="23" cy="9" r="4.5" fill="#ff0054" />
+              <circle cx="26" cy="16" r="4.5" fill="#ff0054" />
+              <circle cx="23" cy="23" r="4.5" fill="#ff0054" />
+              <circle cx="16" cy="26" r="4.5" fill="#ff0054" />
+              <circle cx="9" cy="23" r="4.5" fill="#ff0054" />
+              <circle cx="6" cy="16" r="4.5" fill="#ff0054" />
+              <circle cx="9" cy="9" r="4.5" fill="#ff0054" />
             </svg>
             <span>Happy</span>
           </button>
 
           <button class="mood-pill" data-mood="neutral">
             <svg viewBox="0 0 32 32">
-              <circle cx="16" cy="16" r="4.2" fill="#d47b00" />
-              <circle cx="16" cy="6" r="4.5" fill="#ffd000" />
-              <circle cx="23" cy="9" r="4.5" fill="#ffd000" />
-              <circle cx="26" cy="16" r="4.5" fill="#ffd000" />
-              <circle cx="23" cy="23" r="4.5" fill="#ffd000" />
-              <circle cx="16" cy="26" r="4.5" fill="#ffd000" />
-              <circle cx="9" cy="23" r="4.5" fill="#ffd000" />
-              <circle cx="6" cy="16" r="4.5" fill="#ffd000" />
-              <circle cx="9" cy="9" r="4.5" fill="#ffd000" />
+              <circle cx="16" cy="16" r="4.2" fill="#fb8500" />
+              <circle cx="16" cy="6" r="4.5" fill="#ffb703" />
+              <circle cx="23" cy="9" r="4.5" fill="#ffb703" />
+              <circle cx="26" cy="16" r="4.5" fill="#ffb703" />
+              <circle cx="23" cy="23" r="4.5" fill="#ffb703" />
+              <circle cx="16" cy="26" r="4.5" fill="#ffb703" />
+              <circle cx="9" cy="23" r="4.5" fill="#ffb703" />
+              <circle cx="6" cy="16" r="4.5" fill="#ffb703" />
+              <circle cx="9" cy="9" r="4.5" fill="#ffb703" />
             </svg>
             <span>Neutral</span>
           </button>
@@ -974,14 +976,14 @@
           <button class="mood-pill" data-mood="sadtired">
             <svg viewBox="0 0 32 32">
               <circle cx="16" cy="16" r="4.2" fill="#ffd166" />
-              <circle cx="16" cy="6" r="4.5" fill="#c77dff" />
-              <circle cx="23" cy="9" r="4.5" fill="#c77dff" />
-              <circle cx="26" cy="16" r="4.5" fill="#c77dff" />
-              <circle cx="23" cy="23" r="4.5" fill="#c77dff" />
-              <circle cx="16" cy="26" r="4.5" fill="#c77dff" />
-              <circle cx="9" cy="23" r="4.5" fill="#c77dff" />
-              <circle cx="6" cy="16" r="4.5" fill="#c77dff" />
-              <circle cx="9" cy="9" r="4.5" fill="#c77dff" />
+              <circle cx="16" cy="6" r="4.5" fill="#b5179e" />
+              <circle cx="23" cy="9" r="4.5" fill="#b5179e" />
+              <circle cx="26" cy="16" r="4.5" fill="#b5179e" />
+              <circle cx="23" cy="23" r="4.5" fill="#b5179e" />
+              <circle cx="16" cy="26" r="4.5" fill="#b5179e" />
+              <circle cx="9" cy="23" r="4.5" fill="#b5179e" />
+              <circle cx="6" cy="16" r="4.5" fill="#b5179e" />
+              <circle cx="9" cy="9" r="4.5" fill="#b5179e" />
             </svg>
             <span>Sad/Tired</span>
           </button>
@@ -1037,12 +1039,12 @@
           <h2>Joyful Thoughts 🔔</h2>
           <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseAffirmations">✕</button>
         </div>
-        <div style="background: linear-gradient(135deg, #fff2f6, #fffde6); border-radius: 20px; padding: 18px; margin: 12px 0; border: 1.5px dashed #ff9bb2; text-align: center;">
-          <p id="affirmationQuote" style="font-family: var(--font-serif); font-size:1.3rem; font-style:italic; color:#3b1e32; line-height:1.45;">
+        <div style="background: linear-gradient(135deg, #fff0f5, #fffde6); border-radius: 20px; padding: 18px; margin: 12px 0; border: 1.5px dashed #ff758f; text-align: center;">
+          <p id="affirmationQuote" style="font-family: var(--font-serif); font-size:1.3rem; font-style:italic; color:#3b0d2a; line-height:1.45;">
             "You are blooming with happiness, beauty, and strength every single day!"
           </p>
         </div>
-        <div style="font-size:0.88rem; color:#4a2b3d; margin-bottom:14px; line-height:1.5;">
+        <div style="font-size:0.88rem; color:#4a1e3b; margin-bottom:14px; line-height:1.5;">
           <strong>Sunny Tip:</strong> Color your petal each day and watch your garden blossom into full joy!
         </div>
         <button class="action-btn" id="btnNewAffirmation">✨ Draw Another Thought</button>
@@ -1056,7 +1058,7 @@
           <h2>Manage Petals 📋</h2>
           <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseMenu">✕</button>
         </div>
-        <p style="font-size: 0.86rem; color: #422938; margin-bottom: 12px;">
+        <p style="font-size: 0.86rem; color: #421e35; margin-bottom: 12px;">
           Manage your colored petals. All days are safely preserved on this device.
         </p>
 
@@ -1081,8 +1083,8 @@
           <h2>How to Bloom miTPetal 🌸</h2>
           <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseHelp">✕</button>
         </div>
-        <div style="font-size: 0.88rem; color: #3b2234; line-height: 1.55;">
-          <p>• <strong>1. Pick Your Mood:</strong> Select Happy (Joyful Red), Neutral (Sunny Yellow), or Sad/Tired (Restful Purple).</p><br/>
+        <div style="font-size: 0.88rem; color: #3b0d2a; line-height: 1.55;">
+          <p>• <strong>1. Pick Your Mood:</strong> Select Happy (Joyful Raspberry), Neutral (Sunny Gold), or Sad/Tired (Restful Lilac).</p><br/>
           <p>• <strong>2. Color Your Petal:</strong> Tap today's number on the flower to bloom it with your color.</p><br/>
           <p>• <strong>3. Erase / Edit:</strong> Tap an already colored petal again to reset it, or turn on eraser mode in the menu.</p><br/>
           <p>• <strong>4. Zoom:</strong> Use the left slider (+ / -) to zoom into petals smoothly.</p><br/>
@@ -1098,7 +1100,7 @@
           <h2>Monthly Flower Stats 🌺</h2>
           <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseInsights">✕</button>
         </div>
-        <div id="statsSummaryContent" style="margin: 14px 0; font-size: 0.92rem; color: #3b2234;"></div>
+        <div id="statsSummaryContent" style="margin: 14px 0; font-size: 0.92rem; color: #3b0d2a;"></div>
         <button class="action-btn" id="btnInsightsDone">Close</button>
       </div>
     </div>
@@ -1170,7 +1172,7 @@
     }
 
     /* -----------------------------------------------------------
-       OPTIMIZED BACKGROUND CANVAS
+       OPTIMIZED VIBRANT BACKGROUND CANVAS: Flower Season Meadow
        ----------------------------------------------------------- */
     const mCanvas = document.getElementById('meadowCanvas');
     const mCtx = mCanvas.getContext('2d');
@@ -1178,27 +1180,43 @@
 
     const floatingPetals = [];
     const petalPalette = [
-      'rgba(255, 182, 193, 0.72)',
-      'rgba(255, 223, 105, 0.75)',
-      'rgba(224, 170, 255, 0.70)',
-      'rgba(255, 255, 255, 0.78)',
-      'rgba(255, 154, 162, 0.72)'
+      'rgba(255, 0, 110, 0.82)',
+      'rgba(255, 190, 11, 0.85)',
+      'rgba(131, 56, 236, 0.78)',
+      'rgba(251, 86, 7, 0.82)',
+      'rgba(255, 255, 255, 0.90)',
+      'rgba(58, 134, 255, 0.75)',
+      'rgba(167, 201, 87, 0.82)'
     ];
+
+    let bokehFlowers = [];
 
     function initFloatingPetals() {
       floatingPetals.length = 0;
-      const count = Math.min(45, Math.floor(bgWidth / 18));
+      const count = Math.min(55, Math.floor(bgWidth / 15));
       for (let i = 0; i < count; i++) {
         floatingPetals.push({
           x: Math.random() * bgWidth,
           y: Math.random() * bgHeight,
-          size: Math.random() * 5 + 3,
+          size: Math.random() * 5.5 + 3.5,
           color: petalPalette[Math.floor(Math.random() * petalPalette.length)],
-          speedX: Math.random() * 0.75 + 0.35,
-          speedY: Math.sin(Math.random() * Math.PI) * 0.45 + 0.2,
+          speedX: Math.random() * 0.85 + 0.35,
+          speedY: Math.sin(Math.random() * Math.PI) * 0.5 + 0.22,
           rot: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.035,
+          rotSpeed: (Math.random() - 0.5) * 0.04,
           oscillation: Math.random() * Math.PI * 2
+        });
+      }
+
+      bokehFlowers = [];
+      const bokehCount = Math.floor(bgWidth / 9);
+      for (let i = 0; i < bokehCount; i++) {
+        bokehFlowers.push({
+          x: Math.random() * bgWidth,
+          y: bgHeight * 0.62 + Math.random() * (bgHeight * 0.38),
+          r: Math.random() * 14 + 6,
+          color: petalPalette[Math.floor(Math.random() * petalPalette.length)],
+          alpha: Math.random() * 0.45 + 0.2
         });
       }
     }
@@ -1219,7 +1237,7 @@
         y: y + (Math.random() - 0.5) * 12,
         vx: (Math.random() - 0.5) * 1.0,
         vy: (Math.random() - 0.5) * 1.0 - 0.4,
-        size: Math.random() * 2.5 + 1.2,
+        size: Math.random() * 2.8 + 1.4,
         life: 1.0,
         decay: Math.random() * 0.025 + 0.015
       });
@@ -1228,18 +1246,29 @@
     function renderMeadowScene() {
       mCtx.clearRect(0, 0, bgWidth, bgHeight);
 
-      const sunGradient = mCtx.createRadialGradient(bgWidth * 0.18, bgHeight * 0.15, 25, bgWidth * 0.18, bgHeight * 0.15, bgWidth * 0.9);
-      sunGradient.addColorStop(0, 'rgba(255, 255, 245, 0.92)');
-      sunGradient.addColorStop(0.25, 'rgba(255, 240, 180, 0.45)');
-      sunGradient.addColorStop(0.55, 'rgba(255, 210, 190, 0.14)');
+      const sunGradient = mCtx.createRadialGradient(bgWidth * 0.2, bgHeight * 0.14, 30, bgWidth * 0.2, bgHeight * 0.14, bgWidth * 0.95);
+      sunGradient.addColorStop(0, 'rgba(255, 255, 245, 0.94)');
+      sunGradient.addColorStop(0.24, 'rgba(255, 235, 150, 0.48)');
+      sunGradient.addColorStop(0.55, 'rgba(255, 180, 210, 0.18)');
       sunGradient.addColorStop(1, 'transparent');
       mCtx.fillStyle = sunGradient;
       mCtx.fillRect(0, 0, bgWidth, bgHeight);
 
+      for (let i = 0; i < bokehFlowers.length; i++) {
+        const b = bokehFlowers[i];
+        mCtx.save();
+        mCtx.beginPath();
+        mCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        mCtx.fillStyle = b.color;
+        mCtx.globalAlpha = b.alpha;
+        mCtx.fill();
+        mCtx.restore();
+      }
+
       for (let i = 0; i < floatingPetals.length; i++) {
         const p = floatingPetals[i];
         p.x += p.speedX;
-        p.y += p.speedY + Math.sin(p.oscillation) * 0.25;
+        p.y += p.speedY + Math.sin(p.oscillation) * 0.28;
         p.rot += p.rotSpeed;
         p.oscillation += 0.02;
 
@@ -1269,7 +1298,7 @@
 
         mCtx.beginPath();
         mCtx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
-        mCtx.fillStyle = `rgba(255, 223, 77, ${s.life})`;
+        mCtx.fillStyle = `rgba(255, 230, 80, ${s.life})`;
         mCtx.fill();
       }
 
@@ -1326,8 +1355,8 @@
           const basePetal = document.createElementNS('http://www.w3.org/2000/svg', 'path');
           basePetal.setAttribute('d', createPetalPath(ring.w, ring.h));
           basePetal.setAttribute('fill', ring.baseFill);
-          basePetal.setAttribute('stroke', '#a25997');
-          basePetal.setAttribute('stroke-width', '0.9');
+          basePetal.setAttribute('stroke', '#7209b7');
+          basePetal.setAttribute('stroke-width', '1.1');
           basePetal.setAttribute('transform', `translate(${px}, ${py}) rotate(${deg})`);
           ring.container.appendChild(basePetal);
 
