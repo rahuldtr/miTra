@@ -2,27 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>miTmood — Spring Garden Mood Tracker</title>
-
-  <!-- Typography matching the reference artwork -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>miTPetal — Joyful Spring Garden</title>
 
   <style>
     :root {
-      --color-happy: rgba(230, 48, 75, 0.82);
-      --color-happy-stroke: #d90429;
-      --color-neutral: rgba(255, 195, 0, 0.85);
-      --color-neutral-stroke: #f39c12;
-      --color-sadtired: rgba(181, 71, 230, 0.82);
-      --color-sadtired-stroke: #7209b7;
-      
-      --glass-bg: rgba(255, 255, 255, 0.32);
-      --glass-border: rgba(255, 255, 255, 0.72);
-      --glass-shadow: 0 8px 32px 0 rgba(40, 20, 30, 0.18);
-      --glass-bevel: inset 0 1.5px 2px rgba(255, 255, 255, 0.85), inset 0 -1.5px 2px rgba(0, 0, 0, 0.06);
+      /* Joyful, vibrant happiness palette */
+      --color-happy: rgba(255, 75, 110, 0.88);
+      --color-happy-stroke: #ff124f;
+      --color-neutral: rgba(255, 209, 50, 0.90);
+      --color-neutral-stroke: #ff9e00;
+      --color-sadtired: rgba(199, 125, 255, 0.88);
+      --color-sadtired-stroke: #9d4edd;
+
+      /* Sunny, crystal glassmorphism */
+      --glass-bg: rgba(255, 255, 255, 0.28);
+      --glass-border: rgba(255, 255, 255, 0.85);
+      --glass-shadow: 0 10px 32px 0 rgba(220, 80, 140, 0.16);
+      --glass-bevel: inset 0 2px 3px rgba(255, 255, 255, 0.9), inset 0 -1.5px 2px rgba(255, 200, 220, 0.35);
+
+      /* Universal native offline font stacks */
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-serif: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Baskerville", "Times New Roman", serif;
+      --font-script: "Snell Roundhand", "Brush Script MT", "Caveat", "Segoe Script", "Dancing Script", cursive, serif;
     }
 
     * {
@@ -37,27 +39,44 @@
     html, body {
       width: 100%;
       height: 100%;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
       overflow: hidden;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #231612;
+      font-family: var(--font-body);
+      background: #1d0f19;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
+    /* Screen Viewport */
     #app-viewport {
       position: relative;
-      width: 100%;
-      max-width: 480px;
-      height: 100%;
-      max-height: 980px;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 1250px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 0 80px rgba(0, 0, 0, 0.5);
     }
 
+    @media (min-width: 900px) {
+      body {
+        padding: 24px;
+        background: radial-gradient(circle at center, #2e1627 0%, #11080f 100%);
+      }
+      #app-viewport {
+        height: 94vh;
+        max-height: 950px;
+        border-radius: 38px;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+      }
+    }
+
+    /* Radiant Sunny Daylight Meadow Backdrop */
     .scenery-background {
       position: absolute;
       inset: 0;
@@ -66,10 +85,9 @@
       z-index: 1;
       pointer-events: none;
       background: 
-        radial-gradient(circle at 18% 18%, rgba(255, 255, 235, 0.98) 0%, rgba(255, 232, 162, 0.6) 24%, rgba(255, 195, 170, 0.32) 50%, transparent 72%),
-        linear-gradient(180deg, #97c8ed 0%, #ffcfc4 30%, #fde49e 56%, #89be57 82%, #3c6523 100%);
+        radial-gradient(circle at 22% 16%, rgba(255, 255, 240, 1) 0%, rgba(255, 242, 175, 0.75) 28%, rgba(255, 200, 220, 0.4) 52%, transparent 75%),
+        linear-gradient(180deg, #a0d8ef 0%, #ffe3dc 32%, #fff0b8 58%, #9fd868 84%, #4c8a2b 100%);
       background-size: cover;
-      background-position: center;
     }
 
     #meadowCanvas {
@@ -81,6 +99,7 @@
       pointer-events: none;
     }
 
+    /* Transparent, Floating Overlay */
     .ui-overlay {
       position: relative;
       z-index: 40;
@@ -89,7 +108,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 16px 16px 14px;
+      padding: clamp(12px, 2.4vh, 22px) clamp(16px, 4vw, 36px);
       pointer-events: none;
     }
 
@@ -97,18 +116,19 @@
       pointer-events: auto;
     }
 
+    /* Glass Controls */
     .glass-btn {
       background: var(--glass-bg);
-      border: 1.2px solid var(--glass-border);
+      border: 1.4px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-bevel);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: 14px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 16px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: #3b2234;
+      color: #3f1d35;
       touch-action: manipulation;
       transition: transform 0.12s ease, background 0.2s;
     }
@@ -118,15 +138,15 @@
     }
 
     .glass-icon-box {
-      width: 44px;
-      height: 44px;
+      width: clamp(42px, 4.8vw, 48px);
+      height: clamp(42px, 4.8vw, 48px);
     }
 
     .glass-icon-box svg {
       width: 22px;
       height: 22px;
-      stroke: #3c2436;
-      stroke-width: 2.2;
+      stroke: #3f1d35;
+      stroke-width: 2.3;
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;
@@ -139,75 +159,98 @@
       justify-content: space-between;
     }
 
+    /* Happiness Flower Redesigned Brand Header */
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
     .brand-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.7rem;
+      font-family: var(--font-script);
+      font-size: clamp(2.4rem, 5.5vw, 3.6rem);
       font-weight: 700;
-      letter-spacing: -0.5px;
-      background: linear-gradient(180deg, #ffffff 15%, #ffd4e5 65%, #ffd1b3 100%);
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      background: linear-gradient(180deg, #ffffff 0%, #fff2f6 40%, #ffd0e3 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 2px 14px rgba(135, 45, 80, 0.45));
+      filter: drop-shadow(0 2px 14px rgba(255, 75, 110, 0.5))
+              drop-shadow(0 0 25px rgba(255, 255, 255, 0.8));
+      line-height: 1;
+      padding: 0 4px;
+    }
+
+    .brand-sparkle {
+      font-size: 1.25rem;
+      animation: floralShimmer 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floralShimmer {
+      0% { transform: scale(0.85) rotate(-10deg); filter: drop-shadow(0 0 2px #fff); }
+      100% { transform: scale(1.15) rotate(10deg); filter: drop-shadow(0 0 8px #ff70a6); }
     }
 
     .header-actions {
       display: flex;
-      gap: 10px;
+      gap: clamp(8px, 1.5vw, 14px);
     }
 
+    /* Joyful Mood Pills */
     .mood-pills-row {
       display: flex;
-      gap: 10px;
+      justify-content: center;
+      gap: clamp(8px, 2vw, 16px);
       width: 100%;
-      margin-top: 10px;
+      max-width: 500px;
+      margin: 8px auto 0;
     }
 
     .mood-pill {
       flex: 1;
-      height: 44px;
-      border-radius: 22px;
+      height: clamp(38px, 4.4vh, 46px);
+      border-radius: 24px;
       background: var(--glass-bg);
-      border: 1.2px solid var(--glass-border);
+      border: 1.4px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-bevel);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 7px;
       cursor: pointer;
       touch-action: manipulation;
-      font-family: 'Cormorant Garamond', serif;
+      font-family: var(--font-serif);
       font-style: italic;
       font-weight: 700;
-      font-size: 1.15rem;
-      color: #3b2234;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: #3b1d31;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .mood-pill svg {
-      width: 20px;
-      height: 20px;
-      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+      width: clamp(18px, 2.2vw, 22px);
+      height: clamp(18px, 2.2vw, 22px);
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.18));
     }
 
     .mood-pill.active {
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.95);
       border-color: #ffffff;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(255, 255, 255, 0.6), var(--glass-bevel);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 24px rgba(255, 107, 138, 0.45), var(--glass-bevel);
     }
 
-    .mood-pill[data-mood="happy"].active { color: #b7094c; }
-    .mood-pill[data-mood="neutral"].active { color: #d47b00; }
-    .mood-pill[data-mood="sadtired"].active { color: #6a0dad; }
+    .mood-pill[data-mood="happy"].active { color: #d90429; }
+    .mood-pill[data-mood="neutral"].active { color: #e85d04; }
+    .mood-pill[data-mood="sadtired"].active { color: #7209b7; }
 
+    /* Centered, Zoomed Bloom Stage */
     .flower-stage {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       z-index: 10;
       display: flex;
       align-items: center;
@@ -222,17 +265,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.15s ease-out;
-      transform-origin: center center;
+      transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: center 46%;
     }
 
     .flower-svg {
       width: 100%;
       height: 100%;
-      max-width: 440px;
-      max-height: 720px;
+      max-width: min(92vw, 580px);
+      max-height: min(80vh, 800px);
       overflow: visible;
       pointer-events: auto;
+      filter: drop-shadow(0 14px 28px rgba(80, 20, 50, 0.22));
     }
 
     #stemSwayGroup {
@@ -262,33 +306,33 @@
 
     @keyframes stemWindBreeze {
       0% { transform: rotate(0deg); }
-      35% { transform: rotate(0.8deg) translateX(1px); }
-      70% { transform: rotate(-0.6deg) translateX(-1px); }
-      100% { transform: rotate(0.5deg); }
+      35% { transform: rotate(0.7deg) translateX(1px); }
+      70% { transform: rotate(-0.5deg) translateX(-1px); }
+      100% { transform: rotate(0.4deg); }
     }
 
     @keyframes leftLeafBreeze {
       0% { transform: rotate(0deg) skewX(0deg); }
-      50% { transform: rotate(-3.8deg) translateY(1px) skewX(-1.5deg); }
-      100% { transform: rotate(1.4deg) translateY(-0.8px) skewX(1deg); }
+      50% { transform: rotate(-3.5deg) translateY(1px) skewX(-1.5deg); }
+      100% { transform: rotate(1.2deg) translateY(-0.8px) skewX(1deg); }
     }
 
     @keyframes leafFlutterLeft {
       0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(2.4deg) scale(0.99, 1.01); }
-      100% { transform: rotate(-2.8deg) scale(1.01, 0.99); }
+      50% { transform: rotate(2.2deg) scale(0.99, 1.01); }
+      100% { transform: rotate(-2.5deg) scale(1.01, 0.99); }
     }
 
     @keyframes rightLeafBreeze {
       0% { transform: rotate(0deg) skewX(0deg); }
-      50% { transform: rotate(3.6deg) translateY(1.2px) skewX(1.6deg); }
-      100% { transform: rotate(-1.4deg) translateY(-1px) skewX(-1deg); }
+      50% { transform: rotate(3.4deg) translateY(1.2px) skewX(1.6deg); }
+      100% { transform: rotate(-1.2deg) translateY(-1px) skewX(-1deg); }
     }
 
     @keyframes leafFlutterRight {
       0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(-2.4deg) scale(0.99, 1.01); }
-      100% { transform: rotate(2.8deg) scale(1.01, 0.99); }
+      50% { transform: rotate(-2.2deg) scale(0.99, 1.01); }
+      100% { transform: rotate(2.5deg) scale(1.01, 0.99); }
     }
 
     .creatures-flight-stage {
@@ -301,15 +345,15 @@
 
     .flying-creature {
       position: absolute;
-      width: 70px;
-      height: 70px;
+      width: clamp(56px, 6.5vw, 76px);
+      height: clamp(56px, 6.5vw, 76px);
       pointer-events: auto;
       cursor: pointer;
       touch-action: manipulation;
       transform-style: preserve-3d;
       perspective: 800px;
       transition: transform 0.12s linear;
-      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.24));
     }
 
     .creature-body-svg {
@@ -361,14 +405,14 @@
 
     .sparkling-bee {
       position: absolute;
-      width: 38px;
-      height: 32px;
+      width: clamp(32px, 3.8vw, 42px);
+      height: clamp(28px, 3.4vw, 36px);
       pointer-events: auto;
       cursor: pointer;
       touch-action: manipulation;
       z-index: 35;
       transform-style: preserve-3d;
-      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.9));
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.95));
       transition: transform 0.1s linear;
     }
 
@@ -386,12 +430,11 @@
       100% { transform: scale(1.3); opacity: 1; }
     }
 
-    /* Zero-lag vector hit areas */
     .petal-vector {
       cursor: pointer;
       touch-action: manipulation;
       fill: rgba(255, 255, 255, 0.01);
-      stroke: rgba(255, 255, 255, 0.45);
+      stroke: rgba(255, 255, 255, 0.48);
       stroke-width: 1.2;
       transition: stroke 0.15s, stroke-width 0.15s;
     }
@@ -399,6 +442,7 @@
     .petal-vector:hover {
       stroke: #ffffff;
       stroke-width: 2.2;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.85));
     }
 
     .petal-vector.colored-happy {
@@ -420,14 +464,14 @@
     }
 
     .petal-number {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: var(--font-serif);
       font-size: 15px;
       font-weight: 700;
       text-anchor: middle;
       dominant-baseline: central;
       pointer-events: none;
-      fill: #3b2234;
-      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
+      fill: #3e1b34;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95);
     }
 
     .petal-number.on-colored {
@@ -435,16 +479,17 @@
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
     }
 
+    /* Slim Glass Zoom Slider */
     .left-zoom-slider {
       position: absolute;
-      left: 16px;
+      left: clamp(10px, 2.5vw, 24px);
       top: 50%;
       transform: translateY(-50%);
-      width: 42px;
-      height: 220px;
+      width: clamp(34px, 3.8vw, 42px);
+      height: clamp(170px, 26vh, 230px);
       border-radius: 22px;
       background: var(--glass-bg);
-      border: 1.2px solid var(--glass-border);
+      border: 1.4px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-bevel);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -452,18 +497,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 4px;
+      padding: 8px 3px;
       z-index: 45;
       pointer-events: auto;
     }
 
     .zoom-btn {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border: none;
       background: transparent;
       color: #ffffff;
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 700;
       cursor: pointer;
       touch-action: manipulation;
@@ -486,10 +531,10 @@
     .zoom-thumb {
       position: absolute;
       width: 14px;
-      height: 28px;
-      border-radius: 9px;
+      height: 26px;
+      border-radius: 8px;
       background: #ffffff;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
@@ -507,71 +552,73 @@
 
     .bottom-row {
       width: 100%;
+      max-width: 540px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: clamp(8px, 2vw, 16px);
       margin-bottom: 2px;
     }
 
     .month-pill {
       flex: 1;
-      height: 52px;
+      height: clamp(44px, 5vh, 52px);
       border-radius: 26px;
       background: var(--glass-bg);
-      border: 1.2px solid var(--glass-border);
+      border: 1.4px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-bevel);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 14px;
+      padding: 0 clamp(10px, 2vw, 18px);
     }
 
     .month-name {
-      font-family: 'Great Vibes', cursive;
-      font-size: 2.4rem;
+      font-family: var(--font-script);
+      font-size: clamp(2rem, 3.8vw, 2.6rem);
+      font-weight: 700;
       color: #ffffff;
-      text-shadow: 0 2px 10px rgba(55, 20, 40, 0.6);
-      margin-top: -6px;
+      text-shadow: 0 2px 10px rgba(70, 20, 45, 0.6);
+      margin-top: -4px;
     }
 
     .month-nav-btn {
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.48);
+      border: 1px solid rgba(255, 255, 255, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       touch-action: manipulation;
       color: #3b2234;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       transition: transform 0.2s, background 0.2s;
     }
 
     .month-nav-btn:hover {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       transform: scale(1.12);
     }
 
     .creator-credit {
-      font-size: 0.76rem;
+      font-size: clamp(0.72rem, 1.4vw, 0.8rem);
       font-weight: 700;
       letter-spacing: 0.4px;
-      color: rgba(255, 245, 250, 0.94);
+      color: rgba(255, 245, 250, 0.95);
       text-align: center;
       margin-top: 5px;
-      text-shadow: 0 1px 4px rgba(40, 15, 25, 0.8);
+      text-shadow: 0 1px 4px rgba(60, 20, 40, 0.7);
     }
 
     .glass-modal {
       position: fixed;
       inset: 0;
-      background: rgba(20, 12, 18, 0.52);
+      background: rgba(20, 10, 18, 0.52);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       display: flex;
@@ -591,8 +638,8 @@
 
     .modal-card {
       width: 100%;
-      max-width: 380px;
-      background: rgba(255, 255, 255, 0.94);
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.95);
       border: 1.5px solid #ffffff;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
       border-radius: 28px;
@@ -614,7 +661,7 @@
     }
 
     .modal-head h2 {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: var(--font-serif);
       font-size: 1.6rem;
       font-weight: 700;
       color: #2b1424;
@@ -650,25 +697,27 @@
 
     .toast-pill {
       position: absolute;
-      top: 84px;
+      top: clamp(75px, 9vh, 90px);
+      left: 50%;
+      transform: translate(-50%, -8px);
       background: rgba(255, 255, 255, 0.94);
       border: 1.2px solid #ffffff;
       box-shadow: 0 8px 24px rgba(40, 15, 30, 0.2);
-      padding: 7px 18px;
+      padding: 7px 20px;
       border-radius: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       color: #3b2234;
       pointer-events: none;
       opacity: 0;
-      transform: translateY(-8px);
+      white-space: nowrap;
       transition: all 0.2s ease;
       z-index: 120;
     }
 
     .toast-pill.visible {
       opacity: 1;
-      transform: translateY(0);
+      transform: translate(-50%, 0);
     }
   </style>
 </head>
@@ -683,18 +732,18 @@
     <div class="creatures-flight-stage" id="creaturesStage">
       
       <!-- 1. Monarch Butterfly -->
-      <div class="flying-creature perched" id="creatureMonarch" title="Tap to startle!">
+      <div class="flying-creature perched" id="creatureMonarch">
         <svg class="creature-body-svg" viewBox="0 0 80 80">
           <g class="wing-3d-left" style="transform-origin: 38px 40px;">
-            <path d="M 38,40 C 14,8 -10,22 -4,46 C 2,60 22,62 38,40 Z" fill="#f36900" stroke="#111" stroke-width="2" />
-            <path d="M 38,42 C 12,46 6,66 20,78 C 32,82 38,58 38,42 Z" fill="#d95400" stroke="#111" stroke-width="2" />
+            <path d="M 38,40 C 14,8 -10,22 -4,46 C 2,60 22,62 38,40 Z" fill="#ff7014" stroke="#111" stroke-width="2" />
+            <path d="M 38,42 C 12,46 6,66 20,78 C 32,82 38,58 38,42 Z" fill="#e65100" stroke="#111" stroke-width="2" />
             <circle cx="6" cy="30" r="2.2" fill="#fff" />
             <circle cx="16" cy="22" r="1.8" fill="#fff" />
             <circle cx="18" cy="68" r="1.8" fill="#fff" />
           </g>
           <g class="wing-3d-right" style="transform-origin: 42px 40px;">
-            <path d="M 42,40 C 66,8 90,22 84,46 C 78,60 58,62 42,40 Z" fill="#f36900" stroke="#111" stroke-width="2" />
-            <path d="M 42,42 C 68,46 74,66 60,78 C 48,82 42,58 42,42 Z" fill="#d95400" stroke="#111" stroke-width="2" />
+            <path d="M 42,40 C 66,8 90,22 84,46 C 78,60 58,62 42,40 Z" fill="#ff7014" stroke="#111" stroke-width="2" />
+            <path d="M 42,42 C 68,46 74,66 60,78 C 48,82 42,58 42,42 Z" fill="#e65100" stroke="#111" stroke-width="2" />
             <circle cx="74" cy="30" r="2.2" fill="#fff" />
             <circle cx="64" cy="22" r="1.8" fill="#fff" />
             <circle cx="62" cy="68" r="1.8" fill="#fff" />
@@ -706,16 +755,16 @@
       </div>
 
       <!-- 2. Luna Moth -->
-      <div class="flying-creature perched" id="creatureLuna" title="Tap to startle!">
+      <div class="flying-creature perched" id="creatureLuna">
         <svg class="creature-body-svg" viewBox="0 0 80 80">
           <g class="wing-3d-left" style="transform-origin: 38px 40px;">
-            <path d="M 38,38 C 16,10 -2,22 4,50 C 12,70 30,62 38,38 Z" fill="#90e0a6" stroke="#256e3b" stroke-width="2" />
-            <path d="M 38,40 C 16,48 10,70 24,84 C 34,90 38,62 38,40 Z" fill="#75cb8f" stroke="#256e3b" stroke-width="2" />
+            <path d="M 38,38 C 16,10 -2,22 4,50 C 12,70 30,62 38,38 Z" fill="#a0e8b4" stroke="#256e3b" stroke-width="2" />
+            <path d="M 38,40 C 16,48 10,70 24,84 C 34,90 38,62 38,40 Z" fill="#80d898" stroke="#256e3b" stroke-width="2" />
             <circle cx="20" cy="36" r="3.2" fill="#ffd166" stroke="#256e3b" stroke-width="1.2" />
           </g>
           <g class="wing-3d-right" style="transform-origin: 42px 40px;">
-            <path d="M 42,38 C 64,10 82,22 76,50 C 68,70 50,62 42,38 Z" fill="#90e0a6" stroke="#256e3b" stroke-width="2" />
-            <path d="M 42,40 C 64,48 70,70 56,84 C 46,90 42,62 42,40 Z" fill="#75cb8f" stroke="#256e3b" stroke-width="2" />
+            <path d="M 42,38 C 64,10 82,22 76,50 C 68,70 50,62 42,38 Z" fill="#a0e8b4" stroke="#256e3b" stroke-width="2" />
+            <path d="M 42,40 C 64,48 70,70 56,84 C 46,90 42,62 42,40 Z" fill="#80d898" stroke="#256e3b" stroke-width="2" />
             <circle cx="60" cy="36" r="3.2" fill="#ffd166" stroke="#256e3b" stroke-width="1.2" />
           </g>
           <ellipse cx="40" cy="40" rx="3.5" ry="14" fill="#1b4332" />
@@ -724,17 +773,17 @@
       </div>
 
       <!-- 3. Polyphemus Silk Moth -->
-      <div class="flying-creature perched" id="creatureSilk" title="Tap to startle!">
+      <div class="flying-creature perched" id="creatureSilk">
         <svg class="creature-body-svg" viewBox="0 0 80 80">
           <g class="wing-3d-left" style="transform-origin: 38px 40px;">
-            <path d="M 38,38 C 10,12 -6,22 0,52 C 6,70 26,66 38,38 Z" fill="#c68b59" stroke="#4a2810" stroke-width="2" />
-            <path d="M 38,40 C 14,46 8,68 20,80 C 30,86 36,62 38,40 Z" fill="#a4683a" stroke="#4a2810" stroke-width="2" />
+            <path d="M 38,38 C 10,12 -6,22 0,52 C 6,70 26,66 38,38 Z" fill="#d29662" stroke="#4a2810" stroke-width="2" />
+            <path d="M 38,40 C 14,46 8,68 20,80 C 30,86 36,62 38,40 Z" fill="#b47442" stroke="#4a2810" stroke-width="2" />
             <circle cx="18" cy="44" r="4.2" fill="#3a5a40" stroke="#111" stroke-width="1.4" />
             <circle cx="18" cy="44" r="1.8" fill="#fff" />
           </g>
           <g class="wing-3d-right" style="transform-origin: 42px 40px;">
-            <path d="M 42,38 C 70,12 86,22 80,52 C 74,70 54,66 42,38 Z" fill="#c68b59" stroke="#4a2810" stroke-width="2" />
-            <path d="M 42,40 C 66,46 72,68 60,80 C 50,86 44,62 42,40 Z" fill="#a4683a" stroke="#4a2810" stroke-width="2" />
+            <path d="M 42,38 C 70,12 86,22 80,52 C 74,70 54,66 42,38 Z" fill="#d29662" stroke="#4a2810" stroke-width="2" />
+            <path d="M 42,40 C 66,46 72,68 60,80 C 50,86 44,62 42,40 Z" fill="#b47442" stroke="#4a2810" stroke-width="2" />
             <circle cx="62" cy="44" r="4.2" fill="#3a5a40" stroke="#111" stroke-width="1.4" />
             <circle cx="62" cy="44" r="1.8" fill="#fff" />
           </g>
@@ -743,12 +792,12 @@
         </svg>
       </div>
 
-      <!-- 4. Sparkling Honey Bee -->
+      <!-- 4. Sparkling Golden Bee -->
       <div class="sparkling-bee" id="sparklingBee">
         <div class="bee-glow-halo"></div>
         <svg viewBox="0 0 38 32" width="100%" height="100%">
-          <ellipse cx="15" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.8)" transform="rotate(-28 15 8)"/>
-          <ellipse cx="23" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.8)" transform="rotate(28 23 8)"/>
+          <ellipse cx="15" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.85)" transform="rotate(-28 15 8)"/>
+          <ellipse cx="23" cy="8" rx="8" ry="4.5" fill="rgba(255,255,255,0.85)" transform="rotate(28 23 8)"/>
           <ellipse cx="19" cy="18" rx="12" ry="8" fill="#ffb703"/>
           <path d="M 13,11 L 13,25 M 19,10 L 19,26 M 25,11 L 25,25" stroke="#221e1b" stroke-width="2.2"/>
           <circle cx="9" cy="18" r="3" fill="#221e1b"/>
@@ -758,20 +807,20 @@
 
     </div>
 
-    <!-- Flower & Vector Overlay Stage -->
+    <!-- Centered & Pre-Zoomed Dahlia Flower Stage -->
     <div class="flower-stage">
       <div class="flower-scaler-wrapper" id="flowerScaler">
         
         <svg class="flower-svg" viewBox="0 0 440 700" preserveAspectRatio="xMidYMid meet">
           <defs>
             <filter id="petalShadow" x="-10%" y="-10%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.25" />
+              <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-opacity="0.22" />
             </filter>
 
             <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#fff59d" />
+              <stop offset="0%" stop-color="#fff8b5" />
               <stop offset="35%" stop-color="#ffb74d" />
-              <stop offset="70%" stop-color="#d81b60" />
+              <stop offset="70%" stop-color="#e91e63" />
               <stop offset="100%" stop-color="#4a148c" />
             </radialGradient>
 
@@ -783,33 +832,33 @@
             </linearGradient>
 
             <linearGradient id="leafGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#7cb342" />
+              <stop offset="0%" stop-color="#84cc3b" />
               <stop offset="60%" stop-color="#558b2f" />
               <stop offset="100%" stop-color="#2e7d32" />
             </linearGradient>
 
             <linearGradient id="leafGradRight" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#7cb342" />
+              <stop offset="0%" stop-color="#84cc3b" />
               <stop offset="60%" stop-color="#558b2f" />
               <stop offset="100%" stop-color="#2e7d32" />
             </linearGradient>
 
             <linearGradient id="bgOuterPetal" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#f3d1f4" />
-              <stop offset="60%" stop-color="#d19cdb" />
-              <stop offset="100%" stop-color="#af7ac5" />
+              <stop offset="0%" stop-color="#fce2f9" />
+              <stop offset="60%" stop-color="#d6a9df" />
+              <stop offset="100%" stop-color="#b683cb" />
             </linearGradient>
 
             <linearGradient id="bgMidPetal" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#ffe0ec" />
-              <stop offset="60%" stop-color="#f8a5c2" />
-              <stop offset="100%" stop-color="#ea779a" />
+              <stop offset="0%" stop-color="#ffe5f0" />
+              <stop offset="60%" stop-color="#fcaec5" />
+              <stop offset="100%" stop-color="#f282a5" />
             </linearGradient>
 
             <linearGradient id="bgInnerPetal" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#fff8db" />
-              <stop offset="55%" stop-color="#f6d365" />
-              <stop offset="100%" stop-color="#fda085" />
+              <stop offset="0%" stop-color="#fffce8" />
+              <stop offset="55%" stop-color="#fde076" />
+              <stop offset="100%" stop-color="#fca88d" />
             </linearGradient>
           </defs>
 
@@ -820,8 +869,8 @@
             <g id="leftFoliageGroup">
               <g id="leftFoliageTip">
                 <path d="M 216,540 C 160,545 60,535 40,490 C 80,450 160,490 216,520 Z" fill="url(#leafGradLeft)" stroke="#1b5e20" stroke-width="1.8" />
-                <path d="M 216,536 Q 130,505 44,490" stroke="#aed581" stroke-width="2.4" fill="none" />
-                <path d="M 170,524 Q 140,500 150,486 M 120,508 Q 96,488 108,476" stroke="#aed581" stroke-width="1.4" fill="none" />
+                <path d="M 216,536 Q 130,505 44,490" stroke="#bdf182" stroke-width="2.4" fill="none" />
+                <path d="M 170,524 Q 140,500 150,486 M 120,508 Q 96,488 108,476" stroke="#bdf182" stroke-width="1.4" fill="none" />
                 <circle cx="155" cy="508" r="3.5" fill="#ffffff" opacity="0.85" />
               </g>
             </g>
@@ -829,8 +878,8 @@
             <g id="rightFoliageGroup">
               <g id="rightFoliageTip">
                 <path d="M 224,540 C 280,545 380,535 400,490 C 360,450 280,490 224,520 Z" fill="url(#leafGradRight)" stroke="#1b5e20" stroke-width="1.8" />
-                <path d="M 224,536 Q 310,505 396,490" stroke="#aed581" stroke-width="2.4" fill="none" />
-                <path d="M 270,524 Q 300,500 290,486 M 320,508 Q 344,488 332,476" stroke="#aed581" stroke-width="1.4" fill="none" />
+                <path d="M 224,536 Q 310,505 396,490" stroke="#bdf182" stroke-width="2.4" fill="none" />
+                <path d="M 270,524 Q 300,500 290,486 M 320,508 Q 344,488 332,476" stroke="#bdf182" stroke-width="1.4" fill="none" />
                 <circle cx="310" cy="520" r="3" fill="#ffffff" opacity="0.85" />
               </g>
             </g>
@@ -849,7 +898,6 @@
             <ellipse cx="24" cy="22" rx="2" ry="8" fill="#3a2010" />
           </g>
 
-          <!-- Interactive Vector Layer -->
           <g id="interactiveVectorOverlay"></g>
         </svg>
 
@@ -868,7 +916,12 @@
             </svg>
           </button>
 
-          <h1 class="brand-title">miTmood</h1>
+          <!-- Redesigned Floral Title with Fallback Fonts -->
+          <div class="brand-wrap">
+            <span class="brand-sparkle">🌸</span>
+            <h1 class="brand-title">miTPetal</h1>
+            <span class="brand-sparkle">🌸</span>
+          </div>
 
           <div class="header-actions">
             <button class="glass-btn glass-icon-box" id="btnBell" aria-label="Notifications & Affirmations">
@@ -891,14 +944,14 @@
           <button class="mood-pill active" data-mood="happy">
             <svg viewBox="0 0 32 32">
               <circle cx="16" cy="16" r="4.2" fill="#ffea79" />
-              <circle cx="16" cy="6" r="4.5" fill="#ff4d6d" />
-              <circle cx="23" cy="9" r="4.5" fill="#ff4d6d" />
-              <circle cx="26" cy="16" r="4.5" fill="#ff4d6d" />
-              <circle cx="23" cy="23" r="4.5" fill="#ff4d6d" />
-              <circle cx="16" cy="26" r="4.5" fill="#ff4d6d" />
-              <circle cx="9" cy="23" r="4.5" fill="#ff4d6d" />
-              <circle cx="6" cy="16" r="4.5" fill="#ff4d6d" />
-              <circle cx="9" cy="9" r="4.5" fill="#ff4d6d" />
+              <circle cx="16" cy="6" r="4.5" fill="#ff3366" />
+              <circle cx="23" cy="9" r="4.5" fill="#ff3366" />
+              <circle cx="26" cy="16" r="4.5" fill="#ff3366" />
+              <circle cx="23" cy="23" r="4.5" fill="#ff3366" />
+              <circle cx="16" cy="26" r="4.5" fill="#ff3366" />
+              <circle cx="9" cy="23" r="4.5" fill="#ff3366" />
+              <circle cx="6" cy="16" r="4.5" fill="#ff3366" />
+              <circle cx="9" cy="9" r="4.5" fill="#ff3366" />
             </svg>
             <span>Happy</span>
           </button>
@@ -906,14 +959,14 @@
           <button class="mood-pill" data-mood="neutral">
             <svg viewBox="0 0 32 32">
               <circle cx="16" cy="16" r="4.2" fill="#d47b00" />
-              <circle cx="16" cy="6" r="4.5" fill="#ffe066" />
-              <circle cx="23" cy="9" r="4.5" fill="#ffe066" />
-              <circle cx="26" cy="16" r="4.5" fill="#ffe066" />
-              <circle cx="23" cy="23" r="4.5" fill="#ffe066" />
-              <circle cx="16" cy="26" r="4.5" fill="#ffe066" />
-              <circle cx="9" cy="23" r="4.5" fill="#ffe066" />
-              <circle cx="6" cy="16" r="4.5" fill="#ffe066" />
-              <circle cx="9" cy="9" r="4.5" fill="#ffe066" />
+              <circle cx="16" cy="6" r="4.5" fill="#ffd000" />
+              <circle cx="23" cy="9" r="4.5" fill="#ffd000" />
+              <circle cx="26" cy="16" r="4.5" fill="#ffd000" />
+              <circle cx="23" cy="23" r="4.5" fill="#ffd000" />
+              <circle cx="16" cy="26" r="4.5" fill="#ffd000" />
+              <circle cx="9" cy="23" r="4.5" fill="#ffd000" />
+              <circle cx="6" cy="16" r="4.5" fill="#ffd000" />
+              <circle cx="9" cy="9" r="4.5" fill="#ffd000" />
             </svg>
             <span>Neutral</span>
           </button>
@@ -921,14 +974,14 @@
           <button class="mood-pill" data-mood="sadtired">
             <svg viewBox="0 0 32 32">
               <circle cx="16" cy="16" r="4.2" fill="#ffd166" />
-              <circle cx="16" cy="6" r="4.5" fill="#d070fb" />
-              <circle cx="23" cy="9" r="4.5" fill="#d070fb" />
-              <circle cx="26" cy="16" r="4.5" fill="#d070fb" />
-              <circle cx="23" cy="23" r="4.5" fill="#d070fb" />
-              <circle cx="16" cy="26" r="4.5" fill="#d070fb" />
-              <circle cx="9" cy="23" r="4.5" fill="#d070fb" />
-              <circle cx="6" cy="16" r="4.5" fill="#d070fb" />
-              <circle cx="9" cy="9" r="4.5" fill="#d070fb" />
+              <circle cx="16" cy="6" r="4.5" fill="#c77dff" />
+              <circle cx="23" cy="9" r="4.5" fill="#c77dff" />
+              <circle cx="26" cy="16" r="4.5" fill="#c77dff" />
+              <circle cx="23" cy="23" r="4.5" fill="#c77dff" />
+              <circle cx="16" cy="26" r="4.5" fill="#c77dff" />
+              <circle cx="9" cy="23" r="4.5" fill="#c77dff" />
+              <circle cx="6" cy="16" r="4.5" fill="#c77dff" />
+              <circle cx="9" cy="9" r="4.5" fill="#c77dff" />
             </svg>
             <span>Sad/Tired</span>
           </button>
@@ -942,8 +995,8 @@
         </div>
         <button class="zoom-btn" id="btnZoomOut">−</button>
 
-        <div class="dew-drop" style="width: 7px; height: 7px; bottom: -20px; left: 16px;"></div>
-        <div class="dew-drop" style="width: 5px; height: 5px; bottom: -32px; left: 18px;"></div>
+        <div class="dew-drop" style="width: 7px; height: 7px; bottom: -20px; left: 14px;"></div>
+        <div class="dew-drop" style="width: 5px; height: 5px; bottom: -32px; left: 16px;"></div>
       </div>
 
       <footer style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -975,22 +1028,22 @@
       </footer>
     </main>
 
-    <div class="toast-pill" id="toastNotice">Day recorded</div>
+    <div class="toast-pill" id="toastNotice"></div>
 
     <!-- Modals -->
     <div class="glass-modal" id="modalAffirmations">
       <div class="modal-card">
         <div class="modal-head">
-          <h2>Gentle Reminders 🔔</h2>
+          <h2>Joyful Thoughts 🔔</h2>
           <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseAffirmations">✕</button>
         </div>
-        <div style="background: linear-gradient(135deg, #fff0f5, #fffde7); border-radius: 18px; padding: 16px; margin: 12px 0; border: 1px dashed #f4978e; text-align: center;">
-          <p id="affirmationQuote" style="font-family:'Cormorant Garamond', serif; font-size:1.25rem; font-style:italic; color:#3b2234; line-height:1.45;">
-            "You are allowed to bloom gently, at your very own pace."
+        <div style="background: linear-gradient(135deg, #fff2f6, #fffde6); border-radius: 20px; padding: 18px; margin: 12px 0; border: 1.5px dashed #ff9bb2; text-align: center;">
+          <p id="affirmationQuote" style="font-family: var(--font-serif); font-size:1.3rem; font-style:italic; color:#3b1e32; line-height:1.45;">
+            "You are blooming with happiness, beauty, and strength every single day!"
           </p>
         </div>
         <div style="font-size:0.88rem; color:#4a2b3d; margin-bottom:14px; line-height:1.5;">
-          <strong>Tip:</strong> Take a quiet moment each morning or evening to color today's petal and check in with yourself.
+          <strong>Sunny Tip:</strong> Color your petal each day and watch your garden blossom into full joy!
         </div>
         <button class="action-btn" id="btnNewAffirmation">✨ Draw Another Thought</button>
         <button class="action-btn" id="btnDismissAffirmation">Done</button>
@@ -1000,11 +1053,11 @@
     <div class="glass-modal" id="modalMenu">
       <div class="modal-card">
         <div class="modal-head">
-          <h2>Manage Moods 📋</h2>
+          <h2>Manage Petals 📋</h2>
           <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseMenu">✕</button>
         </div>
         <p style="font-size: 0.86rem; color: #422938; margin-bottom: 12px;">
-          Manage petal entries. Data is automatically preserved in your device.
+          Manage your colored petals. All days are safely preserved on this device.
         </p>
 
         <button class="action-btn" id="btnToggleEraser">
@@ -1016,10 +1069,6 @@
           ⚠️ Clear All Entries for <span id="clearMonthName">October</span>
         </button>
 
-        <button class="action-btn" id="btnExportJSON">
-          📥 Backup Moods (JSON Export)
-        </button>
-
         <button class="action-btn" id="btnStatsView">
           📊 View Monthly Flower Summary
         </button>
@@ -1029,15 +1078,15 @@
     <div class="glass-modal" id="modalHelp">
       <div class="modal-card">
         <div class="modal-head">
-          <h2>How to Use miTmood 🌸</h2>
+          <h2>How to Bloom miTPetal 🌸</h2>
           <button class="glass-btn" style="width:34px; height:34px;" id="btnCloseHelp">✕</button>
         </div>
         <div style="font-size: 0.88rem; color: #3b2234; line-height: 1.55;">
-          <p>• <strong>1. Select Your Mood:</strong> Choose Happy (red), Neutral (yellow), or Sad/Tired (purple) from the top bar.</p><br/>
-          <p>• <strong>2. Color the Flower:</strong> Tap the numbered petal matching today's date to fill it with your mood color.</p><br/>
-          <p>• <strong>3. Erase / Edit:</strong> Tap an already colored petal again to clear it, or use the menu's eraser mode.</p><br/>
-          <p>• <strong>4. Zoom:</strong> Use the left slider (+ / -) to zoom in on petals.</p><br/>
-          <p>• <strong>5. Interactive Garden:</strong> Tap the butterflies, moths, or the golden bee to startle them into flight!</p>
+          <p>• <strong>1. Pick Your Mood:</strong> Select Happy (Joyful Red), Neutral (Sunny Yellow), or Sad/Tired (Restful Purple).</p><br/>
+          <p>• <strong>2. Color Your Petal:</strong> Tap today's number on the flower to bloom it with your color.</p><br/>
+          <p>• <strong>3. Erase / Edit:</strong> Tap an already colored petal again to reset it, or turn on eraser mode in the menu.</p><br/>
+          <p>• <strong>4. Zoom:</strong> Use the left slider (+ / -) to zoom into petals smoothly.</p><br/>
+          <p>• <strong>5. Interactive Garden:</strong> Tap the butterflies, moths, or the sparkling bee to watch them fly through the garden air!</p>
         </div>
         <button class="action-btn" id="btnHelpDone">Got it!</button>
       </div>
@@ -1063,19 +1112,19 @@
     ];
 
     const AFFIRMATIONS = [
-      "You are allowed to bloom gently, at your very own pace.",
-      "Just like flowers need rain to grow, every emotion has its own beauty.",
-      "Your heart is a secret garden; tend to it with kindness today.",
-      "There is sunshine inside you waiting to blossom.",
-      "Every new day is a fresh petal unfolding in your story.",
-      "Small steps each day create a full garden of joy."
+      "You are blooming with happiness, beauty, and strength every single day!",
+      "Just like flowers open to the sunshine, let your heart shine brightly today.",
+      "Your smile brings warm spring colors to everyone around you.",
+      "There is radiant joy inside you waiting to blossom.",
+      "Every new day is a fresh, beautiful petal in your garden of life.",
+      "Be gentle with yourself. You are blooming at the perfect pace."
     ];
 
     let currentYear = 2026;
     let currentMonthIdx = 9; // October default
     let activeMood = 'happy';
     let isEraserMode = false;
-    let currentZoom = 1.0;
+    let currentZoom = 1.22;
 
     const toastEl = document.getElementById('toastNotice');
     let toastTimer = null;
@@ -1087,12 +1136,15 @@
     }
 
     function getStorageKey(y, m) {
-      return `miTmood_save_${y}_${m}`;
+      return `miTPetal_save_${y}_${m}`;
     }
 
     function loadMonthData(y, m) {
       try {
-        const raw = localStorage.getItem(getStorageKey(y, m));
+        let raw = localStorage.getItem(getStorageKey(y, m));
+        if (!raw) {
+          raw = localStorage.getItem(`miTmood_save_${y}_${m}`);
+        }
         return raw ? JSON.parse(raw) : {};
       } catch (e) {
         return {};
@@ -1118,7 +1170,7 @@
     }
 
     /* -----------------------------------------------------------
-       OPTIMIZED BACKGROUND CANVAS (No GPU-blocking shadow passes)
+       OPTIMIZED BACKGROUND CANVAS
        ----------------------------------------------------------- */
     const mCanvas = document.getElementById('meadowCanvas');
     const mCtx = mCanvas.getContext('2d');
@@ -1135,7 +1187,8 @@
 
     function initFloatingPetals() {
       floatingPetals.length = 0;
-      for (let i = 0; i < 30; i++) {
+      const count = Math.min(45, Math.floor(bgWidth / 18));
+      for (let i = 0; i < count; i++) {
         floatingPetals.push({
           x: Math.random() * bgWidth,
           y: Math.random() * bgHeight,
@@ -1175,16 +1228,14 @@
     function renderMeadowScene() {
       mCtx.clearRect(0, 0, bgWidth, bgHeight);
 
-      // Light gradient shaft
-      const sunGradient = mCtx.createRadialGradient(bgWidth * 0.15, bgHeight * 0.15, 20, bgWidth * 0.15, bgHeight * 0.15, bgWidth * 0.85);
-      sunGradient.addColorStop(0, 'rgba(255, 255, 245, 0.85)');
-      sunGradient.addColorStop(0.25, 'rgba(255, 235, 170, 0.40)');
-      sunGradient.addColorStop(0.55, 'rgba(255, 200, 180, 0.12)');
+      const sunGradient = mCtx.createRadialGradient(bgWidth * 0.18, bgHeight * 0.15, 25, bgWidth * 0.18, bgHeight * 0.15, bgWidth * 0.9);
+      sunGradient.addColorStop(0, 'rgba(255, 255, 245, 0.92)');
+      sunGradient.addColorStop(0.25, 'rgba(255, 240, 180, 0.45)');
+      sunGradient.addColorStop(0.55, 'rgba(255, 210, 190, 0.14)');
       sunGradient.addColorStop(1, 'transparent');
       mCtx.fillStyle = sunGradient;
       mCtx.fillRect(0, 0, bgWidth, bgHeight);
 
-      // Floating Petals
       for (let i = 0; i < floatingPetals.length; i++) {
         const p = floatingPetals[i];
         p.x += p.speedX;
@@ -1205,7 +1256,6 @@
         mCtx.restore();
       }
 
-      // Fast sparkle trail
       for (let i = beeSparkles.length - 1; i >= 0; i--) {
         const s = beeSparkles[i];
         s.x += s.vx;
@@ -1303,7 +1353,6 @@
           text.setAttribute('transform', `rotate(${deg} ${px} ${py}) rotate(${-deg} ${px} ${py - (ring.h * 0.45)})`);
           text.textContent = day;
 
-          // Zero-latency instant registration across mouse & mobile touches
           vectorPetal.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1324,18 +1373,15 @@
       const currentMood = data[day];
       const isClear = isEraserMode || (currentMood === activeMood);
 
-      // Instant UI response
       vectorPetal.classList.remove('colored-happy', 'colored-neutral', 'colored-sadtired');
 
       if (isClear) {
         saveDayMood(currentYear, currentMonthIdx, day, null);
         textEl.classList.remove('on-colored');
-        showToast(`Day ${day} ${isEraserMode ? 'cleared' : 'reset'}`);
       } else {
         saveDayMood(currentYear, currentMonthIdx, day, activeMood);
         vectorPetal.classList.add(`colored-${activeMood}`);
         textEl.classList.add('on-colored');
-        showToast(`Day ${day} logged as ${activeMood.toUpperCase()}`);
       }
     }
 
@@ -1346,8 +1392,8 @@
       {
         id: 'creatureMonarch',
         el: document.getElementById('creatureMonarch'),
-        perchX: 0.20,
-        perchY: 0.31,
+        perchRelX: -130,
+        perchRelY: -110,
         perchAngle: -18,
         scale: 0.88,
         isFlying: false,
@@ -1359,8 +1405,8 @@
       {
         id: 'creatureLuna',
         el: document.getElementById('creatureLuna'),
-        perchX: 0.76,
-        perchY: 0.32,
+        perchRelX: 135,
+        perchRelY: -105,
         perchAngle: 22,
         scale: 0.92,
         isFlying: false,
@@ -1372,8 +1418,8 @@
       {
         id: 'creatureSilk',
         el: document.getElementById('creatureSilk'),
-        perchX: 0.22,
-        perchY: 0.58,
+        perchRelX: -125,
+        perchRelY: 90,
         perchAngle: -24,
         scale: 0.95,
         isFlying: false,
@@ -1384,23 +1430,34 @@
       }
     ];
 
-    function generateFlightPath(c, vw, vh) {
-      const startX = c.perchX * vw;
-      const startY = c.perchY * vh;
+    function getCenterCoordinates() {
+      const vp = document.getElementById('app-viewport');
+      const rect = vp.getBoundingClientRect();
+      return {
+        cx: rect.width / 2,
+        cy: rect.height / 2,
+        vw: rect.width,
+        vh: rect.height
+      };
+    }
+
+    function generateFlightPath(c, center) {
+      const startX = center.cx + c.perchRelX;
+      const startY = center.cy + c.perchRelY;
 
       return {
         start: { x: startX, y: startY },
         p1: {
-          x: Math.max(30, Math.min(vw - 60, startX + (Math.random() - 0.5) * vw * 0.7)),
-          y: Math.max(50, startY - (120 + Math.random() * 160))
+          x: Math.max(40, Math.min(center.vw - 60, startX + (Math.random() - 0.5) * center.vw * 0.6)),
+          y: Math.max(50, startY - (100 + Math.random() * 140))
         },
         p2: {
-          x: Math.max(30, Math.min(vw - 60, vw * 0.5 + (Math.random() - 0.5) * vw * 0.6)),
-          y: Math.max(60, Math.min(vh * 0.65, startY + (Math.random() - 0.5) * 140))
+          x: Math.max(40, Math.min(center.vw - 60, center.cx + (Math.random() - 0.5) * center.vw * 0.5)),
+          y: Math.max(60, Math.min(center.vh * 0.7, startY + (Math.random() - 0.5) * 130))
         },
         p3: {
-          x: Math.max(30, Math.min(vw - 60, startX + (Math.random() - 0.5) * 100)),
-          y: Math.max(70, startY - 60)
+          x: Math.max(40, Math.min(center.vw - 60, startX + (Math.random() - 0.5) * 90)),
+          y: Math.max(70, startY - 50)
         },
         end: { x: startX, y: startY }
       };
@@ -1411,45 +1468,48 @@
       return (mt * mt * mt * p0) + (3 * mt * mt * t * p1) + (3 * mt * t * t * p2) + (t * t * t * p3);
     }
 
-    function triggerCreatureTakeoff(c, isStartled = false) {
+    function triggerCreatureTakeoff(c) {
       if (c.isFlying) return;
-      const vp = document.getElementById('app-viewport');
-      const vw = vp.clientWidth;
-      const vh = vp.clientHeight;
+      const center = getCenterCoordinates();
 
       c.isFlying = true;
       c.startTime = performance.now();
-      c.flightDuration = isStartled ? 4500 : (5500 + Math.random() * 2500);
-      c.path = generateFlightPath(c, vw, vh);
+      c.flightDuration = 5500 + Math.random() * 2500;
+      c.path = generateFlightPath(c, center);
 
       c.el.classList.remove('perched');
-      if (isStartled) {
-        showToast("Butterfly startled! 🦋");
-      }
     }
 
     creatures.forEach(c => {
       c.el.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
-        triggerCreatureTakeoff(c, true);
+        triggerCreatureTakeoff(c);
       });
     });
 
     const beeEl = document.getElementById('sparklingBee');
-    let beePos = { x: 260, y: 220, targetX: 290, targetY: 260, angle: 0 };
+    let beePos = { x: 0, y: 0, targetX: 0, targetY: 0, angle: 0, initialized: false };
 
     beeEl.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
-      beePos.targetX = 60 + Math.random() * 320;
-      beePos.targetY = 120 + Math.random() * 200;
-      showToast("Sparkling Bee buzzes! 🐝✨");
+      const center = getCenterCoordinates();
+      beePos.targetX = center.cx + (Math.random() - 0.5) * (center.vw * 0.7);
+      beePos.targetY = center.cy + (Math.random() - 0.5) * (center.vh * 0.5);
       for (let i = 0; i < 14; i++) emitBeeSparkle(beePos.x + 18, beePos.y + 16);
     });
 
-    function updateBeeMotion() {
+    function updateBeeMotion(center) {
+      if (!beePos.initialized) {
+        beePos.x = center.cx + 60;
+        beePos.y = center.cy - 100;
+        beePos.targetX = beePos.x;
+        beePos.targetY = beePos.y;
+        beePos.initialized = true;
+      }
+
       if (Math.hypot(beePos.targetX - beePos.x, beePos.targetY - beePos.y) < 16 || Math.random() < 0.02) {
-        beePos.targetX = 120 + Math.random() * 240;
-        beePos.targetY = 160 + Math.random() * 280;
+        beePos.targetX = center.cx + (Math.random() - 0.5) * Math.min(360, center.vw * 0.65);
+        beePos.targetY = center.cy - 60 + (Math.random() - 0.5) * Math.min(260, center.vh * 0.4);
       }
       const dx = beePos.targetX - beePos.x;
       const dy = beePos.targetY - beePos.y;
@@ -1465,18 +1525,16 @@
     }
 
     function updateCreaturesFlight(now) {
-      const vp = document.getElementById('app-viewport');
-      const vw = vp.clientWidth;
-      const vh = vp.clientHeight;
+      const center = getCenterCoordinates();
 
       creatures.forEach(c => {
         if (!c.isFlying) {
-          const px = c.perchX * vw;
-          const py = c.perchY * vh;
+          const px = center.cx + c.perchRelX;
+          const py = center.cy + c.perchRelY;
           c.el.style.transform = `translate3d(${px}px, ${py}px, 0px) rotate(${c.perchAngle}deg) scale(${c.scale})`;
 
           if (Date.now() > c.nextTakeoffTime) {
-            triggerCreatureTakeoff(c, false);
+            triggerCreatureTakeoff(c);
           }
         } else {
           const elapsed = now - c.startTime;
@@ -1502,7 +1560,7 @@
         }
       });
 
-      updateBeeMotion();
+      updateBeeMotion(center);
       requestAnimationFrame(updateCreaturesFlight);
     }
     requestAnimationFrame(updateCreaturesFlight);
@@ -1555,29 +1613,28 @@
         pill.classList.add('active');
         activeMood = pill.dataset.mood;
         isEraserMode = false;
-        showToast(`Selected: ${pill.textContent.trim()}`);
       });
     });
 
-    // Zoom Slider Controls
+    // Zoom Slider Controls with centered scale
     const flowerScaler = document.getElementById('flowerScaler');
     const zoomThumb = document.getElementById('zoomThumb');
     const zoomRail = document.getElementById('zoomRail');
 
     function applyZoom(z) {
-      currentZoom = Math.max(0.85, Math.min(1.4, z));
+      currentZoom = Math.max(0.9, Math.min(1.5, z));
       flowerScaler.style.transform = `scale(${currentZoom})`;
-      const pct = (currentZoom - 0.85) / (1.4 - 0.85);
+      const pct = (currentZoom - 0.9) / (1.5 - 0.9);
       zoomThumb.style.top = `${(1 - pct) * 100}%`;
     }
 
     document.getElementById('btnZoomIn').addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      applyZoom(currentZoom + 0.1);
+      applyZoom(currentZoom + 0.08);
     });
     document.getElementById('btnZoomOut').addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      applyZoom(currentZoom - 0.1);
+      applyZoom(currentZoom - 0.08);
     });
 
     let isDraggingZoom = false;
@@ -1588,7 +1645,7 @@
       if (clientY === undefined) return;
       const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
       const factor = 1 - (relY / rect.height);
-      applyZoom(0.85 + factor * (1.4 - 0.85));
+      applyZoom(0.9 + factor * (1.5 - 0.9));
     }
 
     zoomRail.addEventListener('pointerdown', (e) => {
@@ -1600,7 +1657,7 @@
     zoomRail.addEventListener('pointerup', () => { isDraggingZoom = false; });
     zoomRail.addEventListener('pointercancel', () => { isDraggingZoom = false; });
 
-    // Modal Helpers
+    // Modals
     function openModal(el) { el.classList.add('active'); }
     function closeModal(el) { el.classList.remove('active'); }
 
@@ -1628,29 +1685,12 @@
     });
 
     document.getElementById('btnClearMonth').addEventListener('pointerdown', () => {
-      if (confirm(`Clear all mood entries for ${MONTHS[currentMonthIdx]} ${currentYear}?`)) {
+      if (confirm(`Clear all petal entries for ${MONTHS[currentMonthIdx]} ${currentYear}?`)) {
         localStorage.removeItem(getStorageKey(currentYear, currentMonthIdx));
         updateMonthView();
         closeModal(modalMenu);
         showToast(`${MONTHS[currentMonthIdx]} entries cleared`);
       }
-    });
-
-    document.getElementById('btnExportJSON').addEventListener('pointerdown', () => {
-      const dump = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('miTmood_save_')) {
-          dump[k] = JSON.parse(localStorage.getItem(k));
-        }
-      }
-      const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `miTmood_backup_${MONTHS[currentMonthIdx]}_${currentYear}.json`;
-      a.click();
-      closeModal(modalMenu);
-      showToast("Backup exported!");
     });
 
     const modalInsights = document.getElementById('modalInsights');
@@ -1691,6 +1731,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', () => {
+      applyZoom(currentZoom);
       updateMonthView();
     });
   </script>
